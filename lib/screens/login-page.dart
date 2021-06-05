@@ -11,20 +11,19 @@ class LoginPage extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 50),
+            margin: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.12),
             child: Column(
               children: [
                 Container(
-                  // height: 100,
                   child: SvgPicture.asset(
                     "assets/Kotak_Mahindra_Bank_logo.svg",
-                    height: 200,
+                    height: MediaQuery.of(context).size.height * 0.25,
                   ),
                 ),
-                SizedBox(
-                  height: 50,
-                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.025),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,6 +34,7 @@ class LoginPage extends StatelessWidget {
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
                               child: Text(
@@ -46,46 +46,46 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                             TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  "Sign Up",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xff6D6D6D),
-                                  ),
-                                ))
+                              onPressed: () {},
+                              child: Text(
+                                "Sign Up",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff6D6D6D),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ],
                     ),
                     SvgPicture.asset(
                       "assets/tsep-logo.svg",
-                      height: 75,
+                      height: MediaQuery.of(context).size.height * 0.11,
                     ),
                   ],
                 ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.025),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    mentorMenteeButton(icon: "assets/icons/mentee.svg"),
-                    mentorMenteeButton(icon: "assets/icons/mentor.svg"),
+                    MentorMenteeButton(icon: "assets/icons/mentee.svg"),
+                    MentorMenteeButton(icon: "assets/icons/mentor.svg"),
                   ],
                 ),
-                loginPageInputForm(name: 'Username'),
-                SizedBox(
-                  height: 15,
-                ),
-                loginPageInputForm(name: 'Password'),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.025),
+                LoginPageInputForm(name: 'Username'),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.0125),
+                LoginPageInputForm(name: 'Password'),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.025),
                 Row(
                   children: [
-                    Container(
-                      child: Text(
-                        'Forgot Password ? /',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Open Sans',
-                          color: Color(0xffAFAFAD),
-                        ),
+                    Text(
+                      'Forgot Password ? /',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Open Sans',
+                        color: Color(0xffAFAFAD),
                       ),
                     ),
                     TextButton(
@@ -97,6 +97,9 @@ class LoginPage extends StatelessWidget {
                           fontFamily: 'Open Sans',
                           color: Color(0xff6D6D6D),
                         ),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
                       ),
                     )
                   ],
@@ -117,10 +120,6 @@ class LoginPage extends StatelessWidget {
                     SizedBox(
                       width: 15,
                     ),
-                    // SvgPicture.asset(
-                    //   "assets/icons/google-login.svg",
-                    //   height: 40,
-                    // ),
                     IconButton(
                       onPressed: () {},
                       icon: SvgPicture.asset(
@@ -139,11 +138,9 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-class loginPageInputForm extends StatelessWidget {
-  final name;
-  final pressFunction;
-  const loginPageInputForm({Key? key, this.name, this.pressFunction})
-      : super(key: key);
+class LoginPageInputForm extends StatelessWidget {
+  final String name;
+  LoginPageInputForm({required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -176,9 +173,9 @@ class loginPageInputForm extends StatelessWidget {
   }
 }
 
-class mentorMenteeButton extends StatelessWidget {
-  final icon;
-  const mentorMenteeButton({Key? key, this.icon}) : super(key: key);
+class MentorMenteeButton extends StatelessWidget {
+  const MentorMenteeButton({Key? key, required this.icon}) : super(key: key);
+  final String icon;
   @override
   Widget build(BuildContext context) {
     return IconButton(
