@@ -1,65 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tsep/local-data/questions.dart';
 
-class scores {
-  int score;
-  bool checked;
-  scores(this.score, this.checked);
-}
-
-class TestScreen extends StatefulWidget {
+class TestScreen extends StatelessWidget {
   const TestScreen({Key? key}) : super(key: key);
-
-  @override
-  _TestScreenState createState() => _TestScreenState();
-}
-
-class _TestScreenState extends State<TestScreen> {
-  int atvscr = 0, totalScored = 0, totalmax = 0;
-  var scores = List<int>.generate(10, (index) => 0);
-  var checked = List<bool>.generate(10, (index) => false);
-  Question question = new Question();
-  int qtnIdx = 0;
-  void nxtclb() {
-    setState(() {
-      // if (qtnIdx >= 10) qtnIdx = 9;
-      if (checked[qtnIdx]) {
-        atvscr = scores[qtnIdx];
-      } else {
-        atvscr = 0;
-        checked[qtnIdx] = true;
-      }
-      qtnIdx += qtnIdx + 1 > 9 ? 0 : 1;
-      updtTotalScores();
-    });
-    print(scores);
-    print(checked);
-  }
-
-  void prvclb() {
-    setState(() {
-      qtnIdx--;
-      if (qtnIdx < 0) qtnIdx = 0;
-      atvscr = scores[qtnIdx];
-      updtTotalScores();
-    });
-  }
-
-  void updtscr(int score) {
-    scores[qtnIdx] = score;
-    setState(() {
-      atvscr = score;
-    });
-  }
-
-  void updtTotalScores() {
-    setState(() {
-      totalScored = scores.reduce((a, b) => a + b);
-      totalmax = checked.where((item) => item == true).length * 3;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,32 +18,18 @@ class _TestScreenState extends State<TestScreen> {
             Container(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  LevelCard(),
-                  CurrentScoreCard(
-                    totalScored: totalScored,
-                    totalmax: totalmax,
-                  )
-                ],
+                children: [LevelCard(), CurrentScoreCard()],
               ),
             ),
             BreakLine(),
             Container(
               child: Column(
                 children: [
-                  QuestionCard(
-                    question: question,
-                    idx: qtnIdx,
-                  ),
+                  QuestionCard(),
                   SizedBox(
                     height: 25,
                   ),
-                  ScoreCard(
-                    question: question,
-                    qtnNum: qtnIdx,
-                    active: atvscr,
-                    updtScr: updtscr,
-                  ),
+                  ScoreCard(),
                   SizedBox(
                     height: 25,
                   ),
@@ -108,11 +38,7 @@ class _TestScreenState extends State<TestScreen> {
               ),
             ),
             BreakLine(),
-            PrevNxtBtn(
-              prvclb: prvclb,
-              nxtclb: nxtclb,
-              qtnIdx: qtnIdx,
-            )
+            DecComRepDropContainer()
           ],
         ),
       ),
@@ -143,56 +69,35 @@ class AnsCard extends StatelessWidget {
   }
 }
 
-class ScoreCard extends StatefulWidget {
-  int qtnNum, active;
-  Question question;
-  Function updtScr;
-  ScoreCard(
-      {required this.qtnNum,
-      required this.question,
-      required this.active,
-      required this.updtScr});
-
-  @override
-  _ScoreCardState createState() => _ScoreCardState();
-}
-
-class _ScoreCardState extends State<ScoreCard> {
-  int atv = 0;
-  void callback(int index) {
-    setState(() {
-      widget.active = index;
-      widget.updtScr(index);
-    });
-  }
-
+class ScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Question _question = Question();
     Size size = MediaQuery.of(context).size;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Color(0xff1F78B4).withOpacity(0.3),
+            color: Color(0xff1F78B4).withOpacity(0.4),
             shape: BoxShape.rectangle,
             borderRadius: BorderRadius.circular(6),
           ),
-          height: size.height * 0.045,
+          height: size.height * 0.05,
           width: size.width * 0.5,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ScoreNum(num: 0, active: widget.active, callback: callback),
-              ScoreNum(num: 1, active: widget.active, callback: callback),
-              ScoreNum(num: 2, active: widget.active, callback: callback),
-              ScoreNum(num: 3, active: widget.active, callback: callback),
+              ScoreNum(num: 0, active: false),
+              ScoreNum(num: 1, active: false),
+              ScoreNum(num: 2, active: true),
+              ScoreNum(num: 3, active: false),
             ],
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            print('hello');
+          },
           icon: SvgPicture.asset(
             "assets/icons/info-btn.svg",
             height: 30,
@@ -203,48 +108,9 @@ class _ScoreCardState extends State<ScoreCard> {
   }
 }
 
-class ScoreNum extends StatelessWidget {
-  final int num, active;
-  final Function callback;
-  ScoreNum({required this.num, required this.active, required this.callback});
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => callback(num),
-      child: Container(
-        // padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        height: MediaQuery.of(context).size.height * 0.03,
-        width: MediaQuery.of(context).size.height * 0.03,
-        decoration: active == num
-            ? BoxDecoration(
-                color: Color(0xff1F78B4).withOpacity(1),
-                borderRadius: BorderRadius.circular(4),
-              )
-            : null,
-        child: Center(
-          child: Text(
-            num.toString(),
-            // textAlign: TextAlign.center,
-            style: TextStyle(
-              color:
-                  active == num ? Colors.white : Colors.black.withOpacity(0.8),
-              fontWeight: FontWeight.w600,
-              fontSize: 17,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class QuestionCard extends StatelessWidget {
-  final int idx;
-  final Question question;
-  QuestionCard({required this.idx, required this.question});
   @override
   Widget build(BuildContext context) {
-    // Question _question = Question();
     Size size = MediaQuery.of(context).size;
     return Row(
       children: [
@@ -264,7 +130,7 @@ class QuestionCard extends StatelessWidget {
           ),
           child: Center(
             child: Text(
-              (idx + 1).toString(),
+              "4",
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -275,7 +141,7 @@ class QuestionCard extends StatelessWidget {
         Container(
           constraints: BoxConstraints(maxWidth: size.width * 0.7),
           child: Text(
-            question.statement[idx],
+            "Tell me something you did with your friends recently",
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
         )
@@ -284,9 +150,33 @@ class QuestionCard extends StatelessWidget {
   }
 }
 
+class ScoreNum extends StatelessWidget {
+  final int num;
+  final bool active;
+  ScoreNum({required this.num, required this.active});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      decoration: active
+          ? BoxDecoration(
+              color: Color(0xff1F78B4).withOpacity(1),
+              borderRadius: BorderRadius.circular(4),
+            )
+          : null,
+      child: Text(
+        num.toString(),
+        style: TextStyle(
+          color: active ? Colors.white : Colors.black.withOpacity(0.8),
+          fontWeight: FontWeight.w600,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
+}
+
 class CurrentScoreCard extends StatelessWidget {
-  final int totalScored, totalmax;
-  CurrentScoreCard({required this.totalScored, required this.totalmax});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -327,38 +217,24 @@ class CurrentScoreCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     height: size.height * 0.05,
-                    width: totalmax == 0
-                        ? 0
-                        : size.width * 0.4 * totalScored / totalmax,
+                    width: size.width * 0.4 * 0.6,
                   ),
-                  CrntScrScore(
-                    totalscored: totalScored,
-                    totalmax: totalmax,
+                  Positioned(
+                    right: 8,
+                    child: Text(
+                      "8 / 12",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ],
           )
         ],
-      ),
-    );
-  }
-}
-
-class CrntScrScore extends StatelessWidget {
-  final int totalscored, totalmax;
-  CrntScrScore({required this.totalscored, required this.totalmax});
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      right: 8,
-      child: Text(
-        "$totalscored / $totalmax",
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
       ),
     );
   }
@@ -435,7 +311,7 @@ class MenteeProfileBanner extends StatelessWidget {
               ),
             ],
           ),
-          DetailsWidget(heading: "Type", value: "Pre-Program"),
+          DetailsWidget(heading: "Type", value: "Pre-Programmed"),
           DetailsWidget(heading: "Batch", value: "B72"),
           DetailsWidget(heading: "Age", value: "17"),
         ],
@@ -537,11 +413,7 @@ class BreakLine extends StatelessWidget {
   }
 }
 
-class PrevNxtBtn extends StatelessWidget {
-  final VoidCallback prvclb, nxtclb;
-  final int qtnIdx;
-  PrevNxtBtn(
-      {required this.prvclb, required this.nxtclb, required this.qtnIdx});
+class DecComRepDropContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -549,12 +421,14 @@ class PrevNxtBtn extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          InkWell(
-            onTap: prvclb,
+          GestureDetector(
+            onTap: () {
+              print('hello');
+            },
             child: Container(
               child: Center(
                 child: Text(
-                  qtnIdx == 0 ? "EXIT" : "PREVIOUS",
+                  "PREVIOUS",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -577,32 +451,29 @@ class PrevNxtBtn extends StatelessWidget {
               ),
             ),
           ),
-          InkWell(
-            onTap: nxtclb,
-            child: Container(
-              child: Center(
-                child: Text(
-                  qtnIdx == 9 ? "FINISH" : "NEXT",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18),
+          Container(
+            child: Center(
+              child: Text(
+                "NEXT",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+            ),
+            height: size.height * 0.07,
+            width: size.width * 0.4,
+            decoration: BoxDecoration(
+              color: Color(0xff1F78B4),
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xff1F78B4),
+                  blurRadius: 10,
                 ),
-              ),
-              height: size.height * 0.07,
-              width: size.width * 0.4,
-              decoration: BoxDecoration(
-                color: Color(0xff1F78B4),
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xff1F78B4),
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
+              ],
             ),
           ),
         ],
