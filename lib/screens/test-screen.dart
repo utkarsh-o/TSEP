@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/local-data/questions.dart';
+import 'package:tsep/screens/mentor-profile.dart';
 
 class scores {
   int score;
@@ -17,7 +18,7 @@ class TestScreen extends StatefulWidget {
 }
 
 class _TestScreenState extends State<TestScreen> {
-  int atvscr = 0, totalScored = 0, totalmax = 0;
+  int atvscr = 0, currentScored = 0, currentMax = 0;
   var scores = List<int>.generate(10, (index) => 0);
   var checked = List<bool>.generate(10, (index) => false);
   Question question = new Question();
@@ -56,8 +57,8 @@ class _TestScreenState extends State<TestScreen> {
 
   void updtTotalScores() {
     setState(() {
-      totalScored = scores.reduce((a, b) => a + b);
-      totalmax = checked.where((item) => item == true).length * 3;
+      currentScored = scores.reduce((a, b) => a + b);
+      currentMax = checked.where((item) => item == true).length * 3;
     });
   }
 
@@ -66,54 +67,59 @@ class _TestScreenState extends State<TestScreen> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            TitleBar(),
-            MenteeProfileBanner(),
-            BreakLine(),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  LevelCard(),
-                  CurrentScoreCard(
-                    totalScored: totalScored,
-                    totalmax: totalmax,
-                  )
-                ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TitleBar(),
+              MenteeProfileBanner(),
+              BreakLine(),
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    LevelCard(
+                      currentMax: currentMax,
+                      currentScored: currentScored,
+                    ),
+                    CurrentScoreCard(
+                      totalScored: currentScored,
+                      totalmax: currentMax,
+                    )
+                  ],
+                ),
               ),
-            ),
-            BreakLine(),
-            Container(
-              child: Column(
-                children: [
-                  QuestionCard(
-                    question: question,
-                    idx: qtnIdx,
-                  ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  ScoreCard(
-                    question: question,
-                    qtnNum: qtnIdx,
-                    active: atvscr,
-                    updtScr: updtscr,
-                  ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  AnsCard()
-                ],
+              BreakLine(),
+              Container(
+                child: Column(
+                  children: [
+                    QuestionCard(
+                      question: question,
+                      idx: qtnIdx,
+                    ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    ScoreCard(
+                      question: question,
+                      qtnNum: qtnIdx,
+                      active: atvscr,
+                      updtScr: updtscr,
+                    ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    AnsCard()
+                  ],
+                ),
               ),
-            ),
-            BreakLine(),
-            PrevNxtBtn(
-              prvclb: prvclb,
-              nxtclb: nxtclb,
-              qtnIdx: qtnIdx,
-            )
-          ],
+              BreakLine(),
+              PrevNxtBtn(
+                prvclb: prvclb,
+                nxtclb: nxtclb,
+                qtnIdx: qtnIdx,
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -125,6 +131,7 @@ class AnsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
+      // alignment: Alignment.center,
       height: size.height * 0.25,
       width: size.width * 0.85,
       decoration: BoxDecoration(
@@ -134,9 +141,17 @@ class AnsCard extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: Text(
-          "I went on a hike with my friends on our bicycles last weekend and had kulfi on our way back.",
+        child: TextField(
+          textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          expands: true,
+          maxLines: null,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintMaxLines: 5,
+            hintText: "Mentee's Response",
+            hintStyle: TextStyle(fontSize: 15),
+          ),
         ),
       ),
     );
@@ -273,7 +288,7 @@ class QuestionCard extends StatelessWidget {
           ),
         ),
         Container(
-          constraints: BoxConstraints(maxWidth: size.width * 0.7),
+          constraints: BoxConstraints(maxWidth: size.width * 0.75),
           child: Text(
             question.statement[idx],
             style: TextStyle(fontWeight: FontWeight.w600),
@@ -365,8 +380,11 @@ class CrntScrScore extends StatelessWidget {
 }
 
 class LevelCard extends StatelessWidget {
+  final int currentScored, currentMax;
+  LevelCard({required this.currentMax, required this.currentScored});
   @override
   Widget build(BuildContext context) {
+    var frac = currentScored / currentMax;
     Size size = MediaQuery.of(context).size;
     return Container(
       child: Column(
@@ -391,10 +409,14 @@ class LevelCard extends StatelessWidget {
               ],
             ),
             height: size.height * 0.05,
-            width: size.width * 0.4,
+            width: size.width * 0.45,
             child: Center(
               child: Text(
-                "INTERMEDIATE",
+                frac <= 1 / 3
+                    ? "NOVICE"
+                    : frac <= 2 / 3
+                        ? "PRE-INTERMEDIATE"
+                        : "INTERMEDIATE",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -482,7 +504,9 @@ class TitleBar extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
             icon: SvgPicture.asset(
               "assets/icons/back-tb.svg",
               height: screenWidth * 0.07,

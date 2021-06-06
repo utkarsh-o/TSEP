@@ -1,12 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tsep/components/CustomNavigationBar.dart';
+import 'package:tsep/screens/mentee-details-page.dart';
 
 class MenteesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -15,7 +16,7 @@ class MenteesPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 TitleBar(),
-                SizedBox(height: screenHeight * 0.05),
+                SizedBox(height: size.height * 0.05),
                 MenteeCard(name: "Bat Man", level: "Intermediate", lesson: 13),
                 MenteeCard(name: "Iron Man", level: "Novice", lesson: 6),
                 MenteeCard(name: "Spider Man", level: "Beginner", lesson: 2),
@@ -29,65 +30,8 @@ class MenteesPage extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(),
-    );
-  }
-}
-
-class CustomBottomNavBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        NavbarIconSmall(icon: 'assets/icons/home-bnb.svg', index: 0),
-        NavbarIconSmall(icon: 'assets/icons/schedule-bnb.svg', index: 1),
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            width: screenWidth / 5,
-            margin: EdgeInsets.only(bottom: 30),
-            child: SvgPicture.asset(
-              "assets/icons/button-add.svg",
-              height: screenHeight * 0.09,
-            ),
-          ),
-        ),
-        NavbarIconSmall(icon: 'assets/icons/menteelist-bnb.svg', index: 2),
-        NavbarIconSmall(icon: 'assets/icons/notifications-bnb.svg', index: 3),
-      ],
-    );
-  }
-}
-
-class NavbarIconSmall extends StatelessWidget {
-  final String icon;
-  final int index;
-  NavbarIconSmall({required this.icon, required this.index});
-  @override
-  Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        width: screenWidth / 5,
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: Color(0xffD92136).withOpacity(0.5),
-              width: 2.0,
-            ),
-          ),
-        ),
-        padding: EdgeInsets.symmetric(vertical: 20),
-        child: SvgPicture.asset(
-          icon,
-          height: screenHeight * 0.03,
-        ),
+      bottomNavigationBar: CustomBottomNavBar(
+        active: 2,
       ),
     );
   }
@@ -115,9 +59,12 @@ class TitleBar extends StatelessWidget {
           width: screenWidth * 0.4,
           height: screenHeight * 0.12,
         ),
-        SvgPicture.asset(
-          "assets/icons/settings-tb.svg",
-          height: screenWidth * 0.06,
+        InkWell(
+          onTap: () {},
+          child: SvgPicture.asset(
+            "assets/icons/settings-tb.svg",
+            height: screenWidth * 0.06,
+          ),
         )
       ],
     );
@@ -164,26 +111,38 @@ class MenteeCard extends StatelessWidget {
         height: screenHeight * 0.1,
         child: Row(
           children: [
-            Container(
-              height: 35,
-              width: 40,
-              margin: EdgeInsets.only(left: 20),
-              decoration: BoxDecoration(
-                color: Color(0xff003670).withOpacity(0.7),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xff003670).withOpacity(0.3),
-                    blurRadius: 10,
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return MenteeDetails();
+                    },
                   ),
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  getInitials(name),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                );
+              },
+              child: Container(
+                height: 35,
+                width: 40,
+                margin: EdgeInsets.only(left: 20),
+                decoration: BoxDecoration(
+                  color: Color(0xff003670).withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xff003670).withOpacity(0.3),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    getInitials(name),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -192,29 +151,41 @@ class MenteeCard extends StatelessWidget {
               constraints: BoxConstraints(minWidth: 120),
               padding:
                   const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return MenteeDetails();
+                      },
                     ),
-                  ),
-                  SizedBox(
-                    height: 3,
-                  ),
-                  Text(
-                    level.toUpperCase(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                      color: Colors.black.withOpacity(0.7),
+                  );
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
                     ),
-                  ),
-                ],
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      level.toUpperCase(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                        color: Colors.black.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             Padding(

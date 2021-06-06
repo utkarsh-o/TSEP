@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tsep/components/CustomNavigationBar.dart';
 
 class SchedulePage extends StatelessWidget {
   const SchedulePage({Key? key}) : super(key: key);
@@ -54,7 +55,9 @@ class SchedulePage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(),
+      bottomNavigationBar: CustomBottomNavBar(
+        active: 1,
+      ),
     );
   }
 }
@@ -232,21 +235,20 @@ class BreakLine extends StatelessWidget {
 class DayCard extends StatelessWidget {
   final bool active, event;
   final String day, date;
-  DayCard({
-    required this.active,
-    required this.event,
-    required this.day,
-    required this.date,
-  });
+  DayCard(
+      {required this.active,
+      required this.event,
+      required this.day,
+      required this.date});
   @override
   Widget build(BuildContext context) {
-    Color fontColor =
-        active ? Colors.white.withOpacity(0.7) : Colors.black.withOpacity(0.7);
+    Color fontColor = active ? Colors.white : Colors.black.withOpacity(0.7);
     Color eventColor = active
         ? Colors.white.withOpacity(0.7)
         : Color(0xff003670).withOpacity(0.8);
     Size size = MediaQuery.of(context).size;
     return Container(
+      width: 40,
       decoration: active
           ? BoxDecoration(
               color: Color(0xff003670).withOpacity(0.8),
@@ -326,65 +328,6 @@ class TitleBar extends StatelessWidget {
           height: screenWidth * 0.06,
         )
       ],
-    );
-  }
-}
-
-class CustomBottomNavBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        NavbarIconSmall(icon: 'assets/icons/home-bnb.svg', index: 0),
-        NavbarIconSmall(icon: 'assets/icons/schedule-bnb.svg', index: 1),
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            width: screenWidth / 5,
-            margin: EdgeInsets.only(bottom: 30),
-            child: SvgPicture.asset(
-              "assets/icons/button-add.svg",
-              height: screenHeight * 0.09,
-            ),
-          ),
-        ),
-        NavbarIconSmall(icon: 'assets/icons/menteelist-bnb.svg', index: 2),
-        NavbarIconSmall(icon: 'assets/icons/notifications-bnb.svg', index: 3),
-      ],
-    );
-  }
-}
-
-class NavbarIconSmall extends StatelessWidget {
-  final String icon;
-  final int index;
-  NavbarIconSmall({required this.icon, required this.index});
-  @override
-  Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        width: screenWidth / 5,
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: Color(0xffD92136).withOpacity(0.5),
-              width: 2.0,
-            ),
-          ),
-        ),
-        padding: EdgeInsets.symmetric(vertical: 20),
-        child: SvgPicture.asset(
-          icon,
-          height: screenHeight * 0.03,
-        ),
-      ),
     );
   }
 }

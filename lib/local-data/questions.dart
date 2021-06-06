@@ -5,7 +5,7 @@ class Question {
     'Tell me something which you can do well now.',
     'Tell me something you did with your friends recently.',
     'What are you going to do this weekend?',
-    'Tell me about your best friend or someone you admire. What is he or she like?',
+    'Tell me about your best friend or someone you admire. What are they like?',
     'Let’s talk about your favorite place. Can you describe your favorite place?',
     'How do you think Mumbai will change in the next 20 years?',
     'What advice would you give to someone visiting Mumbai or India?',

@@ -326,7 +326,9 @@ class TitleBar extends StatelessWidget {
         Container(
           margin: EdgeInsets.only(left: 20),
           child: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
             icon: SvgPicture.asset(
               "assets/icons/back-tb.svg",
               height: screenWidth * 0.07,

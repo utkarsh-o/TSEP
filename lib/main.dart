@@ -15,7 +15,7 @@ class TSEP extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(fontFamily: 'Montserrant'),
-      home: TestScreen(),
+      home: LoginPage(),
     );
   }
 }
