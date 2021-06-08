@@ -26,7 +26,6 @@ class _TestScreenState extends State<TestScreen> {
       } else {
         atvscr = 0;
         checked[qtnIdx] = true;
-        print(atvscr);
       }
       qtnIdx += qtnIdx + 1 > 9 ? 0 : 1;
       updtTotalScores();

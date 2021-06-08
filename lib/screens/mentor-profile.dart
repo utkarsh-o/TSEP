@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/components/CustomNavigationBar.dart';
+import 'package:tsep/screens/login-page.dart';
 
 class MentorProfile extends StatelessWidget {
   const MentorProfile({Key? key}) : super(key: key);
@@ -60,9 +61,21 @@ class TitleBar extends StatelessWidget {
           width: screenWidth * 0.4,
           height: screenHeight * 0.12,
         ),
-        SvgPicture.asset(
-          "assets/icons/edit-tb.svg",
-          height: screenWidth * 0.06,
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              (context),
+              MaterialPageRoute(
+                builder: (context) {
+                  return LoginPage();
+                },
+              ),
+            );
+          },
+          child: SvgPicture.asset(
+            "assets/icons/edit-tb.svg",
+            height: screenWidth * 0.06,
+          ),
         )
       ],
     );

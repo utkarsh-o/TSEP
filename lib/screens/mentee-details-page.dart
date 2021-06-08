@@ -35,10 +35,6 @@ class MenteeDetails extends StatelessWidget {
                       heading: 'Joining Proficiency',
                       value: "Novice",
                     ),
-                    BatchJoinProfAgeWidget(
-                      heading: 'Age',
-                      value: "17",
-                    ),
                   ],
                 ),
               ),

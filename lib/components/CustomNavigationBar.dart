@@ -61,7 +61,6 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
             onPressed: setactv),
         InkWell(
           onTap: () {
-            print('test');
             Navigator.push(
               context,
               MaterialPageRoute(
