@@ -160,7 +160,7 @@ class ScheduleCard extends StatelessWidget {
               ),
             ),
             Container(
-              constraints: BoxConstraints(minWidth: 100),
+              constraints: BoxConstraints(minWidth: size.width * 0.25),
               margin: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

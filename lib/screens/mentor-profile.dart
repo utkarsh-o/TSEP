@@ -48,7 +48,7 @@ class TitleBar extends StatelessWidget {
       children: [
         Container(
           child: Text(
-            "Profile",
+            "Mentor Profile",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black.withOpacity(0.5),

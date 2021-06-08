@@ -4,11 +4,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/local-data/questions.dart';
 import 'package:tsep/screens/mentor-profile.dart';
 
-class scores {
-  int score;
-  bool checked;
-  scores(this.score, this.checked);
-}
+// class scores {
+//   int score;
+//   bool checked;
+//   scores(this.score, this.checked);
+// }
 
 class TestScreen extends StatefulWidget {
   const TestScreen({Key? key}) : super(key: key);
@@ -23,6 +23,7 @@ class _TestScreenState extends State<TestScreen> {
   var checked = List<bool>.generate(10, (index) => false);
   Question question = new Question();
   int qtnIdx = 0;
+
   void nxtclb() {
     setState(() {
       // if (qtnIdx >= 10) qtnIdx = 9;
@@ -50,8 +51,10 @@ class _TestScreenState extends State<TestScreen> {
 
   void updtscr(int score) {
     scores[qtnIdx] = score;
+    checked[qtnIdx] = true;
     setState(() {
       atvscr = score;
+      updtTotalScores();
     });
   }
 
@@ -365,14 +368,17 @@ class CrntScrScore extends StatelessWidget {
   CrntScrScore({required this.totalscored, required this.totalmax});
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      right: 8,
-      child: Text(
-        "$totalscored / $totalmax",
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
+    return Visibility(
+      visible: totalscored / totalmax >= 7 / 18 ? true : false,
+      child: Positioned(
+        right: 8,
+        child: Text(
+          "$totalscored / $totalmax",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
       ),
     );

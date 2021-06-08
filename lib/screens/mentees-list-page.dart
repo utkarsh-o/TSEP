@@ -94,6 +94,7 @@ class MenteeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    int screenwidth = screenWidth.round();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Container(
@@ -148,7 +149,7 @@ class MenteeCard extends StatelessWidget {
               ),
             ),
             Container(
-              constraints: BoxConstraints(minWidth: 120),
+              constraints: BoxConstraints(minWidth: screenWidth * 0.32),
               padding:
                   const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
               child: InkWell(
@@ -174,7 +175,7 @@ class MenteeCard extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      height: 3,
+                      height: screenHeight * 0.003,
                     ),
                     Text(
                       level.toUpperCase(),
@@ -189,7 +190,7 @@ class MenteeCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.01),
               child: Text(
                 "LESSON $lesson",
                 style: TextStyle(

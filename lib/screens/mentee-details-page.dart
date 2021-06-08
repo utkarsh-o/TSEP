@@ -201,7 +201,7 @@ class MenteeProfile extends StatelessWidget {
               Container(
                 // width: double.infinity,
                 child: Text(
-                  "Iron Man",
+                  "Mentee-1",
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
               ),
