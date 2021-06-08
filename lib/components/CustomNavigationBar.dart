@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tsep/screens/info-page.dart';
 import 'package:tsep/screens/login-page.dart';
 import 'package:tsep/screens/mentees-list-page.dart';
 import 'package:tsep/screens/mentor-profile.dart';
@@ -19,7 +20,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
     MentorProfile(),
     SchedulePage(),
     MenteesPage(),
-    LoginPage()
+    InfoPage()
   ];
 
   void setactv(int idx) {
@@ -94,7 +95,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
             active: widget.active,
             onPressed: setactv),
         NavbarIconSmall(
-            icon: 'assets/icons/notifications-bnb.svg',
+            icon: 'assets/icons/info-bnb.svg',
             index: 3,
             active: widget.active,
             onPressed: setactv),

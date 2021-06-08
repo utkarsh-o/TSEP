@@ -4,12 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/local-data/questions.dart';
 import 'package:tsep/screens/mentor-profile.dart';
 
-// class scores {
-//   int score;
-//   bool checked;
-//   scores(this.score, this.checked);
-// }
-
 class TestScreen extends StatefulWidget {
   const TestScreen({Key? key}) : super(key: key);
 
@@ -32,6 +26,7 @@ class _TestScreenState extends State<TestScreen> {
       } else {
         atvscr = 0;
         checked[qtnIdx] = true;
+        print(atvscr);
       }
       qtnIdx += qtnIdx + 1 > 9 ? 0 : 1;
       updtTotalScores();
