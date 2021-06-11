@@ -4,7 +4,7 @@ class Lesson {
   Lesson({required this.title, required this.duration});
 }
 
-List<Lesson> _lessons = [
+List<Lesson> lessons = [
   Lesson(duration: "30mins", title: "INTRODUCTION"),
   Lesson(duration: "40mins", title: "Nouns, Prepositions & Verbs"),
 ];

@@ -25,6 +25,9 @@ dependencies:
     sdk: flutter
   flutter_svg: ^0.22.0
   persistent_bottom_nav_bar: ^4.0.2
+  intl: ^0.17.0
+  fl_chart: ^0.36.1
+
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -66,7 +69,7 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-     - family: Montserrant
+     - family: Montserrat
        fonts:
          - asset: assets/fonts/Montserrat-Regular.ttf
          - asset: assets/fonts/Montserrat-Medium.ttf
@@ -74,6 +77,10 @@ flutter:
            weight: 600
          - asset: assets/fonts/Montserrat-Bold.ttf
          - asset: assets/fonts/Montserrat-ExtraBOld.ttf
+           weight: 800
+         - asset: assets/fonts/Montserrat-Black.ttf
+           weight: 900
+
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:

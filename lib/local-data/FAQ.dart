@@ -4,7 +4,7 @@ class FAQ {
   FAQ({required this.question, required this.answer});
 }
 
-List<FAQ> _faqs = [
+List<FAQ> faqs = [
   FAQ(
       question: 'What is the Full form of TSEP?',
       answer: 'Telephonic Spoken English Programme'),

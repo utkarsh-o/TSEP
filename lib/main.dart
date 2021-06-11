@@ -17,7 +17,7 @@ class TSEP extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(fontFamily: 'Montserrant'),
+      theme: ThemeData(fontFamily: 'Montserrat'),
       home: MentorProfile(),
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 import 'package:tsep/components/CustomNavigationBar.dart';
+import 'package:tsep/local-data/schedule.dart';
 
 class SchedulePage extends StatelessWidget {
   const SchedulePage({Key? key}) : super(key: key);
@@ -8,51 +10,57 @@ class SchedulePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    Widget getSchedule() {
+      DateTime today = DateTime.now();
+      DateTime _firstDayOfTheweek =
+          today.subtract(new Duration(days: today.weekday));
+      DateTime startDate = _firstDayOfTheweek.add(Duration(days: 1));
+      DateTime endDate = _firstDayOfTheweek.add(Duration(days: 7));
+
+      List<Widget> ScheduleList = [];
+      for (var sche in schedule) {
+        if (sche.timing.isAfter(startDate) && sche.timing.isBefore(endDate))
+          ScheduleList.add(new ScheduleCard(s: sche));
+      }
+      return new Column(children: ScheduleList);
+    }
+
+    Widget getDayCards() {
+      DateTime today = DateTime.now();
+      DateTime _firstDayOfTheweek =
+          today.subtract(new Duration(days: today.weekday));
+      List<Widget> DayList = [];
+      DayList.add(SizedBox(width: size.width * 0.02));
+      for (var index = 1; index <= 7; index++) {
+        DayList.add(
+          new DayCard(
+            date: _firstDayOfTheweek.add(
+              Duration(days: index),
+            ),
+          ),
+        );
+      }
+      DayList.add(SizedBox(width: size.width * 0.02));
+      return new Row(
+        children: DayList,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            TitleBar(),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: 10,
-                  ),
-                  DayCard(active: false, event: true, day: "MO", date: "1"),
-                  DayCard(active: true, event: true, day: "TU", date: "2"),
-                  DayCard(active: false, event: false, day: "WE", date: "3"),
-                  DayCard(active: false, event: false, day: "TH", date: "4"),
-                  DayCard(active: false, event: false, day: "FR", date: "5"),
-                  DayCard(active: false, event: true, day: "SA", date: "6"),
-                  DayCard(active: false, event: false, day: "SU", date: "7"),
-                  SizedBox(
-                    width: 10,
-                  ),
-                ],
-              ),
-            ),
-            BreakLine(size: size),
-            TotContriLesTauWrapper(),
-            BreakLine(size: size),
-            ScheduleCard(
-                H1: "Iron Man",
-                H2: "Tue, Lesson 6",
-                H3: "2",
-                H4: "4:00-5:00 PM"),
-            ScheduleCard(
-                H1: "Spider Man",
-                H2: "Thu, Lesson 3",
-                H3: "4",
-                H4: "3:00-3:30 PM"),
-            ScheduleCard(
-                H1: "Bat Man",
-                H2: "Fri, Lesson 5",
-                H3: "5",
-                H4: "6:30-7:20 PM"),
-          ],
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Column(
+            children: [
+              TitleBar(),
+              getDayCards(),
+              BreakLine(size: size),
+              TotContriLesTauWrapper(s: schedule),
+              BreakLine(size: size),
+              getSchedule(),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: CustomBottomNavBar(
@@ -63,19 +71,25 @@ class SchedulePage extends StatelessWidget {
 }
 
 class TotContriLesTauWrapper extends StatelessWidget {
-  const TotContriLesTauWrapper({
-    Key? key,
-  }) : super(key: key);
+  final List<Schedule> s;
+  TotContriLesTauWrapper({
+    required this.s,
+  });
 
   @override
   Widget build(BuildContext context) {
+    Duration ttlcnt = getttlctr(s);
+    String ttlcnthr = ttlcnt.inHours.toString();
+    String ttlcntmn = ttlcnt.inMinutes.remainder(60).toString();
     return Container(
       margin: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          TotContriLesTau(heading: "Total Contribution", value: "10hr 40min"),
-          TotContriLesTau(heading: "Lessons Taught", value: "31"),
+          TotContriLesTau(
+              heading: "Total Contribution",
+              value: "${ttlcnthr}hr ${ttlcntmn}min"),
+          TotContriLesTau(heading: "Lessons Taught", value: ttllsns.toString()),
         ],
       ),
     );
@@ -112,11 +126,16 @@ class TotContriLesTau extends StatelessWidget {
 }
 
 class ScheduleCard extends StatelessWidget {
-  final String H1, H2, H3, H4;
-  ScheduleCard(
-      {required this.H1, required this.H2, required this.H3, required this.H4});
+  final Schedule s;
+  ScheduleCard({required this.s});
   @override
   Widget build(BuildContext context) {
+    var weekday = DateFormat('EEE').format(s.timing);
+    var lesson = s.lesson;
+    String starttime = DateFormat('hh:mm').format(s.timing);
+    starttime = starttime.replaceAll("AM", "am").replaceAll("PM", "pm");
+    String endtime = DateFormat('hh:mm a').format(s.timing.add(s.duration));
+    endtime = endtime.replaceAll("AM", "am").replaceAll("PM", "pm");
     Size size = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
@@ -131,7 +150,7 @@ class ScheduleCard extends StatelessWidget {
             ),
           ],
         ),
-        width: size.width * 0.85,
+        width: size.width * 0.9,
         height: size.height * 0.1,
         child: Row(
           children: [
@@ -151,7 +170,7 @@ class ScheduleCard extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  H3,
+                  DateFormat('d').format(s.timing),
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -167,7 +186,7 @@ class ScheduleCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    H1,
+                    s.mentee,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
@@ -177,7 +196,7 @@ class ScheduleCard extends StatelessWidget {
                     height: 3,
                   ),
                   Text(
-                    H2,
+                    "$weekday, Lesson $lesson",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 10,
@@ -190,7 +209,7 @@ class ScheduleCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text(
-                H4,
+                "$starttime - $endtime",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black.withOpacity(0.8),
@@ -233,15 +252,14 @@ class BreakLine extends StatelessWidget {
 }
 
 class DayCard extends StatelessWidget {
-  final bool active, event;
-  final String day, date;
-  DayCard(
-      {required this.active,
-      required this.event,
-      required this.day,
-      required this.date});
+  final DateTime date;
+  DayCard({
+    required this.date,
+  });
   @override
   Widget build(BuildContext context) {
+    bool active = isactive(date);
+    bool event = iseventful(schedule, date);
     Color fontColor = active ? Colors.white : Colors.black.withOpacity(0.7);
     Color eventColor = active
         ? Colors.white.withOpacity(0.7)
@@ -266,17 +284,18 @@ class DayCard extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(top: 10, left: 4, right: 4),
             child: Text(
-              day,
+              DateFormat('EEE').format(date).toUpperCase(),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: fontColor,
+                fontSize: 12,
               ),
             ),
           ),
           Container(
             margin: EdgeInsets.symmetric(vertical: 2),
             child: Text(
-              "$date",
+              date.day.toString(),
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: fontColor,

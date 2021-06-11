@@ -30,10 +30,14 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           widget.active = idx;
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) {
-                return pages[idx];
-              },
+            // MaterialPageRoute(
+            //   builder: (context) {
+            //     return pages[idx];
+            //   },
+            // ),
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => pages[idx],
+              transitionDuration: Duration(seconds: 0),
             ),
           );
         },
@@ -60,6 +64,8 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
             active: widget.active,
             onPressed: setactv),
         InkWell(
+          splashColor: Color(0xffD92136).withOpacity(0),
+          highlightColor: Color(0xffD92136).withOpacity(0),
           onTap: () {
             Navigator.push(
               context,

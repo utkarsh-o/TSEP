@@ -10,17 +10,13 @@ class InfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Lesson> _lessons = [
-      Lesson(duration: "30mins", title: "INTRODUCTION"),
-      Lesson(duration: "40mins", title: "Nouns, Prepositions & Verbs"),
-    ];
     Widget getLessonList() {
       List<Widget> lessonList = [];
-      for (var index = 0; index < _lessons.length; index++) {
+      for (var index = 0; index < lessons.length; index++) {
         lessonList.add(new LessonCard(
             lesson: index + 1,
-            title: _lessons[index].title,
-            duration: _lessons[index].duration));
+            title: lessons[index].title,
+            duration: lessons[index].duration));
       }
       return new Column(children: lessonList);
     }

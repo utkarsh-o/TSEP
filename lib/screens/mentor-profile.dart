@@ -4,7 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/components/CustomNavigationBar.dart';
+import 'package:tsep/local-data/line_titles.dart';
 import 'package:tsep/screens/login-page.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class MentorProfile extends StatelessWidget {
   const MentorProfile({Key? key}) : super(key: key);
@@ -20,23 +22,128 @@ class MentorProfile extends StatelessWidget {
             MentorProfileBanner(),
             OrgIDNumCard(),
             BreakLine(),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 15),
-              child: SvgPicture.asset(
-                'assets/vectors/mentor-graph.svg',
-                width: size.width * 0.95,
+            ActivityPlot(),
+            Text(
+              "Weeks vs Hours/Lessons".toUpperCase(),
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                color: Colors.black.withOpacity(0.7),
               ),
             ),
             BreakLine(),
-            DecComRepDropContainer(size: size)
+            DecComRepDropContainer()
           ],
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        active: 0,
-      ),
+      bottomNavigationBar: CustomBottomNavBar(active: 0),
     );
   }
+}
+
+// class ActivityPlot extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     Size size = MediaQuery.of(context).size;
+//     return Container(
+//       margin: EdgeInsets.symmetric(vertical: 15),
+//       child: SvgPicture.asset(
+//         'assets/vectors/mentor-graph.svg',
+//         width: size.width * 0.95,
+//       ),
+//     );
+//   }
+// }
+
+class ActivityPlot extends StatelessWidget {
+  final List<Color> gradientColors = [
+    const Color(0xff1F78B4),
+    const Color(0xff1F78B4),
+  ];
+  final List<Color> gradientColors2 = [
+    const Color(0xffD92136).withOpacity(0.7),
+    const Color(0xffD92136).withOpacity(0.7),
+    // const Color(0xffD92136),
+  ];
+  List<LineChartBarData> linechartbardata() {
+    final lessons = LineChartBarData(
+      spots: [
+        FlSpot(1, 3),
+        FlSpot(2, 2),
+        FlSpot(3, 2),
+        FlSpot(4, 1),
+        FlSpot(5, 1),
+        FlSpot(6, 4),
+        FlSpot(7, 3),
+        FlSpot(8, 2),
+        FlSpot(9, 2),
+        FlSpot(10, 3),
+      ],
+      curveSmoothness: 0.6,
+      isCurved: true,
+      colors: gradientColors,
+      preventCurveOverShooting: true,
+      barWidth: 4,
+      dotData: FlDotData(
+        show: false,
+      ),
+      shadow: BoxShadow(
+        blurRadius: 6,
+        color: Color(0xff1F78B4),
+      ),
+    );
+    final hours = LineChartBarData(
+        show: true,
+        spots: [
+          FlSpot(1, 2.7),
+          FlSpot(2, 2.4),
+          FlSpot(3, 2.1),
+          FlSpot(4, 1.7),
+          FlSpot(5, 1.3),
+          FlSpot(6, 3.9),
+          FlSpot(7, 3.2),
+          FlSpot(8, 1.5),
+          FlSpot(9, 2.1),
+          FlSpot(10, 3),
+        ],
+        isCurved: true,
+        colors: gradientColors2,
+        curveSmoothness: 0.6,
+        preventCurveOverShooting: true,
+        barWidth: 4,
+        dotData: FlDotData(
+          show: false,
+        ),
+        shadow: BoxShadow(
+            blurRadius: 6, color: Color(0xffD92136).withOpacity(0.85)));
+    return [lessons, hours];
+  }
+
+  @override
+  Widget build(BuildContext context) => Container(
+        margin: EdgeInsets.only(left: 10, right: 20, top: 20),
+        height: MediaQuery.of(context).size.height * 0.20,
+        child: LineChart(
+          LineChartData(
+            minX: 1,
+            maxX: 10,
+            minY: 0,
+            maxY: 4,
+            titlesData: LineTitles.getTitleData(),
+            gridData: FlGridData(
+              show: false,
+              drawHorizontalLine: true,
+              getDrawingVerticalLine: (value) {
+                return FlLine(
+                  color: Color(0xff37434d),
+                  strokeWidth: 1,
+                );
+              },
+            ),
+            borderData: FlBorderData(show: false),
+            lineBarsData: linechartbardata(),
+          ),
+        ),
+      );
 }
 
 class TitleBar extends StatelessWidget {
@@ -87,14 +194,14 @@ class MentorProfileBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      height: size.height * 0.15,
-      margin: EdgeInsets.only(left: 40, right: 30),
+      height: size.height * 0.2,
+      margin: EdgeInsets.only(left: 25, right: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
             height: double.infinity,
-            width: size.height * 0.15,
+            width: size.height * 0.16,
             child: Image.asset("assets/vectors/mentor-profile.png"),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -108,7 +215,7 @@ class MentorProfileBanner extends StatelessWidget {
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Container(
                 child: Text(
@@ -125,7 +232,7 @@ class MentorProfileBanner extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
                 child: Row(
                   children: [
                     Text(
@@ -139,7 +246,7 @@ class MentorProfileBanner extends StatelessWidget {
                       width: 10,
                     ),
                     Text(
-                      "4",
+                      "2",
                       style: TextStyle(
                           color: Color(0xff003670).withOpacity(0.6),
                           fontSize: 15,
@@ -192,6 +299,50 @@ class MentorProfileBanner extends StatelessWidget {
                   ],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2.0),
+                child: Row(
+                  children: [
+                    Text(
+                      "Expected End of Program",
+                      style: TextStyle(
+                          color: Colors.black.withOpacity(0.6),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      "5 May 2021",
+                      style: TextStyle(
+                          color: Color(0xffD92136).withOpacity(0.6),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2.0),
+                child: Row(
+                  children: [
+                    Text(
+                      "Required Lct/Hr per week",
+                      style: TextStyle(
+                          color: Colors.black.withOpacity(0.6),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      "4 / 2.5",
+                      style: TextStyle(
+                          color: Color(0xffD92136).withOpacity(0.6),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
             ],
           )
         ],
@@ -208,7 +359,7 @@ class OrgIDNumCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+      margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -272,21 +423,15 @@ class BreakLine extends StatelessWidget {
 }
 
 class DecComRepDropContainer extends StatelessWidget {
-  const DecComRepDropContainer({
-    Key? key,
-    required this.size,
-  }) : super(key: key);
-
-  final Size size;
-
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Container(
-            margin: EdgeInsets.only(top: 30),
+            margin: EdgeInsets.only(top: 20),
             child: Center(
               child: Text(
                 "DECLARE\nCOMPLETION",
@@ -312,7 +457,7 @@ class DecComRepDropContainer extends StatelessWidget {
             ),
           ),
           Container(
-            margin: EdgeInsets.only(top: 30),
+            margin: EdgeInsets.only(top: 20),
             child: Center(
               child: Text(
                 "REPORT\nDROPOUT",
