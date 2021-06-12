@@ -5,6 +5,7 @@ import 'package:tsep/screens/info-page.dart';
 import 'package:tsep/screens/login-page.dart';
 import 'package:tsep/screens/mentees-list-page.dart';
 import 'package:tsep/screens/mentor-profile.dart';
+import 'package:tsep/screens/schedule-new-lecture.dart';
 import 'package:tsep/screens/schedule-page.dart';
 import 'package:tsep/screens/test-screen.dart';
 
@@ -30,11 +31,6 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           widget.active = idx;
           Navigator.push(
             context,
-            // MaterialPageRoute(
-            //   builder: (context) {
-            //     return pages[idx];
-            //   },
-            // ),
             PageRouteBuilder(
               pageBuilder: (_, __, ___) => pages[idx],
               transitionDuration: Duration(seconds: 0),
@@ -67,6 +63,16 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           splashColor: Color(0xffD92136).withOpacity(0),
           highlightColor: Color(0xffD92136).withOpacity(0),
           onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return ScheduleNew();
+                },
+              ),
+            );
+          },
+          onLongPress: () {
             Navigator.push(
               context,
               MaterialPageRoute(

@@ -106,6 +106,8 @@ class FAQGdlineCards extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           InkWell(
+            splashColor: Color(0xffD92136).withOpacity(0),
+            highlightColor: Color(0xffD92136).withOpacity(0),
             onTap: () {
               Navigator.push(
                 (context),
@@ -154,6 +156,8 @@ class FAQGdlineCards extends StatelessWidget {
             ),
           ),
           InkWell(
+            splashColor: Color(0xffD92136).withOpacity(0),
+            highlightColor: Color(0xffD92136).withOpacity(0),
             onTap: () {
               Navigator.push(
                 (context),

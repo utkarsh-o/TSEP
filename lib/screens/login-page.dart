@@ -18,7 +18,7 @@ class LoginPage extends StatelessWidget {
               // vertical: size.height * 0.05,
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 mainLogo(),
                 // SizedBox(height: MediaQuery.of(context).size.height * 0.025),
@@ -31,7 +31,18 @@ class LoginPage extends StatelessWidget {
                 LoginPageInputForm(name: 'Password'),
                 // SizedBox(height: MediaQuery.of(context).size.height * 0.025),
                 frgtPassWrapper(),
-                LoginWrapper()
+                LoginWrapper(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Made in India with "),
+                    Icon(
+                      Icons.favorite,
+                      color: Colors.grey,
+                      size: 15,
+                    ),
+                  ],
+                )
               ],
             ),
           ),
@@ -49,37 +60,40 @@ class LoginWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            minimumSize: Size(size.width * 0.6, size.height * 0.06),
-            primary: Color(0xffD92136).withOpacity(0.65),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return MentorProfile();
-                },
+    return Container(
+      margin: EdgeInsets.only(bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size(size.width * 0.6, size.height * 0.06),
+              primary: Color(0xffD92136).withOpacity(0.65),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-            );
-          },
-          child: Text('Login'),
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: SvgPicture.asset(
-            "assets/icons/google-login.svg",
-            height: 40,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return MentorProfile();
+                  },
+                ),
+              );
+            },
+            child: Text('Login'),
           ),
-        )
-      ],
+          IconButton(
+            onPressed: () {},
+            icon: SvgPicture.asset(
+              "assets/icons/google-login.svg",
+              height: 40,
+            ),
+          )
+        ],
+      ),
     );
   }
 }

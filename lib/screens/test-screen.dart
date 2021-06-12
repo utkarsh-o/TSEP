@@ -713,7 +713,11 @@ class PrevNxtBtn extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           InkWell(
-            onTap: prvclb,
+            onTap: qtnIdx == 0
+                ? () {
+                    Navigator.pop(context);
+                  }
+                : prvclb,
             child: Container(
               child: Center(
                 child: Text(
@@ -741,7 +745,11 @@ class PrevNxtBtn extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: nxtclb,
+            onTap: qtnIdx == 9
+                ? () {
+                    Navigator.pop(context);
+                  }
+                : nxtclb,
             child: Container(
               child: Center(
                 child: Text(
