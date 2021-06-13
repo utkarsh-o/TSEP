@@ -7,9 +7,36 @@ import 'package:tsep/components/CustomNavigationBar.dart';
 import 'package:tsep/local-data/line_titles.dart';
 import 'package:tsep/screens/login-page.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class MentorProfile extends StatelessWidget {
+class MentorProfile extends StatefulWidget {
   const MentorProfile({Key? key}) : super(key: key);
+
+  @override
+  _MentorProfileState createState() => _MentorProfileState();
+}
+
+class _MentorProfileState extends State<MentorProfile> {
+  final _auth = FirebaseAuth.instance;
+  User? loggedInUser;
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+  }
+
+  void getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        loggedInUser = user;
+        print(loggedInUser!.email);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -195,11 +222,12 @@ class MentorProfileBanner extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Container(
       height: size.height * 0.2,
-      margin: EdgeInsets.only(left: 25, right: 15),
+      margin: EdgeInsets.symmetric(horizontal: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
+            // margin: EdgeInsets.only(right: size.width * 0.02),
             height: double.infinity,
             width: size.height * 0.16,
             child: Image.asset("assets/vectors/mentor-profile.png"),

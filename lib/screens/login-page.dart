@@ -1,62 +1,131 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tsep/components/loading.dart';
 import 'package:tsep/screens/mentor-profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _auth = FirebaseAuth.instance;
+  String email = '', pass = '';
+  bool loading = false;
+  void emailcbk(String e) => email = e;
+
+  void passcbk(String p) => pass = p;
+
+  void logincbk() async {
+    try {
+      setState(() {
+        loading = true;
+      });
+      final newUser =
+          await _auth.signInWithEmailAndPassword(email: email, password: pass);
+      if (newUser != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return MentorProfile();
+            },
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        loading = false;
+      });
+      print(e);
+    }
+  }
+
+  void signupcbk() async {
+    try {
+      setState(() {
+        loading = true;
+      });
+      final newUser = await _auth.createUserWithEmailAndPassword(
+          email: email, password: pass);
+      if (newUser != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return MentorProfile();
+            },
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        loading = false;
+      });
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            margin: EdgeInsets.symmetric(
-              horizontal: size.width * 0.12,
-              // vertical: size.height * 0.05,
+    return loading
+        ? Loading()
+        : Scaffold(
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: size.width * 0.12,
+                    // vertical: size.height * 0.05,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      mainLogo(),
+                      SignupWrapper(
+                        callback: signupcbk,
+                      ),
+                      MntrMenteeWrapper(),
+                      SizedBox(height: size.height * 0.025),
+                      EmailInputForm(
+                        callback: emailcbk,
+                      ),
+                      SizedBox(height: size.height * 0.0125),
+                      PasswordInputForm(
+                        callback: passcbk,
+                      ),
+                      frgtPassWrapper(),
+                      LoginWrapper(
+                        callback: logincbk,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Made in India with "),
+                          Icon(
+                            Icons.favorite,
+                            color: Colors.grey,
+                            size: 15,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                mainLogo(),
-                // SizedBox(height: MediaQuery.of(context).size.height * 0.025),
-                SignupWrapper(),
-                // SizedBox(height: MediaQuery.of(context).size.height * 0.025),
-                MntrMenteeWrapper(),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.025),
-                LoginPageInputForm(name: 'Username'),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.0125),
-                LoginPageInputForm(name: 'Password'),
-                // SizedBox(height: MediaQuery.of(context).size.height * 0.025),
-                frgtPassWrapper(),
-                LoginWrapper(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Made in India with "),
-                    Icon(
-                      Icons.favorite,
-                      color: Colors.grey,
-                      size: 15,
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 }
 
 class LoginWrapper extends StatelessWidget {
-  const LoginWrapper({
-    Key? key,
-  }) : super(key: key);
-
+  final VoidCallback callback;
+  LoginWrapper({required this.callback});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -73,16 +142,17 @@ class LoginWrapper extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return MentorProfile();
-                  },
-                ),
-              );
-            },
+            onPressed: callback,
+            // () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) {
+            //       return MentorProfile();
+            //     },
+            //   ),
+            // );
+            // },
             child: Text('Login'),
           ),
           IconButton(
@@ -134,28 +204,73 @@ class frgtPassWrapper extends StatelessWidget {
   }
 }
 
-class MntrMenteeWrapper extends StatelessWidget {
-  const MntrMenteeWrapper({
-    Key? key,
-  }) : super(key: key);
+class MntrMenteeWrapper extends StatefulWidget {
+  @override
+  _MntrMenteeWrapperState createState() => _MntrMenteeWrapperState();
+}
+
+class _MntrMenteeWrapperState extends State<MntrMenteeWrapper> {
+  String who = 'mentor', active = 'mentor';
+  void ontap(String who) {
+    setState(() {
+      active = who;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        MentorMenteeButton(icon: "assets/icons/mentee.svg"),
-        MentorMenteeButton(icon: "assets/icons/mentor.svg"),
+        MentorMenteeButton(
+          icon: "assets/icons/mentee.svg",
+          who: 'mentee',
+          active: active,
+          ontap: ontap,
+        ),
+        MentorMenteeButton(
+          icon: "assets/icons/mentor.svg",
+          who: 'mentor',
+          active: active,
+          ontap: ontap,
+        ),
       ],
     );
   }
 }
 
-class SignupWrapper extends StatelessWidget {
-  const SignupWrapper({
-    Key? key,
-  }) : super(key: key);
+class MentorMenteeButton extends StatelessWidget {
+  final String icon, who, active;
+  final Function ontap;
+  MentorMenteeButton(
+      {required this.icon,
+      required this.who,
+      required this.active,
+      required this.ontap});
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      padding: EdgeInsets.all(5),
+      decoration: active == who
+          ? BoxDecoration(
+              color: Color(0xff003670).withOpacity(0.3),
+              borderRadius: BorderRadius.circular(8))
+          : null,
+      child: InkWell(
+        onTap: () => ontap(who),
+        child: SvgPicture.asset(
+          icon,
+          height: size.height * 0.05,
+        ),
+      ),
+    );
+  }
+}
 
+class SignupWrapper extends StatelessWidget {
+  final VoidCallback callback;
+  SignupWrapper({required this.callback});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -186,7 +301,7 @@ class SignupWrapper extends StatelessWidget {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: callback,
                     child: Text(
                       "Sign Up",
                       style: TextStyle(
@@ -226,28 +341,25 @@ class mainLogo extends StatelessWidget {
   }
 }
 
-class LoginPageInputForm extends StatelessWidget {
-  final String name;
-  LoginPageInputForm({required this.name});
-
+class EmailInputForm extends StatelessWidget {
   @override
+  final Function callback;
+  EmailInputForm({required this.callback});
   Widget build(BuildContext context) {
     return TextFormField(
-      keyboardType: name == 'Username' ? TextInputType.emailAddress : null,
-      obscureText: name == 'Username' ? false : true,
+      onChanged: (val) => callback(val),
+      keyboardType: TextInputType.emailAddress,
       style: TextStyle(
-        color: name == 'Username' ? Colors.white : Color(0xffAFAFAD),
+        color: Colors.white,
         fontWeight: FontWeight.w600,
       ),
       decoration: InputDecoration(
         filled: true,
-        fillColor: name == 'Username'
-            ? Color(0xff003670).withOpacity(0.7)
-            : Color(0xffF5F5F5),
+        fillColor: Color(0xff003670).withOpacity(0.7),
         // border: OutlineInputBorder(),
-        hintText: name,
+        hintText: 'Email',
         hintStyle: TextStyle(
-          color: name == 'Username' ? Colors.white : Color(0xffAFAFAD),
+          color: Colors.white,
           fontWeight: FontWeight.w600,
         ),
         enabledBorder: OutlineInputBorder(
@@ -267,15 +379,39 @@ class LoginPageInputForm extends StatelessWidget {
   }
 }
 
-class MentorMenteeButton extends StatelessWidget {
-  const MentorMenteeButton({Key? key, required this.icon}) : super(key: key);
-  final String icon;
+class PasswordInputForm extends StatelessWidget {
   @override
+  final Function callback;
+  PasswordInputForm({required this.callback});
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: () {},
-      icon: SvgPicture.asset(
-        icon,
+    return TextFormField(
+      onChanged: (val) => callback(val),
+      obscureText: true,
+      style: TextStyle(
+        color: Color(0xffAFAFAD),
+        fontWeight: FontWeight.w600,
+      ),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Color(0xffF5F5F5),
+        // border: OutlineInputBorder(),
+        hintText: 'Password',
+        hintStyle: TextStyle(
+          color: Color(0xffAFAFAD),
+          fontWeight: FontWeight.w600,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12.0),
+          ),
+          borderSide: BorderSide(color: Color(0x00003670), width: 0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12.0),
+          ),
+          borderSide: BorderSide(color: Color(0x00003670), width: 0),
+        ),
       ),
     );
   }

@@ -9,8 +9,13 @@ import 'package:tsep/screens/mentor-profile.dart';
 import 'package:tsep/screens/schedule-new-lecture.dart';
 import 'package:tsep/screens/schedule-page.dart';
 import 'package:tsep/screens/test-screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() => runApp(TSEP());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(TSEP());
+}
 
 class TSEP extends StatelessWidget {
   const TSEP({Key? key}) : super(key: key);
@@ -19,7 +24,7 @@ class TSEP extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(fontFamily: 'Montserrat'),
-      home: MentorProfile(),
+      home: LoginPage(),
     );
   }
 }

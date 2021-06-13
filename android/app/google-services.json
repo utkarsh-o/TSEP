@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "49253218585",
+    "project_id": "tsep-8d103",
+    "storage_bucket": "tsep-8d103.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:49253218585:android:29f6047f01dabfce936d88",
+        "android_client_info": {
+          "package_name": "com.kotak.tsep"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "49253218585-4c2pfg659frm3420u3agl4o6ub64aai9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAp7DkeBapeNvtQY7L6GRTBYBq1HByKwQw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "49253218585-4c2pfg659frm3420u3agl4o6ub64aai9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
