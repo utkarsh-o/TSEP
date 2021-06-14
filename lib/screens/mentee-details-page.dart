@@ -12,63 +12,89 @@ class MenteeDetails extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              TitleBar(),
-              MenteeProfile(),
-              SizedBox(
-                height: size.height * 0.02,
+        child: Column(
+          children: [
+            TitleBar(),
+            MenteeProfile(),
+            SizedBox(
+              height: size.height * 0.02,
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(
+                vertical: 10,
               ),
-              Container(
-                margin: EdgeInsets.symmetric(
-                  vertical: 10,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    BatchJoinProfAgeWidget(
-                      heading: 'Batch',
-                      value: "B01",
-                    ),
-                    BatchJoinProfAgeWidget(
-                      heading: 'Joining Proficiency',
-                      value: "Novice",
-                    ),
-                  ],
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  BatchJoinProfAgeWidget(
+                    heading: 'Batch',
+                    value: "B01",
+                  ),
+                  BatchJoinProfAgeWidget(
+                    heading: 'Joining Proficiency',
+                    value: "Novice",
+                  ),
+                ],
               ),
-              SizedBox(
-                height: size.height * 0.02,
+            ),
+            SizedBox(
+              height: size.height * 0.02,
+            ),
+            // BreakLine(),
+            Expanded(
+              child: ListView(
+                children: [
+                  LessonList(
+                    lesson: 1,
+                    lessonLength: "40 mins",
+                    date: "18 May",
+                  ),
+                  LessonList(
+                    lesson: 2,
+                    lessonLength: "21 mins",
+                    date: "21 May",
+                  ),
+                  LessonList(
+                    lesson: 3,
+                    lessonLength: "1hr 08 mins",
+                    date: "24 May",
+                  ),
+                  LessonList(
+                    lesson: 4,
+                    lessonLength: "33 mins",
+                    date: "27 May",
+                  ),
+                  LessonList(
+                    lesson: 5,
+                    lessonLength: "42 mins",
+                    date: "30 May",
+                  ),
+                ],
               ),
-              LessonList(
-                lesson: 1,
-                lessonLength: "40 mins",
-                date: "18 May",
-              ),
-              LessonList(
-                lesson: 2,
-                lessonLength: "21 mins",
-                date: "21 May",
-              ),
-              LessonList(
-                lesson: 3,
-                lessonLength: "1hr 08 mins",
-                date: "24 May",
-              ),
-              LessonList(
-                lesson: 4,
-                lessonLength: "33 mins",
-                date: "27 May",
-              ),
-              LessonList(
-                lesson: 5,
-                lessonLength: "42 mins",
-                date: "30 May",
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class BreakLine extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      height: 3,
+      width: size.width,
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(3),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xff003670).withOpacity(0.1),
+            blurRadius: 10,
+          ),
+        ],
       ),
     );
   }
@@ -83,7 +109,7 @@ class LessonList extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 25),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -95,7 +121,7 @@ class LessonList extends StatelessWidget {
             ),
           ],
         ),
-        width: size.width * 0.85,
+        // width: size.width * 0.75,
         height: size.height * 0.1,
         child: Row(
           children: [

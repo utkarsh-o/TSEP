@@ -4,8 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/components/loading.dart';
-import 'package:tsep/screens/mentor-profile.dart';
+import 'package:tsep/screens/mentor-profile-template.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import 'mentor-profile.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -57,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
           context,
           MaterialPageRoute(
             builder: (context) {
-              return MentorProfile();
+              return MentorProfileTemplate();
             },
           ),
         );

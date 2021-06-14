@@ -31,7 +31,7 @@ class MainBody extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
         width: size.width * 0.9,
-        height: size.height * 0.7,
+        // height: size.height * 0.7,
         decoration: BoxDecoration(
           // color: Colors.redAccent,
           borderRadius: BorderRadius.circular(10),
@@ -51,14 +51,14 @@ class MainBody extends StatelessWidget {
               style: TextStyle(
                 height: 1.4,
                 fontWeight: FontWeight.w600,
-                fontSize: 11,
+                fontSize: size.height * 0.0155,
                 // wordSpacing: 1,
               ),
             ),
             Text(
               "Hope these guidelines will be of help to achieve the best results for our mentees and we are sure we can count on your committed time and efforts.",
               style: TextStyle(
-                fontSize: 12,
+                fontSize: size.height * 0.0165,
                 fontWeight: FontWeight.bold,
                 color: Color(0xffA00D1E).withOpacity(0.85),
                 shadows: [

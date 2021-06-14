@@ -16,18 +16,18 @@ class FAQPage extends StatelessWidget {
             question: faqs[index].question,
             answer: faqs[index].answer));
       }
-      return new Column(children: FAQList);
+      return new ListView(children: FAQList);
     }
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Column(
-            children: [
-              TitleBar(),
-              getFAQList(),
-            ],
-          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            TitleBar(),
+            Expanded(
+              child: getFAQList(),
+            ),
+          ],
         ),
       ),
     );

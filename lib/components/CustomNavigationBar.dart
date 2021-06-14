@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/screens/info-page.dart';
 import 'package:tsep/screens/login-page.dart';
 import 'package:tsep/screens/mentees-list-page.dart';
-import 'package:tsep/screens/mentor-profile.dart';
+import 'package:tsep/screens/mentor-profile-template.dart';
 import 'package:tsep/screens/schedule-new-lecture.dart';
 import 'package:tsep/screens/schedule-page.dart';
 import 'package:tsep/screens/test-screen.dart';
@@ -18,7 +18,7 @@ class CustomBottomNavBar extends StatefulWidget {
 
 class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   List<Widget> pages = [
-    MentorProfile(),
+    MentorProfileTemplate(),
     SchedulePage(),
     MenteesPage(),
     InfoPage()

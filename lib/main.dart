@@ -5,7 +5,7 @@ import 'package:tsep/screens/info-page.dart';
 import 'package:tsep/screens/login-page.dart';
 import 'package:tsep/screens/mentee-details-page.dart';
 import 'package:tsep/screens/mentees-list-page.dart';
-import 'package:tsep/screens/mentor-profile.dart';
+import 'package:tsep/screens/mentor-profile-template.dart';
 import 'package:tsep/screens/schedule-new-lecture.dart';
 import 'package:tsep/screens/schedule-page.dart';
 import 'package:tsep/screens/test-screen.dart';

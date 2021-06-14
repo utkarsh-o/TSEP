@@ -1,8 +1,7 @@
 class Schedule {
-  String mentee;
-  int lesson;
+  String mentee, lesson;
   DateTime timing;
-  Duration duration;
+  int duration;
 
   Schedule({
     required this.mentee,
@@ -15,27 +14,27 @@ class Schedule {
 List<Schedule> schedule = [
   Schedule(
     mentee: 'Iron Man',
-    lesson: 6,
-    duration: Duration(hours: 1),
-    timing: DateTime.parse('2021-06-08 16:00:00'),
+    lesson: 'lesson 6',
+    duration: 60,
+    timing: DateTime.parse('2021-06-19 16:00:00'),
   ),
   Schedule(
     mentee: 'Spider Man',
-    lesson: 3,
-    duration: Duration(minutes: 30),
-    timing: DateTime.parse('2021-06-09 15:00:00'),
+    lesson: 'lesson 5',
+    duration: 30,
+    timing: DateTime.parse('2021-06-17 15:00:00'),
   ),
   Schedule(
     mentee: 'Bat Man',
-    lesson: 5,
-    duration: Duration(minutes: 50),
-    timing: DateTime.parse('2021-06-11 18:30:00'),
+    lesson: 'lesson 3',
+    duration: 50,
+    timing: DateTime.parse('2021-06-16 18:30:00'),
   ),
   Schedule(
     mentee: 'Ant Man',
-    lesson: 5,
-    duration: Duration(minutes: 50),
-    timing: DateTime.parse('2021-06-14 14:30:00'),
+    lesson: 'lesson 2',
+    duration: 50,
+    timing: DateTime.parse('2021-06-14 17:30:00'),
   ),
 ];
 int ttllsns = 0;
@@ -45,7 +44,7 @@ Duration getttlctr(List<Schedule> schedule) {
   ttllsns = 0;
   for (var s in schedule)
     if (s.timing.isBefore(today)) {
-      ttlctr += s.duration;
+      ttlctr += Duration(minutes: s.duration);
       ttllsns++;
     }
   return ttlctr;

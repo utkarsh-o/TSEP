@@ -3,32 +3,20 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 import 'package:tsep/components/CustomNavigationBar.dart';
 import 'package:tsep/local-data/line_titles.dart';
 import 'package:tsep/screens/login-page.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MentorProfile extends StatefulWidget {
-  const MentorProfile({Key? key}) : super(key: key);
+class MentorProfileTemplate extends StatefulWidget {
+  const MentorProfileTemplate({Key? key}) : super(key: key);
 
   @override
-  _MentorProfileState createState() => _MentorProfileState();
+  _MentorProfileTemplateState createState() => _MentorProfileTemplateState();
 }
 
-String FirstName = '',
-    email = '',
-    LastName = '',
-    BatchName = '',
-    Organization = '',
-    uid = '';
-int IDNumber = 0;
-DateTime JoiningDate = DateTime.now();
-
-class _MentorProfileState extends State<MentorProfile> {
-  final firestore = FirebaseFirestore.instance;
+class _MentorProfileTemplateState extends State<MentorProfileTemplate> {
   final auth = FirebaseAuth.instance;
   User? loggedInUser;
 
@@ -55,44 +43,10 @@ class _MentorProfileState extends State<MentorProfile> {
       final user = await auth.currentUser;
       if (user != null) {
         loggedInUser = user;
-        uid = user.uid;
-        // print(loggedInUser!.email);
-        getDataStream();
+        print(loggedInUser!.email);
       }
     } catch (e) {
       print(e);
-    }
-  }
-
-  getData() async {
-    final data = await firestore.collection('MentorData').doc(uid);
-    data.get().then((value) {
-      setState(() {
-        BatchName = value['BatchName'].toString();
-        FirstName = value['FirstName'].toString();
-        IDNumber = value['IDNumber'];
-        LastName = value['LastName'].toString();
-        Organization = value['Organization'];
-        email = value['email'];
-        JoiningDate = value['JoiningDate'].toDate();
-      });
-    });
-  }
-
-  getDataStream() async {
-    await for (var snapshot
-        in firestore.collection('MentorData').doc(uid).snapshots()) {
-      setState(() {
-        BatchName = snapshot.get('BatchName').toString();
-        FirstName = snapshot.get('FirstName').toString();
-        IDNumber = snapshot.get('IDNumber');
-        LastName = snapshot.get('LastName').toString();
-        Organization = snapshot.get('Organization').toString();
-        email = snapshot.get('email');
-        JoiningDate = snapshot.get('JoiningDate').toDate();
-      });
-      // FirstName = snapshot.docs['FirstName'].toString();
-      // LastName = snapshot.docs.
     }
   }
 
@@ -116,9 +70,7 @@ class _MentorProfileState extends State<MentorProfile> {
               ),
             ),
             BreakLine(),
-            DecComRepDropContainer(
-              DropoutCbk: getDataStream,
-            )
+            DecComRepDropContainer()
           ],
         ),
       ),
@@ -270,9 +222,6 @@ class TitleBar extends StatelessWidget {
 }
 
 class MentorProfileBanner extends StatelessWidget {
-  String joiningDate = DateFormat(' d MMMM yyyy').format(JoiningDate);
-  String endDate =
-      DateFormat(' d MMMM').format(JoiningDate.add(Duration(days: 70)));
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -303,12 +252,12 @@ class MentorProfileBanner extends StatelessWidget {
             children: [
               Container(
                 child: Text(
-                  "$FirstName $LastName",
+                  "Sneha Khanna",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ),
               Text(
-                "joined $joiningDate",
+                "joined 10 Apr 2021",
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 10,
@@ -396,7 +345,7 @@ class MentorProfileBanner extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      "$endDate",
+                      "5 May 2021",
                       style: TextStyle(
                           color: Color(0xffD92136).withOpacity(0.6),
                           fontSize: 11,
@@ -447,9 +396,8 @@ class OrgIDNumCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          InsideCard(heading: "Organization", value: "$Organization"),
-          InsideCard(
-              heading: "ID Number /Batch ", value: "$IDNumber / $BatchName"),
+          InsideCard(heading: "Organization", value: "Individual"),
+          InsideCard(heading: "Identification Number", value: "007"),
         ],
       ),
     );
@@ -508,8 +456,6 @@ class BreakLine extends StatelessWidget {
 }
 
 class DecComRepDropContainer extends StatelessWidget {
-  final VoidCallback DropoutCbk;
-  DecComRepDropContainer({required this.DropoutCbk});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -543,33 +489,30 @@ class DecComRepDropContainer extends StatelessWidget {
               ],
             ),
           ),
-          InkWell(
-            onTap: DropoutCbk,
-            child: Container(
-              margin: EdgeInsets.only(top: 20),
-              child: Center(
-                child: Text(
-                  "REPORT\nDROPOUT",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18),
+          Container(
+            margin: EdgeInsets.only(top: 20),
+            child: Center(
+              child: Text(
+                "REPORT\nDROPOUT",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+            ),
+            height: size.height * 0.08,
+            width: size.width * 0.4,
+            decoration: BoxDecoration(
+              color: Color(0xffD92136).withOpacity(0.7),
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xffD92136).withOpacity(0.7),
+                  blurRadius: 10,
                 ),
-              ),
-              height: size.height * 0.08,
-              width: size.width * 0.4,
-              decoration: BoxDecoration(
-                color: Color(0xffD92136).withOpacity(0.7),
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xffD92136).withOpacity(0.7),
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
+              ],
             ),
           ),
         ],

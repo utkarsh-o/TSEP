@@ -2,8 +2,37 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tsep/local-data/schedule.dart';
 
-class ScheduleNew extends StatelessWidget {
+class ScheduleNew extends StatefulWidget {
+  @override
+  _ScheduleNewState createState() => _ScheduleNewState();
+}
+
+final auth = FirebaseAuth.instance;
+String uid = '';
+
+class _ScheduleNewState extends State<ScheduleNew> {
+  void getCurrentUser() async {
+    try {
+      final user = await auth.currentUser;
+      if (user != null) {
+        uid = user.uid;
+        // print(loggedInUser!.email);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -34,6 +63,7 @@ class ScheduleNew extends StatelessWidget {
 
 class CancleScheduleBtn extends StatelessWidget {
   @override
+  final firestore = FirebaseFirestore.instance;
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
@@ -72,7 +102,30 @@ class CancleScheduleBtn extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              DateTime pickedDateTime = DateTime(
+                  pickedDate.year,
+                  pickedDate.month,
+                  pickedDate.day,
+                  pickedTime.hour,
+                  pickedTime.minute);
+              schedule.add(Schedule(
+                  mentee: pickedMentee!,
+                  lesson: pickedLesson!,
+                  duration: pickedDuration,
+                  timing: pickedDateTime));
+              print(schedule);
+              firestore.collection('/MentorData/${uid}/Schedule').add({
+                "Duration": pickedDuration,
+                "LectureNumber": pickedLesson,
+                "LectureTime": Timestamp.fromDate(pickedDateTime),
+                "MenteeName": pickedMentee,
+                "FootNotes": footnotes,
+              });
+              footnotescontroller.clear();
+              footnotes = "";
+              Navigator.of(context).pop(context);
+            },
             child: Container(
               child: Center(
                 child: Text(
@@ -110,13 +163,16 @@ class DurationWrapper extends StatefulWidget {
   _DurationWrapperState createState() => _DurationWrapperState();
 }
 
+int pickedDuration = 0;
+
 class _DurationWrapperState extends State<DurationWrapper> {
-  @override
   Duration active = Duration(minutes: 30);
+  @override
   Widget build(BuildContext context) {
     void callback(Duration dur) {
       setState(() {
         active = dur;
+        pickedDuration = dur.inMinutes.toInt();
       });
     }
 
@@ -220,6 +276,9 @@ class FootNotesWrapper extends StatelessWidget {
   }
 }
 
+String footnotes = "";
+final footnotescontroller = TextEditingController();
+
 class FootNotesData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -244,6 +303,8 @@ class FootNotesData extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: TextField(
+          controller: footnotescontroller,
+          onChanged: (value) => footnotes = value,
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
           expands: true,
@@ -262,10 +323,11 @@ class TimeDatePickerWrapper extends StatefulWidget {
   _TimeDatePickerWrapperState createState() => _TimeDatePickerWrapperState();
 }
 
+DateTime pickedDate = DateTime.now();
+TimeOfDay pickedTime = TimeOfDay.now();
+
 class _TimeDatePickerWrapperState extends State<TimeDatePickerWrapper> {
   @override
-  DateTime pickedDate = DateTime.now();
-  TimeOfDay pickedTime = TimeOfDay.now();
   Widget build(BuildContext context) {
     void datepicker() async {
       DateTime? date = await showDatePicker(
@@ -424,22 +486,23 @@ class MntLsnCards extends StatefulWidget {
   _MntLsnCardsState createState() => _MntLsnCardsState();
 }
 
+String? pickedLesson = 'lesson 1';
+String? pickedMentee = 'Iron Man';
+
 class _MntLsnCardsState extends State<MntLsnCards> {
-  String? dropdownValue2 = 'Lesson 1';
-  String? dropdownValue1 = 'Iron Man';
   @override
   Widget build(BuildContext context) {
     List<String> lessons = [
-      'Lesson 1',
-      'Lesson 2',
-      'Lesson 3',
-      'Lesson 4',
-      'Lesson 5',
-      'Lesson 6',
-      'Lesson 7',
-      'Lesson 8',
-      'Lesson 9',
-      'Lesson 10'
+      'lesson 1',
+      'lesson 2',
+      'lesson 3',
+      'lesson 4',
+      'lesson 5',
+      'lesson 6',
+      'lesson 7',
+      'lesson 8',
+      'lesson 9',
+      'lesson 10',
     ];
     List<String> mentees = [
       'Iron Man',
@@ -485,7 +548,7 @@ class _MntLsnCardsState extends State<MntLsnCards> {
                     color: Colors.black.withOpacity(0.6),
                     fontFamily: 'Montserrat'),
                 isExpanded: true,
-                value: dropdownValue1,
+                value: pickedMentee,
                 items: mentees.map((String value) {
                   return DropdownMenuItem<String>(
                     child: Text(value),
@@ -494,7 +557,7 @@ class _MntLsnCardsState extends State<MntLsnCards> {
                 }).toList(),
                 onChanged: (String? value) {
                   setState(() {
-                    dropdownValue1 = value;
+                    pickedMentee = value;
                   });
                 },
                 underline: Container(
@@ -539,7 +602,7 @@ class _MntLsnCardsState extends State<MntLsnCards> {
                     color: Colors.black.withOpacity(0.6),
                     fontFamily: 'Montserrat'),
                 isExpanded: true,
-                value: dropdownValue2,
+                value: pickedLesson,
                 items: lessons.map((String value) {
                   return DropdownMenuItem<String>(
                     child: Text(value),
@@ -548,7 +611,7 @@ class _MntLsnCardsState extends State<MntLsnCards> {
                 }).toList(),
                 onChanged: (String? value) {
                   setState(() {
-                    dropdownValue2 = value;
+                    pickedLesson = value;
                   });
                 },
                 underline: Container(
