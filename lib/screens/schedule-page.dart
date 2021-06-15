@@ -118,17 +118,6 @@ class _SchedulePageState extends State<SchedulePage> {
                 child: Column(
                   children: [
                     TitleBar(),
-                    // StreamBuilder<QuerySnapshot>(
-                    //     stream: firestore
-                    //         .collection('MentorData/${uid}/Schedule')
-                    //         .snapshots(),
-                    //     builder: (context, snapshot) {
-                    //       return getDayCards();
-                    //     }),
-                    // getDayCards(),
-                    // BreakLine(size: size),
-                    // TotContriLesTauWrapper(s: scheduleList),
-                    // BreakLine(size: size),
                     StreamBuilder<QuerySnapshot>(
                       stream: firestore
                           .collection('MentorData/${uid}/Schedule')
@@ -137,11 +126,14 @@ class _SchedulePageState extends State<SchedulePage> {
                         DateTime today = DateTime.now();
                         DateTime _firstDayOfTheweek =
                             today.subtract(new Duration(days: today.weekday));
-                        DateTime startDate =
-                            _firstDayOfTheweek.add(Duration(days: 1));
+                        DateTime startDate = _firstDayOfTheweek
+                            .add(Duration(days: 1))
+                            .subtract(Duration(
+                                hours: TimeOfDay.now().hour,
+                                minutes: TimeOfDay.now().minute));
                         DateTime endDate =
                             _firstDayOfTheweek.add(Duration(days: 7));
-                        List<Widget> ScheduleList = [];
+              ◘          List<Widget> ScheduleCardList = [];
                         if (snapshot.hasData) {
                           scheduleList.clear();
                           final schedules = snapshot.data!.docs;
@@ -157,13 +149,12 @@ class _SchedulePageState extends State<SchedulePage> {
                             scheduleList.add(s);
                             if (lectureTime.isAfter(startDate) &&
                                 lectureTime.isBefore(endDate)) {
-                              ScheduleList.add(
+                              ScheduleCardList.add(
                                 new ScheduleCard(s: s),
                               );
                             }
                           }
                         }
-                        print('builder called');
                         return Column(
                           children: [
                             getDayCards(),
@@ -171,7 +162,7 @@ class _SchedulePageState extends State<SchedulePage> {
                             TotContriLesTauWrapper(s: scheduleList),
                             BreakLine(size: size),
                             Column(
-                              children: ScheduleList,
+                              children: ScheduleCardList,
                             ),
                           ],
                         );

@@ -1,11 +1,12 @@
 import 'dart:ui';
-
+import 'dart:core';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:tsep/components/CustomNavigationBar.dart';
 import 'package:tsep/local-data/line_titles.dart';
+import 'package:tsep/local-data/schedule.dart';
 import 'package:tsep/screens/login-page.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,7 +25,10 @@ String FirstName = '',
     BatchName = '',
     Organization = '',
     uid = '',
-    Gender = '';
+    Gender = '',
+    lastInteraction = '',
+    nextInteraction = '';
+double lecrate = 0, hrrate = 0;
 int IDNumber = 0;
 DateTime JoiningDate = DateTime.now();
 
@@ -37,6 +41,7 @@ class _MentorProfileState extends State<MentorProfile> {
   void initState() {
     super.initState();
     getCurrentUser();
+    getScheduleDataStream();
   }
 
   void editbtncbk() {
@@ -94,9 +99,23 @@ class _MentorProfileState extends State<MentorProfile> {
         JoiningDate = snapshot.get('JoiningDate').toDate();
         Gender = snapshot.get('Gender');
       });
-      // FirstName = snapshot.docs['FirstName'].toString();
-      // LastName = snapshot.docs.
     }
+  }
+
+  getScheduleDataStream() async {
+    await for (var snapshot
+        in firestore.collection('MentorData/${uid}/Schedule').snapshots()) {
+      setState(() {
+        lastInteraction = getLastInteraction();
+        nextInteraction = getNextInteraction();
+        lecrate = getLecHrRate(JoiningDate).first;
+        hrrate = getLecHrRate(JoiningDate).last;
+      });
+    }
+  }
+
+  testfnc() {
+    getlessonChartData(JoiningDate);
   }
 
   @override
@@ -120,7 +139,7 @@ class _MentorProfileState extends State<MentorProfile> {
             ),
             BreakLine(),
             DecComRepDropContainer(
-              DropoutCbk: getDataStream,
+              DropoutCbk: testfnc,
             )
           ],
         ),
@@ -129,20 +148,6 @@ class _MentorProfileState extends State<MentorProfile> {
     );
   }
 }
-
-// class ActivityPlot extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     Size size = MediaQuery.of(context).size;
-//     return Container(
-//       margin: EdgeInsets.symmetric(vertical: 15),
-//       child: SvgPicture.asset(
-//         'assets/vectors/mentor-graph.svg',
-//         width: size.width * 0.95,
-//       ),
-//     );
-//   }
-// }
 
 class ActivityPlot extends StatelessWidget {
   final List<Color> gradientColors = [
@@ -156,18 +161,7 @@ class ActivityPlot extends StatelessWidget {
   ];
   List<LineChartBarData> linechartbardata() {
     final lessons = LineChartBarData(
-      spots: [
-        FlSpot(1, 3),
-        FlSpot(2, 2),
-        FlSpot(3, 2),
-        FlSpot(4, 1),
-        FlSpot(5, 1),
-        FlSpot(6, 4),
-        FlSpot(7, 3),
-        FlSpot(8, 2),
-        FlSpot(9, 2),
-        FlSpot(10, 3),
-      ],
+      spots: getlessonChartData(JoiningDate),
       curveSmoothness: 0.6,
       isCurved: true,
       colors: gradientColors,
@@ -183,18 +177,7 @@ class ActivityPlot extends StatelessWidget {
     );
     final hours = LineChartBarData(
         show: true,
-        spots: [
-          FlSpot(1, 2.7),
-          FlSpot(2, 2.4),
-          FlSpot(3, 2.1),
-          FlSpot(4, 1.7),
-          FlSpot(5, 1.3),
-          FlSpot(6, 3.9),
-          FlSpot(7, 3.2),
-          FlSpot(8, 1.5),
-          FlSpot(9, 2.1),
-          FlSpot(10, 3),
-        ],
+        spots: gethourChartData(JoiningDate),
         isCurved: true,
         colors: gradientColors2,
         curveSmoothness: 0.6,
@@ -357,7 +340,7 @@ class MentorProfileBanner extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      "19 hours",
+                      lastInteraction,
                       style: TextStyle(
                           color: Color(0xff34A853).withOpacity(0.6),
                           fontSize: 11,
@@ -379,7 +362,7 @@ class MentorProfileBanner extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      "27 hours",
+                      nextInteraction,
                       style: TextStyle(
                           color: Color(0xff34A853).withOpacity(0.6),
                           fontSize: 11,
@@ -423,7 +406,7 @@ class MentorProfileBanner extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      "4 / 2.5",
+                      "${lecrate} / ${hrrate}",
                       style: TextStyle(
                           color: Color(0xffD92136).withOpacity(0.6),
                           fontSize: 11,

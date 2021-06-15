@@ -1,3 +1,8 @@
+import 'dart:ffi';
+import 'dart:math';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:tsep/screens/mentor-profile.dart';
+
 class Schedule {
   String mentee, lesson;
   DateTime timing;
@@ -48,6 +53,105 @@ Duration getttlctr(List<Schedule> schedule) {
       ttllsns++;
     }
   return ttlctr;
+}
+
+String getLastInteraction() {
+  Duration result = Duration(days: 1000);
+  for (var s in scheduleList) {
+    if (s.timing.isBefore(DateTime.now())) {
+      Duration dur = s.timing.difference(DateTime.now()).abs();
+      if (dur < result) result = dur;
+    }
+  }
+  if (result == Duration(days: 1000) || result > Duration(days: 70)) {
+    return "-";
+  } else {
+    if (result.inHours > 24) {
+      return "${(result.inHours / 24).floor()} days, ${result.inHours % 24} hours";
+    } else
+      return "${result.inHours} hours";
+  }
+}
+
+String getNextInteraction() {
+  Duration result = Duration(days: 1000);
+  for (var s in scheduleList) {
+    if (s.timing.isAfter(DateTime.now())) {
+      Duration dur = s.timing.difference(DateTime.now()).abs();
+      if (dur < result) result = dur;
+    }
+  }
+  if (result == Duration(days: 1000)) {
+    return "-";
+  } else {
+    if (result.inHours > 24) {
+      return "${(result.inHours / 24).floor()} days : ${result.inHours % 24} hours";
+    } else
+      return "${result.inHours} hours";
+  }
+}
+
+double roundDouble(double value, int places) {
+  num mod = pow(10, places);
+  return ((value * mod).round().toDouble() / mod);
+}
+
+List<double> getLecHrRate(DateTime joiningDate) {
+  int lectaken = 0;
+  Duration hrtaken = Duration(seconds: 0);
+  int weekleft =
+      10 - ((DateTime.now().difference(joiningDate).inDays) / 7).floor();
+  for (var s in scheduleList) {
+    if (s.timing.isBefore(DateTime.now())) {
+      lectaken++;
+      hrtaken += Duration(minutes: s.duration);
+    }
+  }
+  double lecrate = roundDouble((30 - lectaken) / weekleft, 1);
+  double hrrate = roundDouble((15 - hrtaken.inHours) / weekleft, 1);
+  return [lecrate, hrrate];
+}
+
+List<FlSpot> getlessonChartData(DateTime JoiningDate) {
+  //TODO:initialize middle weeks without values to 0;
+  List<FlSpot> result = [];
+  Map<int, int> map = {};
+  for (var s in scheduleList) {
+    if (s.timing.isBefore(DateTime.now())) {
+      int week = (s.timing.difference(JoiningDate).inDays / 7).floor() + 1;
+      if (map.containsKey(week)) {
+        map.update(week, (val) => val + 1);
+      } else
+        map[week] = 1;
+    }
+  }
+  for (int i = 1; i <= 10; i++) {
+    if (map.containsKey(i))
+      result.add(FlSpot(i.toDouble(), map[i]!.toDouble()));
+  }
+  print(result);
+  return result;
+}
+
+List<FlSpot> gethourChartData(DateTime JoiningDate) {
+  //TODO:initialize middle weeks without values to 0;
+  List<FlSpot> result = [];
+  Map<int, double> map = {};
+  for (var s in scheduleList) {
+    if (s.timing.isBefore(DateTime.now())) {
+      int week = (s.timing.difference(JoiningDate).inDays / 7).floor() + 1;
+      if (map.containsKey(week)) {
+        map.update(week, (val) => val + s.duration / 60);
+      } else
+        map[week] = s.duration / 60;
+    }
+  }
+  for (int i = 1; i <= 10; i++) {
+    if (map.containsKey(i))
+      result.add(FlSpot(i.toDouble(), map[i]!.toDouble()));
+  }
+  print(result);
+  return result;
 }
 
 bool iseventful(List<Schedule> schedule, DateTime today) {
