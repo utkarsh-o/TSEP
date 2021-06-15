@@ -1,7 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:tsep/components/CustomNavigationBar.dart';
+import 'package:tsep/components/loading.dart';
 import 'package:tsep/local-data/schedule.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,6 +12,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 final firestore = FirebaseFirestore.instance;
 final auth = FirebaseAuth.instance;
 String? uid;
+bool loading = false;
 
 class SchedulePage extends StatefulWidget {
   const SchedulePage({Key? key}) : super(key: key);
@@ -105,59 +109,82 @@ class _SchedulePageState extends State<SchedulePage> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            TitleBar(),
-            getDayCards(),
-            BreakLine(size: size),
-            TotContriLesTauWrapper(s: schedule),
-            BreakLine(size: size),
-            StreamBuilder<QuerySnapshot>(
-              stream: firestore
-                  .collection('MentorData/${uid}/Schedule')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                DateTime today = DateTime.now();
-                DateTime _firstDayOfTheweek =
-                    today.subtract(new Duration(days: today.weekday));
-                DateTime startDate = _firstDayOfTheweek.add(Duration(days: 1));
-                DateTime endDate = _firstDayOfTheweek.add(Duration(days: 7));
-                List<Widget> ScheduleList = [];
-                if (snapshot.hasData) {
-                  final schedules = snapshot.data!.docs;
-                  for (var schedule in schedules) {
-                    var lectureTime = schedule.get('LectureTime').toDate();
-                    if (lectureTime.isAfter(startDate) &&
-                        lectureTime.isBefore(endDate)) {
-                      Schedule s = Schedule(
-                        mentee: schedule.get('MenteeName'),
-                        lesson: schedule.get('LectureNumber'),
-                        duration: schedule.get('Duration'),
-                        timing: schedule.get('LectureTime').toDate(),
-                      );
-                      ScheduleList.add(
-                        new ScheduleCard(s: s),
-                      );
-                    }
-                  }
-                }
-                return Expanded(
-                  child: ListView(
-                    children: ScheduleList,
-                  ),
-                );
-              },
+    return loading
+        ? Loading()
+        : Scaffold(
+            backgroundColor: Colors.white,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TitleBar(),
+                    // StreamBuilder<QuerySnapshot>(
+                    //     stream: firestore
+                    //         .collection('MentorData/${uid}/Schedule')
+                    //         .snapshots(),
+                    //     builder: (context, snapshot) {
+                    //       return getDayCards();
+                    //     }),
+                    // getDayCards(),
+                    // BreakLine(size: size),
+                    // TotContriLesTauWrapper(s: scheduleList),
+                    // BreakLine(size: size),
+                    StreamBuilder<QuerySnapshot>(
+                      stream: firestore
+                          .collection('MentorData/${uid}/Schedule')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        DateTime today = DateTime.now();
+                        DateTime _firstDayOfTheweek =
+                            today.subtract(new Duration(days: today.weekday));
+                        DateTime startDate =
+                            _firstDayOfTheweek.add(Duration(days: 1));
+                        DateTime endDate =
+                            _firstDayOfTheweek.add(Duration(days: 7));
+                        List<Widget> ScheduleList = [];
+                        if (snapshot.hasData) {
+                          scheduleList.clear();
+                          final schedules = snapshot.data!.docs;
+                          for (var schedule in schedules) {
+                            var lectureTime =
+                                schedule.get('LectureTime').toDate();
+                            Schedule s = Schedule(
+                              mentee: schedule.get('MenteeName'),
+                              lesson: schedule.get('LectureNumber'),
+                              duration: schedule.get('Duration'),
+                              timing: schedule.get('LectureTime').toDate(),
+                            );
+                            scheduleList.add(s);
+                            if (lectureTime.isAfter(startDate) &&
+                                lectureTime.isBefore(endDate)) {
+                              ScheduleList.add(
+                                new ScheduleCard(s: s),
+                              );
+                            }
+                          }
+                        }
+                        print('builder called');
+                        return Column(
+                          children: [
+                            getDayCards(),
+                            BreakLine(size: size),
+                            TotContriLesTauWrapper(s: scheduleList),
+                            BreakLine(size: size),
+                            Column(
+                              children: ScheduleList,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: CustomBottomNavBar(
-        active: 1,
-      ),
-    );
+            bottomNavigationBar: CustomBottomNavBar(
+              active: 1,
+            ),
+          );
   }
 }
 
@@ -298,15 +325,37 @@ class ScheduleCard extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-                "$starttime - $endtime",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black.withOpacity(0.8),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
+                  child: Text(
+                    "$starttime - $endtime",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black.withOpacity(0.8),
+                    ),
+                  ),
                 ),
-              ),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.access_time_filled,
+                      color: Color(0xff268200).withOpacity(0.7),
+                      size: 12,
+                    ),
+                    Text(
+                      "  ${s.duration} mins",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xff269200).withOpacity(0.7),
+                          fontSize: 12),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -351,7 +400,7 @@ class DayCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool active = isactive(date);
-    bool event = iseventful(schedule, date);
+    bool event = iseventful(scheduleList, date);
     Color fontColor = active ? Colors.white : Colors.black.withOpacity(0.7);
     Color eventColor = active
         ? Colors.white.withOpacity(0.7)

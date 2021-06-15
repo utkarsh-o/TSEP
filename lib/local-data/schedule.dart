@@ -11,31 +11,31 @@ class Schedule {
   });
 }
 
-List<Schedule> schedule = [
-  Schedule(
-    mentee: 'Iron Man',
-    lesson: 'lesson 6',
-    duration: 60,
-    timing: DateTime.parse('2021-06-19 16:00:00'),
-  ),
-  Schedule(
-    mentee: 'Spider Man',
-    lesson: 'lesson 5',
-    duration: 30,
-    timing: DateTime.parse('2021-06-17 15:00:00'),
-  ),
-  Schedule(
-    mentee: 'Bat Man',
-    lesson: 'lesson 3',
-    duration: 50,
-    timing: DateTime.parse('2021-06-16 18:30:00'),
-  ),
-  Schedule(
-    mentee: 'Ant Man',
-    lesson: 'lesson 2',
-    duration: 50,
-    timing: DateTime.parse('2021-06-14 17:30:00'),
-  ),
+List<Schedule> scheduleList = [
+  // Schedule(
+  //   mentee: 'Iron Man',
+  //   lesson: 'lesson 6',
+  //   duration: 60,
+  //   timing: DateTime.parse('2021-06-19 16:00:00'),
+  // ),
+  // Schedule(
+  //   mentee: 'Spider Man',
+  //   lesson: 'lesson 5',
+  //   duration: 30,
+  //   timing: DateTime.parse('2021-06-17 15:00:00'),
+  // ),
+  // Schedule(
+  //   mentee: 'Bat Man',
+  //   lesson: 'lesson 3',
+  //   duration: 50,
+  //   timing: DateTime.parse('2021-06-16 18:30:00'),
+  // ),
+  // Schedule(
+  //   mentee: 'Ant Man',
+  //   lesson: 'lesson 2',
+  //   duration: 50,
+  //   timing: DateTime.parse('2021-06-14 17:30:00'),
+  // ),
 ];
 int ttllsns = 0;
 Duration getttlctr(List<Schedule> schedule) {
@@ -43,7 +43,7 @@ Duration getttlctr(List<Schedule> schedule) {
   DateTime today = DateTime.now();
   ttllsns = 0;
   for (var s in schedule)
-    if (s.timing.isBefore(today)) {
+    if (s.timing.add(Duration(minutes: s.duration)).isBefore(today)) {
       ttlctr += Duration(minutes: s.duration);
       ttllsns++;
     }

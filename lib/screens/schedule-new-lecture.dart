@@ -31,6 +31,11 @@ class _ScheduleNewState extends State<ScheduleNew> {
   void initState() {
     super.initState();
     getCurrentUser();
+    setState(() {
+      pickedTime = TimeOfDay.now();
+      pickedDate = DateTime.now();
+      pickedDuration = 30;
+    });
   }
 
   @override
@@ -109,12 +114,12 @@ class CancleScheduleBtn extends StatelessWidget {
                   pickedDate.day,
                   pickedTime.hour,
                   pickedTime.minute);
-              schedule.add(Schedule(
+              scheduleList.add(Schedule(
                   mentee: pickedMentee!,
                   lesson: pickedLesson!,
                   duration: pickedDuration,
                   timing: pickedDateTime));
-              print(schedule);
+              print(scheduleList);
               firestore.collection('/MentorData/${uid}/Schedule').add({
                 "Duration": pickedDuration,
                 "LectureNumber": pickedLesson,
@@ -122,7 +127,6 @@ class CancleScheduleBtn extends StatelessWidget {
                 "MenteeName": pickedMentee,
                 "FootNotes": footnotes,
               });
-              footnotescontroller.clear();
               footnotes = "";
               Navigator.of(context).pop(context);
             },
@@ -170,10 +174,13 @@ class _DurationWrapperState extends State<DurationWrapper> {
   @override
   Widget build(BuildContext context) {
     void callback(Duration dur) {
-      setState(() {
-        active = dur;
-        pickedDuration = dur.inMinutes.toInt();
-      });
+      setState(
+        () {
+          active = dur;
+          pickedDuration = dur.inMinutes.toInt();
+          print('picked duration = {$pickedDuration}');
+        },
+      );
     }
 
     return Row(

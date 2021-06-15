@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/components/loading.dart';
 import 'package:tsep/screens/mentor-profile-template.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tsep/screens/signup-page.dart';
 
 import 'mentor-profile.dart';
 
@@ -145,16 +146,6 @@ class LoginWrapper extends StatelessWidget {
               ),
             ),
             onPressed: callback,
-            // () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) {
-            //       return MentorProfile();
-            //     },
-            //   ),
-            // );
-            // },
             child: Text('Login'),
           ),
           IconButton(
@@ -303,7 +294,16 @@ class SignupWrapper extends StatelessWidget {
                     ),
                   ),
                   TextButton(
-                    onPressed: callback,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return SignUp();
+                          },
+                        ),
+                      );
+                    },
                     child: Text(
                       "Sign Up",
                       style: TextStyle(

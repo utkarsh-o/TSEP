@@ -235,7 +235,7 @@ class MentorProfileBanner extends StatelessWidget {
             // margin: EdgeInsets.only(right: size.width * 0.02),
             height: double.infinity,
             width: size.height * 0.16,
-            child: Image.asset("assets/vectors/mentor-profile.png"),
+            child: Image.asset("assets/vectors/Mentor(F).png"),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [

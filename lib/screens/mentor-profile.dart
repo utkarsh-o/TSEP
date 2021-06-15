@@ -23,7 +23,8 @@ String FirstName = '',
     LastName = '',
     BatchName = '',
     Organization = '',
-    uid = '';
+    uid = '',
+    Gender = '';
 int IDNumber = 0;
 DateTime JoiningDate = DateTime.now();
 
@@ -75,6 +76,7 @@ class _MentorProfileState extends State<MentorProfile> {
         Organization = value['Organization'];
         email = value['email'];
         JoiningDate = value['JoiningDate'].toDate();
+        Gender = value['Gender'].toString();
       });
     });
   }
@@ -90,6 +92,7 @@ class _MentorProfileState extends State<MentorProfile> {
         Organization = snapshot.get('Organization').toString();
         email = snapshot.get('email');
         JoiningDate = snapshot.get('JoiningDate').toDate();
+        Gender = snapshot.get('Gender');
       });
       // FirstName = snapshot.docs['FirstName'].toString();
       // LastName = snapshot.docs.
@@ -286,7 +289,9 @@ class MentorProfileBanner extends StatelessWidget {
             // margin: EdgeInsets.only(right: size.width * 0.02),
             height: double.infinity,
             width: size.height * 0.16,
-            child: Image.asset("assets/vectors/mentor-profile.png"),
+            child: Gender == 'male'
+                ? Image.asset("assets/vectors/Mentor(M).png")
+                : Image.asset("assets/vectors/Mentor(F).png"),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [
