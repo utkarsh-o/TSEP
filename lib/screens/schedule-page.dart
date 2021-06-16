@@ -27,7 +27,6 @@ class _SchedulePageState extends State<SchedulePage> {
       final user = await auth.currentUser;
       if (user != null) {
         uid = user.uid;
-        // print(loggedInUser!.email);
       }
     } catch (e) {
       print(e);
@@ -133,7 +132,7 @@ class _SchedulePageState extends State<SchedulePage> {
                                 minutes: TimeOfDay.now().minute));
                         DateTime endDate =
                             _firstDayOfTheweek.add(Duration(days: 7));
-              ◘          List<Widget> ScheduleCardList = [];
+                        List<Widget> ScheduleCardList = [];
                         if (snapshot.hasData) {
                           scheduleList.clear();
                           final schedules = snapshot.data!.docs;
@@ -263,11 +262,12 @@ class ScheduleCard extends StatelessWidget {
         width: size.width * 0.9,
         height: size.height * 0.1,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
               height: 35,
               width: 40,
-              margin: EdgeInsets.symmetric(horizontal: 17),
+              margin: EdgeInsets.only(right: 5, left: 15),
               decoration: BoxDecoration(
                 color: Color(0xff003670).withOpacity(0.7),
                 borderRadius: BorderRadius.circular(8),
@@ -289,8 +289,8 @@ class ScheduleCard extends StatelessWidget {
               ),
             ),
             Container(
-              constraints: BoxConstraints(minWidth: size.width * 0.25),
-              margin: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
+              constraints: BoxConstraints(minWidth: size.width * 0.35),
+              margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,

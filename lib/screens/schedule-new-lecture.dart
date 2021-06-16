@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tsep/local-data/schedule.dart';
+import 'package:tsep/screens/mentor-profile.dart';
 
 class ScheduleNew extends StatefulWidget {
   @override
@@ -13,6 +14,8 @@ class ScheduleNew extends StatefulWidget {
 
 final auth = FirebaseAuth.instance;
 String uid = '';
+List<String> mentees = [];
+String? DisplayName = '';
 
 class _ScheduleNewState extends State<ScheduleNew> {
   void getCurrentUser() async {
@@ -31,11 +34,19 @@ class _ScheduleNewState extends State<ScheduleNew> {
   void initState() {
     super.initState();
     getCurrentUser();
+    getData();
     setState(() {
       pickedTime = TimeOfDay.now();
       pickedDate = DateTime.now();
+      footnotescontroller.clear();
       pickedDuration = 30;
     });
+  }
+
+  getData() {
+    mentees.clear();
+    for (var mentee in menteeList) mentees.add(mentee.Name);
+    DisplayName = mentees.first;
   }
 
   @override
@@ -119,12 +130,23 @@ class CancleScheduleBtn extends StatelessWidget {
                   lesson: pickedLesson!,
                   duration: pickedDuration,
                   timing: pickedDateTime));
-              print(scheduleList);
               firestore.collection('/MentorData/${uid}/Schedule').add({
                 "Duration": pickedDuration,
                 "LectureNumber": pickedLesson,
                 "LectureTime": Timestamp.fromDate(pickedDateTime),
                 "MenteeName": pickedMentee,
+                "FootNotes": footnotes,
+              });
+              var pickedUID;
+              menteeList.forEach((e) {
+                if (e.Name == pickedMentee) pickedUID = e.uid;
+              });
+              print("$pickedUID is pickedUID");
+              firestore.collection('/MenteeInfo/${pickedUID}/Schedule').add({
+                "Duration": pickedDuration,
+                "LectureNumber": pickedLesson,
+                "LectureTime": Timestamp.fromDate(pickedDateTime),
+                "MentorName": MentorName,
                 "FootNotes": footnotes,
               });
               footnotes = "";
@@ -178,7 +200,6 @@ class _DurationWrapperState extends State<DurationWrapper> {
         () {
           active = dur;
           pickedDuration = dur.inMinutes.toInt();
-          print('picked duration = {$pickedDuration}');
         },
       );
     }
@@ -511,12 +532,8 @@ class _MntLsnCardsState extends State<MntLsnCards> {
       'lesson 9',
       'lesson 10',
     ];
-    List<String> mentees = [
-      'Iron Man',
-      'Spider Man',
-      'Bat Man',
-      'Ant Man',
-    ];
+    // List<String> mentees = ['Iron Man'];
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -555,7 +572,7 @@ class _MntLsnCardsState extends State<MntLsnCards> {
                     color: Colors.black.withOpacity(0.6),
                     fontFamily: 'Montserrat'),
                 isExpanded: true,
-                value: pickedMentee,
+                value: DisplayName,
                 items: mentees.map((String value) {
                   return DropdownMenuItem<String>(
                     child: Text(value),
@@ -565,6 +582,7 @@ class _MntLsnCardsState extends State<MntLsnCards> {
                 onChanged: (String? value) {
                   setState(() {
                     pickedMentee = value;
+                    DisplayName = value;
                   });
                 },
                 underline: Container(

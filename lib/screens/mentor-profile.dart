@@ -27,7 +27,8 @@ String FirstName = '',
     uid = '',
     Gender = '',
     lastInteraction = '',
-    nextInteraction = '';
+    nextInteraction = '',
+    MentorName = '';
 double lecrate = 0, hrrate = 0;
 int IDNumber = 0;
 DateTime JoiningDate = DateTime.now();
@@ -99,6 +100,7 @@ class _MentorProfileState extends State<MentorProfile> {
         JoiningDate = snapshot.get('JoiningDate').toDate();
         Gender = snapshot.get('Gender');
       });
+      MentorName = "$FirstName $LastName";
     }
   }
 

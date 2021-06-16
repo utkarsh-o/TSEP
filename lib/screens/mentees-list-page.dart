@@ -2,9 +2,71 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/components/CustomNavigationBar.dart';
+import 'package:tsep/local-data/schedule.dart';
 import 'package:tsep/screens/mentee-details-page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MenteesPage extends StatelessWidget {
+final firestore = FirebaseFirestore.instance;
+final auth = FirebaseAuth.instance;
+String? uid;
+
+class MenteesPage extends StatefulWidget {
+  @override
+  _MenteesPageState createState() => _MenteesPageState();
+}
+
+class _MenteesPageState extends State<MenteesPage> {
+  void getCurrentUser() async {
+    try {
+      final user = await auth.currentUser;
+      if (user != null) {
+        uid = user.uid;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void initState() {
+    super.initState();
+    getCurrentUser();
+    getData();
+  }
+
+  List<Widget> MenteeCardHolder = [];
+  getData() async {
+    await firestore.collection('MentorData/${uid}/Mentees').get().then(
+      (value) async {
+        menteeList.clear();
+        for (var mentee in value.docs) {
+          print(mentee.id);
+          var name = "${mentee['FirstName']} ${mentee['LastName']}";
+          var level;
+          var lesson;
+          await firestore.collection('/MenteeInfo').doc(mentee.id).get().then(
+            (value) {
+              level = value['InitialLevel'];
+              lesson = value['LatestLecture'];
+            },
+          );
+          MenteeCardHolder.add(MenteeCard(
+            name: name,
+            level: level,
+            lesson: lesson,
+            uid: mentee.id,
+          ));
+          menteeList.add(Mentee(Name: name, uid: mentee.id));
+        }
+      },
+    );
+    for (var i in menteeList) {
+      print(i.uid);
+      print(i.Name);
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -15,12 +77,10 @@ class MenteesPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                TitleBar(),
-                SizedBox(height: size.height * 0.05),
-                MenteeCard(name: "Bat Man", level: "Intermediate", lesson: 13),
-                MenteeCard(name: "Iron Man", level: "Novice", lesson: 6),
-                MenteeCard(name: "Spider Man", level: "Beginner", lesson: 2),
-                MenteeCard(name: "Ant Man", level: "Intermediate", lesson: 11),
+                TitleBar(
+                  callback: getData,
+                ),
+                Column(children: MenteeCardHolder)
               ],
             ),
           ),
@@ -34,6 +94,8 @@ class MenteesPage extends StatelessWidget {
 }
 
 class TitleBar extends StatelessWidget {
+  final VoidCallback callback;
+  TitleBar({required this.callback});
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -56,7 +118,7 @@ class TitleBar extends StatelessWidget {
           height: screenHeight * 0.12,
         ),
         InkWell(
-          onTap: () {},
+          onTap: callback,
           child: SvgPicture.asset(
             "assets/icons/settings-tb.svg",
             height: screenWidth * 0.06,
@@ -68,10 +130,13 @@ class TitleBar extends StatelessWidget {
 }
 
 class MenteeCard extends StatelessWidget {
-  final String name, level;
+  final String name, level, uid;
   final int lesson;
   const MenteeCard(
-      {required this.name, required this.level, required this.lesson});
+      {required this.name,
+      required this.level,
+      required this.lesson,
+      required this.uid});
   String getInitials(name) {
     List<String> names = name.split(" ");
     String initials = "";
@@ -114,7 +179,9 @@ class MenteeCard extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return MenteeDetails();
+                      return MenteeDetails(
+                        MenteeUID: uid,
+                      );
                     },
                   ),
                 );
@@ -154,7 +221,9 @@ class MenteeCard extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return MenteeDetails();
+                        return MenteeDetails(
+                          MenteeUID: uid,
+                        );
                       },
                     ),
                   );

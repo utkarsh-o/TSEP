@@ -16,32 +16,13 @@ class Schedule {
   });
 }
 
-List<Schedule> scheduleList = [
-  // Schedule(
-  //   mentee: 'Iron Man',
-  //   lesson: 'lesson 6',
-  //   duration: 60,
-  //   timing: DateTime.parse('2021-06-19 16:00:00'),
-  // ),
-  // Schedule(
-  //   mentee: 'Spider Man',
-  //   lesson: 'lesson 5',
-  //   duration: 30,
-  //   timing: DateTime.parse('2021-06-17 15:00:00'),
-  // ),
-  // Schedule(
-  //   mentee: 'Bat Man',
-  //   lesson: 'lesson 3',
-  //   duration: 50,
-  //   timing: DateTime.parse('2021-06-16 18:30:00'),
-  // ),
-  // Schedule(
-  //   mentee: 'Ant Man',
-  //   lesson: 'lesson 2',
-  //   duration: 50,
-  //   timing: DateTime.parse('2021-06-14 17:30:00'),
-  // ),
-];
+class Mentee {
+  String Name, uid;
+  Mentee({required this.Name, required this.uid});
+}
+
+List<Schedule> scheduleList = [];
+List<Mentee> menteeList = [];
 int ttllsns = 0;
 Duration getttlctr(List<Schedule> schedule) {
   Duration ttlctr = Duration();
@@ -129,7 +110,6 @@ List<FlSpot> getlessonChartData(DateTime JoiningDate) {
     if (map.containsKey(i))
       result.add(FlSpot(i.toDouble(), map[i]!.toDouble()));
   }
-  print(result);
   return result;
 }
 
@@ -150,7 +130,6 @@ List<FlSpot> gethourChartData(DateTime JoiningDate) {
     if (map.containsKey(i))
       result.add(FlSpot(i.toDouble(), map[i]!.toDouble()));
   }
-  print(result);
   return result;
 }
 
