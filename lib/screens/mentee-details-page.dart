@@ -74,43 +74,45 @@ class _MenteeDetailsState extends State<MenteeDetails> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            TitleBar(),
-            StreamBuilder<QuerySnapshot>(
-              stream: firestore
-                  .collection('MentorData/${MentorUID}/Schedule')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                List<Widget> lessonList = [];
-                if (snapshot.hasData) {
-                  Engagement = 0;
-                  final lessons = snapshot.data!.docs;
-                  for (var lesson in lessons) {
-                    if (lesson.get('MenteeName') == MenteeName) {
-                      Engagement += lesson.get('Duration');
-                      lessonList.add(LessonList(
-                          lesson: lesson.get('LectureNumber'),
-                          date: DateFormat('EEE, d MMMM')
-                              .format(lesson.get('LectureTime').toDate()),
-                          lessonLength: lesson.get('Duration').toString()));
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TitleBar(),
+              StreamBuilder<QuerySnapshot>(
+                stream: firestore
+                    .collection('MentorData/$MentorUID/Schedule')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  List<Widget> lessonList = [];
+                  if (snapshot.hasData) {
+                    Engagement = 0;
+                    final lessons = snapshot.data!.docs;
+                    for (var lesson in lessons) {
+                      if (lesson.get('MenteeName') == MenteeName) {
+                        Engagement += lesson.get('Duration');
+                        lessonList.add(LessonList(
+                            lesson: lesson.get('LectureNumber'),
+                            date: DateFormat('EEE, d MMMM')
+                                .format(lesson.get('LectureTime').toDate()),
+                            lessonLength: lesson.get('Duration').toString()));
+                      }
                     }
                   }
-                }
-                return Column(
-                  children: [
-                    MenteeProfile(),
-                    SizedBox(height: size.height * 0.02),
-                    BatchJoinProfWrapper(),
-                    SizedBox(height: size.height * 0.02),
-                    Column(
-                      children: lessonList,
-                    )
-                  ],
-                );
-              },
-            )
-          ],
+                  return Column(
+                    children: [
+                      MenteeProfile(),
+                      SizedBox(height: size.height * 0.02),
+                      BatchJoinProfWrapper(),
+                      SizedBox(height: size.height * 0.02),
+                      Column(
+                        children: lessonList,
+                      )
+                    ],
+                  );
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -319,7 +321,8 @@ class MenteeProfile extends StatelessWidget {
                   Container(
                     child: EngLessonCards(
                       heading: "Engagement",
-                      value: "$Engagement min",
+                      value:
+                          "${(Engagement / 60).floor()}hr ${Engagement % 60}min",
                       valueColor: Color(0xffD92136).withOpacity(0.6),
                     ),
                   ),

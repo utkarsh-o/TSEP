@@ -4,11 +4,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:tsep/screens/mentor-profile.dart';
 
 class Schedule {
-  String mentee, lesson;
+  String mentee, lesson, menteeUID, mentorSchID, menteeSchID;
   DateTime timing;
   int duration;
 
   Schedule({
+    required this.menteeUID,
+    required this.menteeSchID,
+    required this.mentorSchID,
     required this.mentee,
     required this.lesson,
     required this.duration,
@@ -24,6 +27,7 @@ class Mentee {
 List<Schedule> scheduleList = [];
 List<Mentee> menteeList = [];
 int ttllsns = 0;
+int schlsns = 0;
 Duration getttlctr(List<Schedule> schedule) {
   Duration ttlctr = Duration();
   DateTime today = DateTime.now();
@@ -36,6 +40,17 @@ Duration getttlctr(List<Schedule> schedule) {
   return ttlctr;
 }
 
+Duration getschcnt(List<Schedule> schedule) {
+  Duration schcnt = Duration();
+  DateTime today = DateTime.now();
+  schlsns = 0;
+  for (var s in schedule) {
+    schcnt += Duration(minutes: s.duration);
+    schlsns++;
+  }
+  return schcnt;
+}
+
 String getLastInteraction() {
   Duration result = Duration(days: 1000);
   for (var s in scheduleList) {
@@ -44,7 +59,7 @@ String getLastInteraction() {
       if (dur < result) result = dur;
     }
   }
-  if (result == Duration(days: 1000) || result > Duration(days: 70)) {
+  if (result == Duration(days: 1000) || result > Duration(days: 80)) {
     return "-";
   } else {
     if (result.inHours > 24) {
@@ -66,9 +81,9 @@ String getNextInteraction() {
     return "-";
   } else {
     if (result.inHours > 24) {
-      return "${(result.inHours / 24).floor()} days : ${result.inHours % 24} hours";
+      return "in ${(result.inHours / 24).floor()} days ${result.inHours % 24} hours";
     } else
-      return "${result.inHours} hours";
+      return "in ${result.inHours} hours";
   }
 }
 
@@ -96,15 +111,24 @@ List<double> getLecHrRate(DateTime joiningDate) {
 List<FlSpot> getlessonChartData(DateTime JoiningDate) {
   //TODO:initialize middle weeks without values to 0;
   List<FlSpot> result = [];
-  Map<int, int> map = {};
+  Map<int, int> map = {
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+    7: 0,
+    8: 0,
+    9: 0,
+    10: 0,
+  };
   for (var s in scheduleList) {
-    if (s.timing.isBefore(DateTime.now())) {
-      int week = (s.timing.difference(JoiningDate).inDays / 7).floor() + 1;
-      if (map.containsKey(week)) {
-        map.update(week, (val) => val + 1);
-      } else
-        map[week] = 1;
-    }
+    int week = (s.timing.difference(JoiningDate).inDays / 7).floor() + 1;
+    if (map.containsKey(week)) {
+      map.update(week, (val) => val + 1);
+    } else
+      map[week] = 1;
   }
   for (int i = 1; i <= 10; i++) {
     if (map.containsKey(i))
@@ -116,15 +140,26 @@ List<FlSpot> getlessonChartData(DateTime JoiningDate) {
 List<FlSpot> gethourChartData(DateTime JoiningDate) {
   //TODO:initialize middle weeks without values to 0;
   List<FlSpot> result = [];
-  Map<int, double> map = {};
+  Map<int, double> map = {
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+    7: 0,
+    8: 0,
+    9: 0,
+    10: 0,
+  };
   for (var s in scheduleList) {
-    if (s.timing.isBefore(DateTime.now())) {
-      int week = (s.timing.difference(JoiningDate).inDays / 7).floor() + 1;
-      if (map.containsKey(week)) {
-        map.update(week, (val) => val + s.duration / 60);
-      } else
-        map[week] = s.duration / 60;
-    }
+    // if (s.timing.isBefore(DateTime.now())) {
+    int week = (s.timing.difference(JoiningDate).inDays / 7).floor() + 1;
+    if (map.containsKey(week)) {
+      map.update(week, (val) => val + s.duration / 60);
+    } else
+      map[week] = s.duration / 60;
+    // }
   }
   for (int i = 1; i <= 10; i++) {
     if (map.containsKey(i))

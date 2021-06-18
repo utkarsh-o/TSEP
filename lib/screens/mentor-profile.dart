@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'dart:core';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:tsep/components/CustomNavigationBar.dart';
 import 'package:tsep/local-data/line_titles.dart';
@@ -19,16 +18,16 @@ class MentorProfile extends StatefulWidget {
   _MentorProfileState createState() => _MentorProfileState();
 }
 
-String FirstName = '',
+String firstName = '',
     email = '',
-    LastName = '',
-    BatchName = '',
-    Organization = '',
+    lastName = '',
+    batchName = '',
+    organization = '',
     uid = '',
-    Gender = '',
+    gender = '',
     lastInteraction = '',
     nextInteraction = '',
-    MentorName = '';
+    mentorName = '';
 double lecrate = 0, hrrate = 0;
 int IDNumber = 0;
 DateTime JoiningDate = DateTime.now();
@@ -45,7 +44,7 @@ class _MentorProfileState extends State<MentorProfile> {
     getScheduleDataStream();
   }
 
-  void editbtncbk() {
+  void logoutCbk() {
     auth.signOut();
     Navigator.push(
       (context),
@@ -75,14 +74,14 @@ class _MentorProfileState extends State<MentorProfile> {
     final data = await firestore.collection('MentorData').doc(uid);
     data.get().then((value) {
       setState(() {
-        BatchName = value['BatchName'].toString();
-        FirstName = value['FirstName'].toString();
+        batchName = value['BatchName'].toString();
+        firstName = value['FirstName'].toString();
         IDNumber = value['IDNumber'];
-        LastName = value['LastName'].toString();
-        Organization = value['Organization'];
+        lastName = value['LastName'].toString();
+        organization = value['Organization'];
         email = value['email'];
         JoiningDate = value['JoiningDate'].toDate();
-        Gender = value['Gender'].toString();
+        gender = value['Gender'].toString();
       });
     });
   }
@@ -91,22 +90,22 @@ class _MentorProfileState extends State<MentorProfile> {
     await for (var snapshot
         in firestore.collection('MentorData').doc(uid).snapshots()) {
       setState(() {
-        BatchName = snapshot.get('BatchName').toString();
-        FirstName = snapshot.get('FirstName').toString();
+        batchName = snapshot.get('BatchName').toString();
+        firstName = snapshot.get('FirstName').toString();
         IDNumber = snapshot.get('IDNumber');
-        LastName = snapshot.get('LastName').toString();
-        Organization = snapshot.get('Organization').toString();
+        lastName = snapshot.get('LastName').toString();
+        organization = snapshot.get('Organization').toString();
         email = snapshot.get('email');
         JoiningDate = snapshot.get('JoiningDate').toDate();
-        Gender = snapshot.get('Gender');
+        gender = snapshot.get('Gender');
       });
-      MentorName = "$FirstName $LastName";
+      mentorName = "$firstName $lastName";
     }
   }
 
   getScheduleDataStream() async {
     await for (var snapshot
-        in firestore.collection('MentorData/${uid}/Schedule').snapshots()) {
+        in firestore.collection('MentorData/$uid/Schedule').snapshots()) {
       setState(() {
         lastInteraction = getLastInteraction();
         nextInteraction = getNextInteraction();
@@ -127,7 +126,7 @@ class _MentorProfileState extends State<MentorProfile> {
       body: SafeArea(
         child: Column(
           children: [
-            TitleBar(callback: editbtncbk),
+            TitleBar(callback: logoutCbk),
             MentorProfileBanner(),
             OrgIDNumCard(),
             BreakLine(),
@@ -141,7 +140,7 @@ class _MentorProfileState extends State<MentorProfile> {
             ),
             BreakLine(),
             DecComRepDropContainer(
-              DropoutCbk: testfnc,
+              dropoutCbk: testfnc,
             )
           ],
         ),
@@ -152,11 +151,11 @@ class _MentorProfileState extends State<MentorProfile> {
 }
 
 class ActivityPlot extends StatelessWidget {
-  final List<Color> gradientColors = [
+  final List<Color> lessonBlueGradient = [
     const Color(0xff1F78B4),
     const Color(0xff1F78B4),
   ];
-  final List<Color> gradientColors2 = [
+  final List<Color> hoursRedGradient = [
     const Color(0xffD92136).withOpacity(0.7),
     const Color(0xffD92136).withOpacity(0.7),
     // const Color(0xffD92136),
@@ -166,7 +165,7 @@ class ActivityPlot extends StatelessWidget {
       spots: getlessonChartData(JoiningDate),
       curveSmoothness: 0.6,
       isCurved: true,
-      colors: gradientColors,
+      colors: lessonBlueGradient,
       preventCurveOverShooting: true,
       barWidth: 4,
       dotData: FlDotData(
@@ -178,18 +177,21 @@ class ActivityPlot extends StatelessWidget {
       ),
     );
     final hours = LineChartBarData(
-        show: true,
-        spots: gethourChartData(JoiningDate),
-        isCurved: true,
-        colors: gradientColors2,
-        curveSmoothness: 0.6,
-        preventCurveOverShooting: true,
-        barWidth: 4,
-        dotData: FlDotData(
-          show: false,
-        ),
-        shadow: BoxShadow(
-            blurRadius: 6, color: Color(0xffD92136).withOpacity(0.85)));
+      show: true,
+      spots: gethourChartData(JoiningDate),
+      isCurved: true,
+      colors: hoursRedGradient,
+      curveSmoothness: 0.6,
+      preventCurveOverShooting: true,
+      barWidth: 4,
+      dotData: FlDotData(
+        show: false,
+      ),
+      shadow: BoxShadow(
+        blurRadius: 6,
+        color: Color(0xffD92136).withOpacity(0.85),
+      ),
+    );
     return [lessons, hours];
   }
 
@@ -242,14 +244,29 @@ class TitleBar extends StatelessWidget {
           ),
         ),
         SizedBox(
-          width: screenWidth * 0.4,
+          width: screenWidth * 0.2,
           height: screenHeight * 0.12,
         ),
         InkWell(
           onTap: callback,
-          child: SvgPicture.asset(
-            "assets/icons/edit-tb.svg",
-            height: screenWidth * 0.06,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Color(0xffD92136).withOpacity(0.7),
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xffD92136).withOpacity(0.7),
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            child: Text(
+              "Logout",
+              style:
+                  TextStyle(fontWeight: FontWeight.w800, color: Colors.white),
+            ),
           ),
         )
       ],
@@ -274,7 +291,7 @@ class MentorProfileBanner extends StatelessWidget {
             // margin: EdgeInsets.only(right: size.width * 0.02),
             height: double.infinity,
             width: size.height * 0.16,
-            child: Gender == 'male'
+            child: gender == 'male'
                 ? Image.asset("assets/vectors/Mentor(M).png")
                 : Image.asset("assets/vectors/Mentor(F).png"),
             decoration: BoxDecoration(
@@ -293,7 +310,7 @@ class MentorProfileBanner extends StatelessWidget {
             children: [
               Container(
                 child: Text(
-                  "$FirstName $LastName",
+                  "$firstName $lastName",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -342,7 +359,7 @@ class MentorProfileBanner extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      lastInteraction,
+                      "$lastInteraction ago",
                       style: TextStyle(
                           color: Color(0xff34A853).withOpacity(0.6),
                           fontSize: 11,
@@ -408,7 +425,7 @@ class MentorProfileBanner extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      "${lecrate} / ${hrrate}",
+                      "$lecrate / $hrrate",
                       style: TextStyle(
                           color: Color(0xffD92136).withOpacity(0.6),
                           fontSize: 11,
@@ -437,9 +454,9 @@ class OrgIDNumCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          InsideCard(heading: "Organization", value: "$Organization"),
+          InsideCard(heading: "Organization", value: "$organization"),
           InsideCard(
-              heading: "ID Number /Batch ", value: "$IDNumber / $BatchName"),
+              heading: "ID Number /Batch ", value: "$IDNumber / $batchName"),
         ],
       ),
     );
@@ -498,8 +515,8 @@ class BreakLine extends StatelessWidget {
 }
 
 class DecComRepDropContainer extends StatelessWidget {
-  final VoidCallback DropoutCbk;
-  DecComRepDropContainer({required this.DropoutCbk});
+  final VoidCallback dropoutCbk;
+  DecComRepDropContainer({required this.dropoutCbk});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -534,7 +551,7 @@ class DecComRepDropContainer extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: DropoutCbk,
+            onTap: dropoutCbk,
             child: Container(
               margin: EdgeInsets.only(top: 20),
               child: Center(

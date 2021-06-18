@@ -23,7 +23,6 @@ class _ScheduleNewState extends State<ScheduleNew> {
       final user = await auth.currentUser;
       if (user != null) {
         uid = user.uid;
-        // print(loggedInUser!.email);
       }
     } catch (e) {
       print(e);
@@ -40,6 +39,7 @@ class _ScheduleNewState extends State<ScheduleNew> {
       pickedDate = DateTime.now();
       footnotescontroller.clear();
       pickedDuration = 30;
+      pickedLesson = 'lesson 1';
     });
   }
 
@@ -47,6 +47,7 @@ class _ScheduleNewState extends State<ScheduleNew> {
     mentees.clear();
     for (var mentee in menteeList) mentees.add(mentee.Name);
     DisplayName = mentees.first;
+    pickedMentee = DisplayName;
   }
 
   @override
@@ -61,7 +62,7 @@ class _ScheduleNewState extends State<ScheduleNew> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TitleBar(),
-                MntLsnCards(size: MediaQuery.of(context).size),
+                MntLsnCards(),
                 TimeDatePickerWrapper(),
                 BreakLine(),
                 FootNotesWrapper(),
@@ -118,37 +119,49 @@ class CancleScheduleBtn extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: () {
+            onTap: () async {
+              String mentorSchID = '', menteeSchID = '';
               DateTime pickedDateTime = DateTime(
                   pickedDate.year,
                   pickedDate.month,
                   pickedDate.day,
                   pickedTime.hour,
                   pickedTime.minute);
-              scheduleList.add(Schedule(
-                  mentee: pickedMentee!,
-                  lesson: pickedLesson!,
-                  duration: pickedDuration,
-                  timing: pickedDateTime));
+
+              var pickedUID;
+              menteeList.forEach((e) {
+                if (e.Name == pickedMentee) pickedUID = e.uid;
+              });
+              await firestore
+                  .collection('/MenteeInfo/${pickedUID}/Schedule')
+                  .add({
+                "Duration": pickedDuration,
+                "LectureNumber": pickedLesson,
+                "LectureTime": Timestamp.fromDate(pickedDateTime),
+                "MentorName": mentorName,
+                "FootNotes": footnotes,
+              }).then((var value) => menteeSchID = value.id);
+              print("the menteeSchID is $menteeSchID");
               firestore.collection('/MentorData/${uid}/Schedule').add({
                 "Duration": pickedDuration,
                 "LectureNumber": pickedLesson,
                 "LectureTime": Timestamp.fromDate(pickedDateTime),
                 "MenteeName": pickedMentee,
                 "FootNotes": footnotes,
-              });
-              var pickedUID;
-              menteeList.forEach((e) {
-                if (e.Name == pickedMentee) pickedUID = e.uid;
-              });
-              print("$pickedUID is pickedUID");
-              firestore.collection('/MenteeInfo/${pickedUID}/Schedule').add({
-                "Duration": pickedDuration,
-                "LectureNumber": pickedLesson,
-                "LectureTime": Timestamp.fromDate(pickedDateTime),
-                "MentorName": MentorName,
-                "FootNotes": footnotes,
-              });
+                "MenteeScheduleID": menteeSchID,
+                "MenteeUID": pickedUID
+              }).then((value) => mentorSchID = value.id);
+              scheduleList.add(
+                Schedule(
+                  mentee: pickedMentee!,
+                  lesson: pickedLesson!,
+                  duration: pickedDuration,
+                  timing: pickedDateTime,
+                  menteeUID: pickedUID,
+                  menteeSchID: menteeSchID,
+                  mentorSchID: mentorSchID,
+                ),
+              );
               footnotes = "";
               Navigator.of(context).pop(context);
             },
@@ -508,8 +521,6 @@ class TimePicker extends StatelessWidget {
 }
 
 class MntLsnCards extends StatefulWidget {
-  Size size;
-  MntLsnCards({required this.size});
   @override
   _MntLsnCardsState createState() => _MntLsnCardsState();
 }
@@ -520,6 +531,7 @@ String? pickedMentee = 'Iron Man';
 class _MntLsnCardsState extends State<MntLsnCards> {
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     List<String> lessons = [
       'lesson 1',
       'lesson 2',
@@ -548,7 +560,7 @@ class _MntLsnCardsState extends State<MntLsnCards> {
                   fontSize: 16),
             ),
             Container(
-              width: widget.size.width * 0.4,
+              width: size.width * 0.4,
               margin: EdgeInsets.symmetric(vertical: 10),
               padding: EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
@@ -603,7 +615,7 @@ class _MntLsnCardsState extends State<MntLsnCards> {
                   fontSize: 16),
             ),
             Container(
-              width: widget.size.width * 0.4,
+              width: size.width * 0.4,
               margin: EdgeInsets.symmetric(vertical: 10),
               padding: EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(

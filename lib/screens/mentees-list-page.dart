@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/components/CustomNavigationBar.dart';
 import 'package:tsep/local-data/schedule.dart';
@@ -10,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 final firestore = FirebaseFirestore.instance;
 final auth = FirebaseAuth.instance;
 String? uid;
+bool notAssigned = false;
 
 class MenteesPage extends StatefulWidget {
   @override
@@ -30,6 +32,7 @@ class _MenteesPageState extends State<MenteesPage> {
 
   void initState() {
     super.initState();
+    notAssigned = true;
     getCurrentUser();
     getData();
   }
@@ -40,7 +43,6 @@ class _MenteesPageState extends State<MenteesPage> {
       (value) async {
         menteeList.clear();
         for (var mentee in value.docs) {
-          print(mentee.id);
           var name = "${mentee['FirstName']} ${mentee['LastName']}";
           var level;
           var lesson;
@@ -58,12 +60,9 @@ class _MenteesPageState extends State<MenteesPage> {
           ));
           menteeList.add(Mentee(Name: name, uid: mentee.id));
         }
+        if (menteeList.isNotEmpty) notAssigned = false;
       },
     );
-    for (var i in menteeList) {
-      print(i.uid);
-      print(i.Name);
-    }
     setState(() {});
   }
 
@@ -80,7 +79,33 @@ class _MenteesPageState extends State<MenteesPage> {
                 TitleBar(
                   callback: getData,
                 ),
-                Column(children: MenteeCardHolder)
+                notAssigned
+                    ? Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical: size.height * 0.2,
+                            horizontal: size.width * 0.1),
+                        child: Column(
+                          children: [
+                            Text(
+                              "Please check back later, you will be assigned mentee/s shortly!",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black.withOpacity(0.5),
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: size.height * 0.05,
+                            ),
+                            SpinKitFadingCube(
+                              color: Color(0xff003670).withOpacity(0.5),
+                              size: 70,
+                            ),
+                          ],
+                        ),
+                      )
+                    : Column(children: MenteeCardHolder)
               ],
             ),
           ),
@@ -169,7 +194,7 @@ class MenteeCard extends StatelessWidget {
             ),
           ],
         ),
-        width: screenWidth * 0.85,
+        width: screenWidth * 0.9,
         height: screenHeight * 0.1,
         child: Row(
           children: [
@@ -212,7 +237,7 @@ class MenteeCard extends StatelessWidget {
               ),
             ),
             Container(
-              constraints: BoxConstraints(minWidth: screenWidth * 0.32),
+              constraints: BoxConstraints(minWidth: screenWidth * 0.4),
               padding:
                   const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
               child: InkWell(
