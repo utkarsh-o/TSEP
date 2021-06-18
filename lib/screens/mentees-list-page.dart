@@ -2,16 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tsep/components/CustomNavigationBar.dart';
-import 'package:tsep/local-data/schedule.dart';
-import 'package:tsep/screens/mentee-details-page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tsep/local-data/constants.dart';
+import 'package:tsep/logic/data-processing.dart';
+import '../components/CustomNavigationBar.dart';
+import '../logic/cached-data.dart';
+import '../screens/mentee-details-page.dart';
 
-final firestore = FirebaseFirestore.instance;
-final auth = FirebaseAuth.instance;
-String? uid;
-bool notAssigned = false;
+bool Assigned = true;
 
 class MenteesPage extends StatefulWidget {
   @override
@@ -19,51 +16,25 @@ class MenteesPage extends StatefulWidget {
 }
 
 class _MenteesPageState extends State<MenteesPage> {
-  void getCurrentUser() async {
-    try {
-      final user = await auth.currentUser;
-      if (user != null) {
-        uid = user.uid;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
   void initState() {
     super.initState();
-    notAssigned = true;
-    getCurrentUser();
-    getData();
+    Assigned = false;
+    parseMenteeList();
   }
 
-  List<Widget> MenteeCardHolder = [];
-  getData() async {
-    await firestore.collection('MentorData/${uid}/Mentees').get().then(
-      (value) async {
-        menteeList.clear();
-        for (var mentee in value.docs) {
-          var name = "${mentee['FirstName']} ${mentee['LastName']}";
-          var level;
-          var lesson;
-          await firestore.collection('/MenteeInfo').doc(mentee.id).get().then(
-            (value) {
-              level = value['InitialLevel'];
-              lesson = value['LatestLecture'];
-            },
-          );
-          MenteeCardHolder.add(MenteeCard(
-            name: name,
-            level: level,
-            lesson: lesson,
-            uid: mentee.id,
-          ));
-          menteeList.add(Mentee(Name: name, uid: mentee.id));
-        }
-        if (menteeList.isNotEmpty) notAssigned = false;
-      },
-    );
-    setState(() {});
+  List<Widget> menteeCards = [];
+  parseMenteeList() {
+    for (var mentee in menteesList) {
+      menteeCards.add(
+        MenteeCard(
+          name: mentee.fullName,
+          lesson: mentee.latestLecture,
+          level: mentee.initialLevel,
+          uid: mentee.uid,
+        ),
+      );
+    }
+    Assigned = menteeCards.length > 0 ? true : false;
   }
 
   @override
@@ -76,10 +47,8 @@ class _MenteesPageState extends State<MenteesPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                TitleBar(
-                  callback: getData,
-                ),
-                notAssigned
+                TitleBar(),
+                !Assigned
                     ? Container(
                         margin: EdgeInsets.symmetric(
                             vertical: size.height * 0.2,
@@ -95,9 +64,7 @@ class _MenteesPageState extends State<MenteesPage> {
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            SizedBox(
-                              height: size.height * 0.05,
-                            ),
+                            SizedBox(height: size.height * 0.05),
                             SpinKitFadingCube(
                               color: Color(0xff003670).withOpacity(0.5),
                               size: 70,
@@ -105,22 +72,18 @@ class _MenteesPageState extends State<MenteesPage> {
                           ],
                         ),
                       )
-                    : Column(children: MenteeCardHolder)
+                    : Column(children: menteeCards)
               ],
             ),
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        active: 2,
-      ),
+      bottomNavigationBar: CustomBottomNavBar(active: 2),
     );
   }
 }
 
 class TitleBar extends StatelessWidget {
-  final VoidCallback callback;
-  TitleBar({required this.callback});
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -143,7 +106,7 @@ class TitleBar extends StatelessWidget {
           height: screenHeight * 0.12,
         ),
         InkWell(
-          onTap: callback,
+          onTap: () {},
           child: SvgPicture.asset(
             "assets/icons/settings-tb.svg",
             height: screenWidth * 0.06,
@@ -157,30 +120,16 @@ class TitleBar extends StatelessWidget {
 class MenteeCard extends StatelessWidget {
   final String name, level, uid;
   final int lesson;
-  const MenteeCard(
+  MenteeCard(
       {required this.name,
       required this.level,
       required this.lesson,
       required this.uid});
-  String getInitials(name) {
-    List<String> names = name.split(" ");
-    String initials = "";
-    int numWords = 2;
-
-    if (numWords < names.length) {
-      numWords = names.length;
-    }
-    for (var i = 0; i < numWords; i++) {
-      initials += '${names[i][0]}';
-    }
-    return initials;
-  }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    int screenwidth = screenWidth.round();
+    Size size = MediaQuery.of(context).size;
+    int screenWidthInt = size.width.round();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Container(
@@ -194,9 +143,10 @@ class MenteeCard extends StatelessWidget {
             ),
           ],
         ),
-        width: screenWidth * 0.9,
-        height: screenHeight * 0.1,
+        width: size.width * 0.9,
+        height: size.height * 0.1,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             InkWell(
               onTap: () {
@@ -214,20 +164,20 @@ class MenteeCard extends StatelessWidget {
               child: Container(
                 height: 35,
                 width: 40,
-                margin: EdgeInsets.only(left: 20),
+                margin: EdgeInsets.only(left: 15),
                 decoration: BoxDecoration(
-                  color: Color(0xff003670).withOpacity(0.7),
+                  color: kBlue.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0xff003670).withOpacity(0.3),
+                      color: kBlue.withOpacity(0.3),
                       blurRadius: 10,
                     ),
                   ],
                 ),
                 child: Center(
                   child: Text(
-                    getInitials(name),
+                    parseInitials(name),
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -237,7 +187,7 @@ class MenteeCard extends StatelessWidget {
               ),
             ),
             Container(
-              constraints: BoxConstraints(minWidth: screenWidth * 0.4),
+              constraints: BoxConstraints(minWidth: size.width * 0.37),
               padding:
                   const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
               child: InkWell(
@@ -264,9 +214,7 @@ class MenteeCard extends StatelessWidget {
                         fontSize: 13,
                       ),
                     ),
-                    SizedBox(
-                      height: screenHeight * 0.003,
-                    ),
+                    SizedBox(height: size.height * 0.003),
                     Text(
                       level.toUpperCase(),
                       style: TextStyle(
@@ -280,12 +228,12 @@ class MenteeCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.01),
+              padding: EdgeInsets.symmetric(horizontal: screenWidthInt * 0.01),
               child: Text(
                 "LESSON $lesson",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Color(0xff003670),
+                  color: kBlue,
                 ),
               ),
             ),
@@ -293,7 +241,7 @@ class MenteeCard extends StatelessWidget {
               onPressed: () {},
               icon: SvgPicture.asset(
                 "assets/icons/phone-call.svg",
-                height: screenWidth * 0.06,
+                height: size.width * 0.06,
               ),
             ),
           ],

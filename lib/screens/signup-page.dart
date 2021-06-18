@@ -1,65 +1,66 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tsep/components/loading.dart';
-import 'package:tsep/screens/login-page.dart';
-import 'package:tsep/screens/mentor-profile.dart';
+import '../components/loading.dart';
+import '../local-data/constants.dart';
+import '../logic/authentication.dart';
+import '../screens/login-page.dart';
 
 class SignUp extends StatefulWidget {
+  static String route = "SignUp";
   @override
   _SignUpState createState() => _SignUpState();
 }
 
-String email = '',
-    pass = '',
-    uid = '',
-    FirstName = '',
-    LastName = '',
-    Organization = '',
-    Batch = '',
-    Gender = 'male';
-bool loading = false;
-int IDNumber = -1;
-
 class _SignUpState extends State<SignUp> {
-  void emailcbk(String e) => email = e;
-  void passcbk(String p) => pass = p;
-  final auth = FirebaseAuth.instance;
-  final firestore = FirebaseFirestore.instance;
+  bool loading = false;
+  String email = '',
+      password = '',
+      uid = '',
+      batch = '',
+      firstName = '',
+      lastName = '',
+      organization = '',
+      gender = 'male';
+
+  void emailCallback(String inputEmail) => email = inputEmail;
+  void passwordCallback(String inputPassword) => password = inputPassword;
+  void batchCallback(String inputBatch) => batch = inputBatch;
+  void firstNameCallback(String inputFirstName) => firstName = inputFirstName;
+  void lastNameCallback(String inputLastName) => lastName = inputLastName;
+  void organizationCallback(String inputLastName) =>
+      organization = inputLastName;
+  void genderCallback(String inputGender) {
+    setState(() {
+      gender = inputGender;
+    });
+  }
+
   void signUpcbk() async {
+    final firestore = FirebaseFirestore.instance;
+    final auth = Authentication();
     try {
       setState(() {
         loading = true;
       });
-      final newUser = (await auth.createUserWithEmailAndPassword(
-              email: email, password: pass))
-          .user;
+      final newUser = auth.signupUser(email, password).user;
       if (newUser != null) {
         uid = newUser.uid;
-        print(uid);
         setState(() {
           loading = false;
         });
         firestore.collection('/MentorData').doc(uid).set({
-          'BatchName': Batch,
-          'FirstName': FirstName,
+          'BatchName': batch,
+          'FirstName': firstName,
           'IDNumber': -1,
           'JoiningDate': Timestamp.fromDate(DateTime.now()),
-          'LastName': LastName,
-          'Organization': Organization,
+          'LastName': lastName,
+          'Organization': organization,
           'email': email,
-          'Gender': Gender,
+          'Gender': gender,
         });
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return LoginPage();
-            },
-          ),
-        );
+        Navigator.pushNamed(context, LoginPage.route);
       }
     } catch (e) {
       setState(() {
@@ -81,11 +82,18 @@ class _SignUpState extends State<SignUp> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     TitleBar(),
-                    AvatarWrapper(),
-                    NameWrapper(),
-                    OrgBchWrapper(),
-                    EmailInputForm(callback: emailcbk),
-                    PasswordInputForm(callback: passcbk),
+                    AvatarWrapper(
+                        genderCallback: genderCallback, gender: gender),
+                    NameWrapper(
+                      firstNameCallback: firstNameCallback,
+                      lastNameCallback: lastNameCallback,
+                    ),
+                    OrgBchWrapper(
+                      batchCallback: batchCallback,
+                      organizationCallback: organizationCallback,
+                    ),
+                    EmailInputForm(callback: emailCallback),
+                    PasswordInputForm(callback: passwordCallback),
                     LoginWrapper(callback: signUpcbk)
                   ],
                 ),
@@ -96,6 +104,9 @@ class _SignUpState extends State<SignUp> {
 }
 
 class AvatarWrapper extends StatefulWidget {
+  final String gender;
+  final Function genderCallback;
+  AvatarWrapper({required this.gender, required this.genderCallback});
   @override
   _AvatarWrapperState createState() => _AvatarWrapperState();
 }
@@ -121,17 +132,13 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             InkWell(
-              onTap: () {
-                setState(() {
-                  Gender = 'female';
-                });
-              },
+              onTap: () => widget.genderCallback("female"),
               child: Container(
                 child: Image.asset(
                   'assets/vectors/Mentor(F).png',
                   width: size.width * 0.3,
                 ),
-                decoration: Gender == 'female'
+                decoration: widget.gender == 'female'
                     ? BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
@@ -145,17 +152,13 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
               ),
             ),
             InkWell(
-              onTap: () {
-                setState(() {
-                  Gender = 'male';
-                });
-              },
+              onTap: () => widget.genderCallback("male"),
               child: Container(
                 child: Image.asset(
                   'assets/vectors/Mentor(M).png',
                   width: size.width * 0.2,
                 ),
-                decoration: Gender == 'male'
+                decoration: widget.gender == 'male'
                     ? BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
@@ -177,6 +180,9 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
 }
 
 class NameWrapper extends StatelessWidget {
+  final Function firstNameCallback, lastNameCallback;
+  NameWrapper(
+      {required this.firstNameCallback, required this.lastNameCallback});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -202,19 +208,19 @@ class NameWrapper extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(
-                    color: Color(0xffD92136).withOpacity(0.7),
+                    color: kRed.withOpacity(0.7),
                     width: 3,
                   ),
                   borderRadius: BorderRadius.circular(5),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0xffD92136).withOpacity(0.7),
+                      color: kRed.withOpacity(0.7),
                       blurRadius: 6,
                     ),
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (val) => FirstName = val,
+                  onChanged: (String val) => firstNameCallback,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -269,7 +275,7 @@ class NameWrapper extends StatelessWidget {
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (val) => LastName = val,
+                  onChanged: (String val) => lastNameCallback,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -296,6 +302,9 @@ class NameWrapper extends StatelessWidget {
 }
 
 class OrgBchWrapper extends StatelessWidget {
+  final Function batchCallback, organizationCallback;
+  OrgBchWrapper(
+      {required this.batchCallback, required this.organizationCallback});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -322,19 +331,19 @@ class OrgBchWrapper extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(
-                    color: Color(0xff003670).withOpacity(0.7),
+                    color: kBlue.withOpacity(0.7),
                     width: 3,
                   ),
                   borderRadius: BorderRadius.circular(5),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0xff003670).withOpacity(0.7),
+                      color: kBlue.withOpacity(0.7),
                       blurRadius: 6,
                     ),
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (val) => Organization = val,
+                  onChanged: (String val) => organizationCallback,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -375,19 +384,19 @@ class OrgBchWrapper extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(
-                    color: Color(0xff003670).withOpacity(0.7),
+                    color: kBlue.withOpacity(0.7),
                     width: 3,
                   ),
                   borderRadius: BorderRadius.circular(5),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0xff003670).withOpacity(0.7),
+                      color: kBlue.withOpacity(0.7),
                       blurRadius: 6,
                     ),
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (val) => Batch = val,
+                  onChanged: (String val) => batchCallback,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -457,7 +466,6 @@ class TitleBar extends StatelessWidget {
 }
 
 class EmailInputForm extends StatelessWidget {
-  @override
   final Function callback;
   EmailInputForm({required this.callback});
   Widget build(BuildContext context) {
@@ -474,7 +482,7 @@ class EmailInputForm extends StatelessWidget {
         ),
         decoration: InputDecoration(
           filled: true,
-          fillColor: Color(0xff003670).withOpacity(0.7),
+          fillColor: kBlue.withOpacity(0.7),
           // border: OutlineInputBorder(),
           hintText: 'Email',
           hintStyle: TextStyle(
@@ -500,7 +508,6 @@ class EmailInputForm extends StatelessWidget {
 }
 
 class PasswordInputForm extends StatelessWidget {
-  @override
   final Function callback;
   PasswordInputForm({required this.callback});
   Widget build(BuildContext context) {

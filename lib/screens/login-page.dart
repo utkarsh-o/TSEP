@@ -1,70 +1,34 @@
-import 'dart:ffi';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tsep/components/loading.dart';
-import 'package:tsep/screens/mentor-profile-template.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tsep/screens/signup-page.dart';
+import 'package:tsep/local-data/constants.dart';
 
+import '../logic/authentication.dart';
+import '../components/loading.dart';
+import '../screens/signup-page.dart';
 import 'mentor-profile.dart';
 
 class LoginPage extends StatefulWidget {
+  static String route = "LoginPage";
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _auth = FirebaseAuth.instance;
-  String email = '', pass = '';
+  String email = '', password = '';
   bool loading = false;
-  void emailcbk(String e) => email = e;
 
-  void passcbk(String p) => pass = p;
+  void emailCallback(String inputEmail) => email = inputEmail;
+  void passwordCallback(String inputPass) => password = inputPass;
 
-  void logincbk() async {
+  void loginCallback() async {
+    final auth = Authentication();
     try {
       setState(() {
         loading = true;
       });
-      final newUser =
-          await _auth.signInWithEmailAndPassword(email: email, password: pass);
-      if (newUser != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return MentorProfile();
-            },
-          ),
-        );
-      }
-    } catch (e) {
-      setState(() {
-        loading = false;
-      });
-      print(e);
-    }
-  }
-
-  void signupcbk() async {
-    try {
-      setState(() {
-        loading = true;
-      });
-      final newUser = await _auth.createUserWithEmailAndPassword(
-          email: email, password: pass);
-      if (newUser != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return MentorProfileTemplate();
-            },
-          ),
-        );
-      }
+      final newUser = await auth.loginUser(email, password);
+      if (newUser != null) Navigator.pushNamed(context, MentorProfile.route);
     } catch (e) {
       setState(() {
         loading = false;
@@ -82,47 +46,39 @@ class _LoginPageState extends State<LoginPage> {
             body: SafeArea(
               child: SingleChildScrollView(
                 child: Container(
-                  margin: EdgeInsets.symmetric(
-                    horizontal: size.width * 0.12,
-                    // vertical: size.height * 0.05,
-                  ),
+                  margin: EdgeInsets.symmetric(horizontal: size.width * 0.12),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       mainLogo(),
-                      SignupWrapper(
-                        callback: signupcbk,
-                      ),
+                      SignupWrapper(),
                       MntrMenteeWrapper(),
                       SizedBox(height: size.height * 0.025),
-                      EmailInputForm(
-                        callback: emailcbk,
-                      ),
+                      EmailInputForm(callback: emailCallback),
                       SizedBox(height: size.height * 0.0125),
-                      PasswordInputForm(
-                        callback: passcbk,
-                      ),
+                      PasswordInputForm(callback: passwordCallback),
                       frgtPassWrapper(),
-                      LoginWrapper(
-                        callback: logincbk,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Made in India with "),
-                          Icon(
-                            Icons.favorite,
-                            color: Colors.grey,
-                            size: 15,
-                          ),
-                        ],
-                      ),
+                      LoginWrapper(callback: loginCallback),
+                      FooterText(),
                     ],
                   ),
                 ),
               ),
             ),
           );
+  }
+}
+
+class FooterText extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text("Made in India with "),
+        Icon(Icons.favorite, color: Colors.grey, size: 15),
+      ],
+    );
   }
 }
 
@@ -140,7 +96,7 @@ class LoginWrapper extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               minimumSize: Size(size.width * 0.6, size.height * 0.06),
-              primary: Color(0xffD92136).withOpacity(0.65),
+              primary: kRed.withOpacity(0.65),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -162,10 +118,6 @@ class LoginWrapper extends StatelessWidget {
 }
 
 class frgtPassWrapper extends StatelessWidget {
-  const frgtPassWrapper({
-    Key? key,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -203,8 +155,8 @@ class MntrMenteeWrapper extends StatefulWidget {
 }
 
 class _MntrMenteeWrapperState extends State<MntrMenteeWrapper> {
-  String who = 'mentor', active = 'mentor';
-  void ontap(String who) {
+  String active = 'mentor';
+  void onTap(String who) {
     setState(() {
       active = who;
     });
@@ -219,13 +171,13 @@ class _MntrMenteeWrapperState extends State<MntrMenteeWrapper> {
           icon: "assets/icons/mentee.svg",
           who: 'mentee',
           active: active,
-          ontap: ontap,
+          ontap: onTap,
         ),
         MentorMenteeButton(
           icon: "assets/icons/mentor.svg",
           who: 'mentor',
           active: active,
-          ontap: ontap,
+          ontap: onTap,
         ),
       ],
     );
@@ -247,7 +199,7 @@ class MentorMenteeButton extends StatelessWidget {
       padding: EdgeInsets.all(5),
       decoration: active == who
           ? BoxDecoration(
-              color: Color(0xff003670).withOpacity(0.3),
+              color: kBlue.withOpacity(0.3),
               borderRadius: BorderRadius.circular(8))
           : null,
       child: InkWell(
@@ -262,8 +214,6 @@ class MentorMenteeButton extends StatelessWidget {
 }
 
 class SignupWrapper extends StatelessWidget {
-  final VoidCallback callback;
-  SignupWrapper({required this.callback});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -295,14 +245,7 @@ class SignupWrapper extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return SignUp();
-                          },
-                        ),
-                      );
+                      Navigator.pushNamed(context, SignUp.route);
                     },
                     child: Text(
                       "Sign Up",
@@ -327,10 +270,6 @@ class SignupWrapper extends StatelessWidget {
 }
 
 class mainLogo extends StatelessWidget {
-  const mainLogo({
-    Key? key,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -357,7 +296,7 @@ class EmailInputForm extends StatelessWidget {
       ),
       decoration: InputDecoration(
         filled: true,
-        fillColor: Color(0xff003670).withOpacity(0.7),
+        fillColor: kBlue.withOpacity(0.7),
         // border: OutlineInputBorder(),
         hintText: 'Email',
         hintStyle: TextStyle(
@@ -365,15 +304,11 @@ class EmailInputForm extends StatelessWidget {
           fontWeight: FontWeight.w600,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(12.0),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(12.0)),
           borderSide: BorderSide(color: Color(0x00003670), width: 0),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(12.0),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(12.0)),
           borderSide: BorderSide(color: Color(0x00003670), width: 0),
         ),
       ),

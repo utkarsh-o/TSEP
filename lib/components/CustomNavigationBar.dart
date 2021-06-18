@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tsep/local-data/constants.dart';
 import 'package:tsep/screens/info-page.dart';
 import 'package:tsep/screens/login-page.dart';
 import 'package:tsep/screens/mentees-list-page.dart';
@@ -61,8 +62,8 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
             active: widget.active,
             onPressed: setactv),
         InkWell(
-          splashColor: Color(0xffD92136).withOpacity(0),
-          highlightColor: Color(0xffD92136).withOpacity(0),
+          splashColor: kRed.withOpacity(0),
+          highlightColor: kRed.withOpacity(0),
           onTap: () {
             Navigator.push(
               context,
@@ -93,7 +94,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xffD92136).withOpacity(1),
+                  color: kRed.withOpacity(1),
                   blurRadius: 20,
                   spreadRadius: -15,
                 ),
@@ -130,22 +131,22 @@ class NavbarIconSmall extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return InkWell(
-      splashColor: Color(0xffD92136).withOpacity(0),
-      highlightColor: Color(0xffD92136).withOpacity(0),
+      splashColor: kRed.withOpacity(0),
+      highlightColor: kRed.withOpacity(0),
       onTap: () => onPressed(index),
       child: Container(
         width: screenWidth / 5,
         decoration: BoxDecoration(
           border: Border(
             top: BorderSide(
-              color: Color(0xffD92136).withOpacity(0.5),
+              color: kRed.withOpacity(0.5),
               width: 2.0,
             ),
           ),
           boxShadow: active == index
               ? [
                   BoxShadow(
-                    color: Color(0xffD92136).withOpacity(0.5),
+                    color: kRed.withOpacity(0.5),
                     blurRadius: 30,
                     spreadRadius: -20,
                   )

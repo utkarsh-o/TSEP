@@ -2,17 +2,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:tsep/local-data/schedule.dart';
-import 'package:tsep/screens/schedule-page.dart';
+import '../logic/cached-data.dart';
+import '../logic/data-processing.dart';
+import '../logic/firestore.dart';
+import '../screens/schedule-page.dart';
 
 final firestore = FirebaseFirestore.instance;
+List<Schedule> scheduleList = [];
 
-class ScheduleComplete extends StatelessWidget {
-  String uid;
-  ScheduleComplete({required this.uid});
+class ScheduleComplete extends StatefulWidget {
+  static String route = "ScheduleComplete";
+
+  @override
+  _ScheduleCompleteState createState() => _ScheduleCompleteState();
+}
+
+class _ScheduleCompleteState extends State<ScheduleComplete> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
@@ -21,42 +30,30 @@ class ScheduleComplete extends StatelessWidget {
               TitleBar(),
               StreamBuilder<QuerySnapshot>(
                 stream: firestore
-                    .collection('MentorData/${uid}/Schedule')
+                    .collection('MentorData/$mentorUID/Schedule')
                     .orderBy('LectureTime')
                     .snapshots(),
                 builder: (context, snapshot) {
-                  DateTime today = DateTime.now();
-                  DateTime _firstDayOfTheweek =
-                      today.subtract(new Duration(days: today.weekday));
-                  DateTime startDate = _firstDayOfTheweek
-                      .add(Duration(days: 1))
-                      .subtract(Duration(
-                          hours: TimeOfDay.now().hour,
-                          minutes: TimeOfDay.now().minute));
-                  DateTime endDate = _firstDayOfTheweek.add(Duration(days: 7));
-                  List<Widget> ScheduleCardList = [];
+                  List<Widget> scheduleCardList = [];
                   if (snapshot.hasData) {
                     scheduleList.clear();
                     final schedules = snapshot.data!.docs;
-                    var x = 1;
+                    int index = 1;
                     for (var schedule in schedules) {
-                      var lectureTime = schedule.get('LectureTime').toDate();
-                      Schedule s = Schedule(
+                      Schedule sch = Schedule(
                         mentee: schedule.get('MenteeName'),
                         lesson: schedule.get('LectureNumber'),
                         duration: schedule.get('Duration'),
                         timing: schedule.get('LectureTime').toDate(),
-                        mentorSchID: schedule.id,
-                        menteeSchID: schedule.get('MenteeScheduleID'),
+                        mentorScheduleID: schedule.id,
+                        menteeScheduleID: schedule.get('MenteeScheduleID'),
                         menteeUID: schedule.get('MenteeUID'),
                       );
-                      scheduleList.add(s);
-                      // if (lectureTime.isAfter(startDate) &&
-                      //     lectureTime.isBefore(endDate)) {
-                      ScheduleCardList.add(
+                      scheduleList.add(sch);
+                      scheduleCardList.add(
                         new ScheduleCard(
-                          s: s,
-                          index: x++,
+                          schedule: sch,
+                          index: index++,
                         ),
                       );
                       // }
@@ -65,11 +62,9 @@ class ScheduleComplete extends StatelessWidget {
                   return Column(
                     children: [
                       BreakLine(size: size),
-                      TotContriLesTauWrapper(s: scheduleList),
+                      TotContriLesTauWrapper(schedule: scheduleList),
                       BreakLine(size: size),
-                      Column(
-                        children: ScheduleCardList,
-                      ),
+                      ...scheduleCardList
                     ],
                   );
                 },
@@ -122,18 +117,18 @@ class TitleBar extends StatelessWidget {
 }
 
 class ScheduleCard extends StatelessWidget {
-  final Schedule s;
-  int index;
-  ScheduleCard({required this.s, required this.index});
+  final Schedule schedule;
+  final int index;
+  ScheduleCard({required this.schedule, required this.index});
   @override
   Widget build(BuildContext context) {
-    var weekday = DateFormat('EEE d MMMM').format(s.timing);
-    var lesson = s.lesson;
-    String starttime = DateFormat('hh:mm').format(s.timing);
-    starttime = starttime.replaceAll("AM", "am").replaceAll("PM", "pm");
-    String endtime = DateFormat('hh:mm a')
-        .format(s.timing.add(Duration(minutes: s.duration)));
-    endtime = endtime.replaceAll("AM", "am").replaceAll("PM", "pm");
+    var weekday = DateFormat('EEE d MMMM').format(schedule.timing);
+    var lesson = schedule.lesson;
+    String startTime = DateFormat('hh:mm').format(schedule.timing);
+    startTime = startTime.replaceAll("AM", "am").replaceAll("PM", "pm");
+    String endTime = DateFormat('hh:mm a')
+        .format(schedule.timing.add(Duration(minutes: schedule.duration)));
+    endTime = endTime.replaceAll("AM", "am").replaceAll("PM", "pm");
     Size size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () {
@@ -177,7 +172,7 @@ class ScheduleCard extends StatelessWidget {
                           ),
                         ),
                         CanDelBtnWrapper(
-                          s: s,
+                          schedule: schedule,
                         ),
                       ],
                     ),
@@ -237,7 +232,7 @@ class ScheduleCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      s.mentee,
+                      schedule.mentee,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 15,
@@ -264,7 +259,7 @@ class ScheduleCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8.0, vertical: 5),
                     child: Text(
-                      "$starttime - $endtime",
+                      "$startTime - $endTime",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black.withOpacity(0.8),
@@ -279,7 +274,7 @@ class ScheduleCard extends StatelessWidget {
                         size: 12,
                       ),
                       Text(
-                        "  ${s.duration} mins",
+                        "  ${schedule.duration} mins",
                         style: TextStyle(
                             fontWeight: FontWeight.w800,
                             color: Color(0xff269200).withOpacity(0.7),
@@ -298,26 +293,26 @@ class ScheduleCard extends StatelessWidget {
 }
 
 class TotContriLesTauWrapper extends StatelessWidget {
-  final List<Schedule> s;
+  final List<Schedule> schedule;
   TotContriLesTauWrapper({
-    required this.s,
+    required this.schedule,
   });
 
   @override
   Widget build(BuildContext context) {
-    Duration ttlcnt = getschcnt(s);
-    String ttlcnthr = ttlcnt.inHours.toString();
-    String ttlcntmn = ttlcnt.inMinutes.remainder(60).toString();
+    Duration totalContribution = getPlannedEngagement(schedule).first;
+    String hours = totalContribution.inHours.toString();
+    String minutes = totalContribution.inMinutes.remainder(60).toString();
+    int plannedLessons = getPlannedEngagement(schedule).last;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           TotContriLesTau(
-              heading: "Planned Engagement",
-              value: "${ttlcnthr}hr ${ttlcntmn}min"),
+              heading: "Planned Engagement", value: "${hours}hr ${minutes}min"),
           TotContriLesTau(
-              heading: "Planned Lessons", value: schlsns.toString()),
+              heading: "Planned Lessons", value: plannedLessons.toString()),
         ],
       ),
     );
@@ -374,6 +369,95 @@ class BreakLine extends StatelessWidget {
           BoxShadow(
             color: Color(0xff003670).withOpacity(0.1),
             blurRadius: 10,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CanDelBtnWrapper extends StatelessWidget {
+  deleteSchedule(String MentorSchID, String MenteeUID, String MenteeSchID) {
+    firestore
+        .collection('MenteeInfo/$MenteeUID/Schedule')
+        .doc(MenteeSchID)
+        .delete();
+    firestore
+        .collection('MentorData/$mentorUID/Schedule')
+        .doc(MentorSchID)
+        .delete();
+  }
+
+  Schedule schedule;
+  CanDelBtnWrapper({required this.schedule});
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          InkWell(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              child: Center(
+                child: Text(
+                  "CANCLE",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18),
+                ),
+              ),
+              height: size.height * 0.042,
+              width: size.width * 0.3,
+              decoration: BoxDecoration(
+                color: Color(0xff1F78B4),
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xff1F78B4),
+                    blurRadius: 10,
+                  )
+                ],
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              deleteSchedule(schedule.mentorScheduleID, schedule.menteeUID,
+                  schedule.menteeScheduleID);
+              Navigator.pop(context);
+            },
+            child: Container(
+              child: Center(
+                child: Text(
+                  "DELETE",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18),
+                ),
+              ),
+              height: size.height * 0.042,
+              width: size.width * 0.3,
+              decoration: BoxDecoration(
+                color: Color(0xffD92136).withOpacity(0.7),
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xffD92136).withOpacity(0.7),
+                    blurRadius: 10,
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

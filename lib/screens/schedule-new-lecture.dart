@@ -3,56 +3,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tsep/local-data/schedule.dart';
-import 'package:tsep/screens/mentor-profile.dart';
+import '../local-data/schedule.dart';
+import '../logic/cached-data.dart';
+import '../screens/mentor-profile.dart';
 
 class ScheduleNew extends StatefulWidget {
   @override
   _ScheduleNewState createState() => _ScheduleNewState();
 }
 
-final auth = FirebaseAuth.instance;
-String uid = '';
-List<String> mentees = [];
-String? DisplayName = '';
+String DisplayName = '';
 
 class _ScheduleNewState extends State<ScheduleNew> {
-  void getCurrentUser() async {
-    try {
-      final user = await auth.currentUser;
-      if (user != null) {
-        uid = user.uid;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    getCurrentUser();
-    getData();
     setState(() {
       pickedTime = TimeOfDay.now();
       pickedDate = DateTime.now();
       footnotescontroller.clear();
       pickedDuration = 30;
       pickedLesson = 'lesson 1';
+      DisplayName =
+          "${menteesList.first.firstName} ${menteesList.first.lastName}";
+      pickedMentee = DisplayName;
     });
-  }
-
-  getData() {
-    mentees.clear();
-    for (var mentee in menteeList) mentees.add(mentee.Name);
-    DisplayName = mentees.first;
-    pickedMentee = DisplayName;
   }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -129,11 +108,11 @@ class CancleScheduleBtn extends StatelessWidget {
                   pickedTime.minute);
 
               var pickedUID;
-              menteeList.forEach((e) {
-                if (e.Name == pickedMentee) pickedUID = e.uid;
+              menteesList.forEach((mentee) {
+                if (mentee.fullName == pickedMentee) pickedUID = mentee.uid;
               });
               await firestore
-                  .collection('/MenteeInfo/${pickedUID}/Schedule')
+                  .collection('/MenteeInfo/$pickedUID/Schedule')
                   .add({
                 "Duration": pickedDuration,
                 "LectureNumber": pickedLesson,
@@ -141,8 +120,7 @@ class CancleScheduleBtn extends StatelessWidget {
                 "MentorName": mentorName,
                 "FootNotes": footnotes,
               }).then((var value) => menteeSchID = value.id);
-              print("the menteeSchID is $menteeSchID");
-              firestore.collection('/MentorData/${uid}/Schedule').add({
+              firestore.collection('/MentorData/$mentorUID/Schedule').add({
                 "Duration": pickedDuration,
                 "LectureNumber": pickedLesson,
                 "LectureTime": Timestamp.fromDate(pickedDateTime),
@@ -158,8 +136,8 @@ class CancleScheduleBtn extends StatelessWidget {
                   duration: pickedDuration,
                   timing: pickedDateTime,
                   menteeUID: pickedUID,
-                  menteeSchID: menteeSchID,
-                  mentorSchID: mentorSchID,
+                  menteeScheduleID: menteeSchID,
+                  mentorScheduleID: mentorSchID,
                 ),
               );
               footnotes = "";
@@ -585,16 +563,16 @@ class _MntLsnCardsState extends State<MntLsnCards> {
                     fontFamily: 'Montserrat'),
                 isExpanded: true,
                 value: DisplayName,
-                items: mentees.map((String value) {
+                items: menteesList.map((value) {
                   return DropdownMenuItem<String>(
-                    child: Text(value),
-                    value: value,
+                    child: Text(value.fullName),
+                    value: value.fullName,
                   );
                 }).toList(),
                 onChanged: (String? value) {
                   setState(() {
                     pickedMentee = value;
-                    DisplayName = value;
+                    DisplayName = value ?? "test";
                   });
                 },
                 underline: Container(

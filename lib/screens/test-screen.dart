@@ -30,8 +30,6 @@ class _TestScreenState extends State<TestScreen> {
       qtnIdx += qtnIdx + 1 > 9 ? 0 : 1;
       updtTotalScores();
     });
-    print(scores);
-    print(checked);
   }
 
   void prvclb() {
