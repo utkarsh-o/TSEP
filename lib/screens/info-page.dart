@@ -109,14 +109,7 @@ class FAQGdlineCards extends StatelessWidget {
             splashColor: Color(0xffD92136).withOpacity(0),
             highlightColor: Color(0xffD92136).withOpacity(0),
             onTap: () {
-              Navigator.push(
-                (context),
-                MaterialPageRoute(
-                  builder: (context) {
-                    return FAQPage();
-                  },
-                ),
-              );
+              Navigator.pushNamed(context, FAQPage.route);
             },
             child: Container(
               margin: EdgeInsets.only(top: 30),
@@ -159,14 +152,7 @@ class FAQGdlineCards extends StatelessWidget {
             splashColor: Color(0xffD92136).withOpacity(0),
             highlightColor: Color(0xffD92136).withOpacity(0),
             onTap: () {
-              Navigator.push(
-                (context),
-                MaterialPageRoute(
-                  builder: (context) {
-                    return GuidelinesPage();
-                  },
-                ),
-              );
+              Navigator.pushNamed(context, GuidelinesPage.route);
             },
             child: Container(
               margin: EdgeInsets.only(top: 30),

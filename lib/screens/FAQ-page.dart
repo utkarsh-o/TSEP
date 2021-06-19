@@ -4,8 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/local-data/FAQ.dart';
 
 class FAQPage extends StatelessWidget {
-  const FAQPage({Key? key}) : super(key: key);
-
+  static String route = "FAQPage";
   @override
   Widget build(BuildContext context) {
     Widget getFAQList() {

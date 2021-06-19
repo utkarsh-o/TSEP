@@ -6,27 +6,56 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../logic/cached-data.dart';
 import '../screens/mentor-profile.dart';
 
-class ScheduleNew extends StatefulWidget {
+class EditLecture extends StatefulWidget {
+  String mentorScheduleID, menteeScheduleID, menteeUID;
+  EditLecture(
+      {required this.menteeScheduleID,
+      required this.mentorScheduleID,
+      required this.menteeUID});
   @override
-  _ScheduleNewState createState() => _ScheduleNewState();
+  _EditLectureState createState() => _EditLectureState();
 }
 
-String DisplayName = '';
+TimeOfDay pickedTime = TimeOfDay.now();
+DateTime pickedDate = DateTime.now();
+var footnotesController = TextEditingController();
+int pickedDuration = 0;
+String footnotes = "",
+    pickedMentee = '',
+    menteeScheduleID = '',
+    mentorScheduleID = '',
+    menteeUID = '';
+String? pickedLesson = 'lesson 1';
 
-class _ScheduleNewState extends State<ScheduleNew> {
+class _EditLectureState extends State<EditLecture> {
+  final firestore = FirebaseFirestore.instance;
+
+  getDate() async {
+    await firestore
+        .collection('MentorData/$mentorUID/Schedule')
+        .doc(widget.mentorScheduleID)
+        .get()
+        .then((var value) {
+      DateTime time = DateTime.fromMicrosecondsSinceEpoch(
+          value.get('LectureTime').microsecondsSinceEpoch);
+      setState(() {
+        pickedTime = TimeOfDay.fromDateTime(time);
+        pickedDate = time;
+        footnotesController.text = value.get('FootNotes');
+        pickedDuration = value.get('Duration');
+        pickedLesson = value.get('LectureNumber');
+        pickedMentee = value.get('MenteeName');
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    setState(() {
-      pickedTime = TimeOfDay.now();
-      pickedDate = DateTime.now();
-      footnotescontroller.clear();
-      pickedDuration = 30;
-      pickedLesson = 'lesson 1';
-      DisplayName =
-          "${menteesList.first.firstName} ${menteesList.first.lastName}";
-      pickedMentee = DisplayName;
-    });
+    getDate();
+    mentorScheduleID = widget.mentorScheduleID;
+    menteeScheduleID = widget.menteeScheduleID;
+    menteeUID = widget.menteeUID;
   }
 
   @override
@@ -40,13 +69,13 @@ class _ScheduleNewState extends State<ScheduleNew> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TitleBar(),
-                MntLsnCards(),
+                MenteeLessonWrapper(),
                 TimeDatePickerWrapper(),
                 BreakLine(),
                 FootNotesWrapper(),
                 DurationWrapper(),
                 BreakLine(),
-                CancleScheduleBtn(),
+                CancelConfirmWrapper(),
               ],
             ),
           ),
@@ -56,8 +85,7 @@ class _ScheduleNewState extends State<ScheduleNew> {
   }
 }
 
-class CancleScheduleBtn extends StatelessWidget {
-  @override
+class CancelConfirmWrapper extends StatelessWidget {
   final firestore = FirebaseFirestore.instance;
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -98,43 +126,41 @@ class CancleScheduleBtn extends StatelessWidget {
           ),
           InkWell(
             onTap: () async {
-              String mentorSchID = '', menteeSchID = '';
               DateTime pickedDateTime = DateTime(
                   pickedDate.year,
                   pickedDate.month,
                   pickedDate.day,
                   pickedTime.hour,
                   pickedTime.minute);
-
-              var pickedUID;
-              menteesList.forEach((mentee) {
-                if (mentee.fullName == pickedMentee) pickedUID = mentee.uid;
-              });
               await firestore
-                  .collection('/MenteeInfo/$pickedUID/Schedule')
-                  .add({
+                  .collection('/MenteeInfo/$menteeUID/Schedule')
+                  .doc(menteeScheduleID)
+                  .update({
                 "Duration": pickedDuration,
                 "LectureNumber": pickedLesson,
                 "LectureTime": Timestamp.fromDate(pickedDateTime),
                 "MentorName": mentorName,
                 "FootNotes": footnotes,
-              }).then((var value) => menteeSchID = value.id);
-              firestore.collection('/MentorData/$mentorUID/Schedule').add({
+              });
+              firestore
+                  .collection('/MentorData/$mentorUID/Schedule')
+                  .doc(mentorScheduleID)
+                  .update({
                 "Duration": pickedDuration,
                 "LectureNumber": pickedLesson,
                 "LectureTime": Timestamp.fromDate(pickedDateTime),
                 "MenteeName": pickedMentee,
                 "FootNotes": footnotes,
-                "MenteeScheduleID": menteeSchID,
-                "MenteeUID": pickedUID
-              }).then((value) => mentorSchID = value.id);
+                "MenteeScheduleID": menteeScheduleID,
+                "MenteeUID": menteeUID
+              });
               footnotes = "";
               Navigator.of(context).pop(context);
             },
             child: Container(
               child: Center(
                 child: Text(
-                  "SCHEDULE",
+                  "CONFIRM",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -168,21 +194,15 @@ class DurationWrapper extends StatefulWidget {
   _DurationWrapperState createState() => _DurationWrapperState();
 }
 
-int pickedDuration = 0;
-
 class _DurationWrapperState extends State<DurationWrapper> {
-  Duration active = Duration(minutes: 30);
+  callback(Duration dur) {
+    setState(() {
+      pickedDuration = dur.inMinutes.toInt();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    void callback(Duration dur) {
-      setState(
-        () {
-          active = dur;
-          pickedDuration = dur.inMinutes.toInt();
-        },
-      );
-    }
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -197,23 +217,12 @@ class _DurationWrapperState extends State<DurationWrapper> {
             shape: BoxShape.rectangle,
             borderRadius: BorderRadius.circular(6),
           ),
-          // height: size.height * 0.045,
-          // width: size.width * 0.65,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              DurationNum(
-                  duration: Duration(minutes: 30),
-                  active: active,
-                  callback: callback),
-              DurationNum(
-                  duration: Duration(minutes: 45),
-                  active: active,
-                  callback: callback),
-              DurationNum(
-                  duration: Duration(hours: 1),
-                  active: active,
-                  callback: callback),
+              DurationNum(duration: Duration(minutes: 30), callback: callback),
+              DurationNum(duration: Duration(minutes: 45), callback: callback),
+              DurationNum(duration: Duration(hours: 1), callback: callback),
             ],
           ),
         ),
@@ -223,10 +232,9 @@ class _DurationWrapperState extends State<DurationWrapper> {
 }
 
 class DurationNum extends StatelessWidget {
-  final Duration duration, active;
+  final Duration duration;
   final Function callback;
-  DurationNum(
-      {required this.active, required this.callback, required this.duration});
+  DurationNum({required this.callback, required this.duration});
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -236,7 +244,7 @@ class DurationNum extends StatelessWidget {
         // padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         // height: MediaQuery.of(context).size.height * 0.03,
         // width: MediaQuery.of(context).size.width * 0.1,
-        decoration: active == duration
+        decoration: duration.inMinutes == pickedDuration
             ? BoxDecoration(
                 color: Color(0xff34A853).withOpacity(0.7),
                 borderRadius: BorderRadius.circular(4),
@@ -248,11 +256,12 @@ class DurationNum extends StatelessWidget {
             "${duration.inMinutes} mins",
             // textAlign: TextAlign.center,
             style: TextStyle(
-              color: active == duration
+              color: duration.inMinutes == pickedDuration
                   ? Colors.white
                   : Colors.black.withOpacity(0.8),
-              fontWeight:
-                  active == duration ? FontWeight.w700 : FontWeight.w600,
+              fontWeight: duration.inMinutes == pickedDuration
+                  ? FontWeight.w700
+                  : FontWeight.w600,
               fontSize: 14,
             ),
           ),
@@ -283,16 +292,12 @@ class FootNotesWrapper extends StatelessWidget {
   }
 }
 
-String footnotes = "";
-final footnotescontroller = TextEditingController();
-
 class FootNotesData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 13),
-      // alignment: Alignment.center,
       height: size.height * 0.25,
       width: size.width * 0.85,
       decoration: BoxDecoration(
@@ -310,7 +315,7 @@ class FootNotesData extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: TextField(
-          controller: footnotescontroller,
+          controller: footnotesController,
           onChanged: (value) => footnotes = value,
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
@@ -330,18 +335,15 @@ class TimeDatePickerWrapper extends StatefulWidget {
   _TimeDatePickerWrapperState createState() => _TimeDatePickerWrapperState();
 }
 
-DateTime pickedDate = DateTime.now();
-TimeOfDay pickedTime = TimeOfDay.now();
-
 class _TimeDatePickerWrapperState extends State<TimeDatePickerWrapper> {
   @override
   Widget build(BuildContext context) {
-    void datepicker() async {
+    void datePicker() async {
       DateTime? date = await showDatePicker(
         context: context,
         initialDate: pickedDate,
-        firstDate: DateTime(DateTime.now().year - 5),
-        lastDate: DateTime(DateTime.now().year + 5),
+        firstDate: DateTime(DateTime.now().year - 1),
+        lastDate: DateTime(DateTime.now().year + 1),
       );
       if (date != null) {
         setState(() {
@@ -350,7 +352,7 @@ class _TimeDatePickerWrapperState extends State<TimeDatePickerWrapper> {
       }
     }
 
-    void timepicker() async {
+    void timePicker() async {
       TimeOfDay? time =
           await showTimePicker(context: context, initialTime: pickedTime);
       if (time != null) {
@@ -366,12 +368,10 @@ class _TimeDatePickerWrapperState extends State<TimeDatePickerWrapper> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           TimePicker(
-            callback: timepicker,
-            pickedTime: pickedTime,
+            callback: timePicker,
           ),
           DatePicker(
-            callback: datepicker,
-            pickedDate: pickedDate,
+            callback: datePicker,
           ),
         ],
       ),
@@ -381,8 +381,7 @@ class _TimeDatePickerWrapperState extends State<TimeDatePickerWrapper> {
 
 class DatePicker extends StatelessWidget {
   final VoidCallback callback;
-  final DateTime pickedDate;
-  DatePicker({required this.callback, required this.pickedDate});
+  DatePicker({required this.callback});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -430,10 +429,8 @@ class DatePicker extends StatelessWidget {
 }
 
 class TimePicker extends StatelessWidget {
-  @override
   final VoidCallback callback;
-  final TimeOfDay pickedTime;
-  TimePicker({required this.callback, required this.pickedTime});
+  TimePicker({required this.callback});
   Widget build(BuildContext context) {
     String formatTimeOfDay(TimeOfDay tod) {
       final now = new DateTime.now();
@@ -486,15 +483,12 @@ class TimePicker extends StatelessWidget {
   }
 }
 
-class MntLsnCards extends StatefulWidget {
+class MenteeLessonWrapper extends StatefulWidget {
   @override
-  _MntLsnCardsState createState() => _MntLsnCardsState();
+  _MenteeLessonWrapperState createState() => _MenteeLessonWrapperState();
 }
 
-String? pickedLesson = 'lesson 1';
-String? pickedMentee = 'Iron Man';
-
-class _MntLsnCardsState extends State<MntLsnCards> {
+class _MenteeLessonWrapperState extends State<MenteeLessonWrapper> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -517,6 +511,7 @@ class _MntLsnCardsState extends State<MntLsnCards> {
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          // mainAxisSize: MainAxisSize.max,
           children: [
             Text(
               "Mentee",
@@ -532,40 +527,14 @@ class _MntLsnCardsState extends State<MntLsnCards> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(
-                  color: Color(0xffD92136).withOpacity(0.7),
-                  width: 3,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xffD92136).withOpacity(0.7),
-                    blurRadius: 6,
-                  ),
-                ],
               ),
-              child: DropdownButton(
+              child: Text(
+                pickedMentee,
                 style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black.withOpacity(0.6),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black.withOpacity(0.8),
                     fontFamily: 'Montserrat'),
-                isExpanded: true,
-                value: DisplayName,
-                items: menteesList.map((value) {
-                  return DropdownMenuItem<String>(
-                    child: Text(value.fullName),
-                    value: value.fullName,
-                  );
-                }).toList(),
-                onChanged: (String? value) {
-                  setState(() {
-                    pickedMentee = value;
-                    DisplayName = value ?? "test";
-                  });
-                },
-                underline: Container(
-                  height: 0,
-                ),
               ),
             )
           ],
@@ -655,7 +624,7 @@ class TitleBar extends StatelessWidget {
         ),
         Container(
           child: Text(
-            "Schedule a Lecture",
+            "Modify a Lecture",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black.withOpacity(0.5),

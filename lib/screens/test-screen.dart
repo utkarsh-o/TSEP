@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tsep/local-data/questions.dart';
-import 'package:tsep/screens/mentor-profile-template.dart';
+import '../local-data/constants.dart';
+import '../local-data/questions.dart';
 
 class TestScreen extends StatefulWidget {
   const TestScreen({Key? key}) : super(key: key);
@@ -12,45 +12,45 @@ class TestScreen extends StatefulWidget {
 }
 
 class _TestScreenState extends State<TestScreen> {
-  int atvscr = 0, currentScored = 0, currentMax = 0;
+  int activeScore = 0, currentScored = 0, currentMax = 0;
   var scores = List<int>.generate(10, (index) => 0);
   var checked = List<bool>.generate(10, (index) => false);
   Question question = new Question();
   int qtnIdx = 0;
 
-  void nxtclb() {
+  void nextButtonCallback() {
     setState(() {
       // if (qtnIdx >= 10) qtnIdx = 9;
       if (checked[qtnIdx]) {
-        atvscr = scores[qtnIdx];
+        activeScore = scores[qtnIdx];
       } else {
-        atvscr = 0;
+        activeScore = 0;
         checked[qtnIdx] = true;
       }
       qtnIdx += qtnIdx + 1 > 9 ? 0 : 1;
-      updtTotalScores();
+      updateTotalScores();
     });
   }
 
-  void prvclb() {
+  void previousButtonCallback() {
     setState(() {
       qtnIdx--;
       if (qtnIdx < 0) qtnIdx = 0;
-      atvscr = scores[qtnIdx];
-      updtTotalScores();
+      activeScore = scores[qtnIdx];
+      updateTotalScores();
     });
   }
 
-  void updtscr(int score) {
+  void upateScore(int score) {
     scores[qtnIdx] = score;
     checked[qtnIdx] = true;
     setState(() {
-      atvscr = score;
-      updtTotalScores();
+      activeScore = score;
+      updateTotalScores();
     });
   }
 
-  void updtTotalScores() {
+  void updateTotalScores() {
     setState(() {
       currentScored = scores.reduce((a, b) => a + b);
       currentMax = checked.where((item) => item == true).length * 3;
@@ -97,8 +97,8 @@ class _TestScreenState extends State<TestScreen> {
                     ScoreCard(
                       question: question,
                       qtnNum: qtnIdx,
-                      active: atvscr,
-                      updtScr: updtscr,
+                      active: activeScore,
+                      updateScore: upateScore,
                     ),
                     SizedBox(
                       height: 25,
@@ -109,8 +109,8 @@ class _TestScreenState extends State<TestScreen> {
               ),
               BreakLine(),
               PrevNxtBtn(
-                prvclb: prvclb,
-                nxtclb: nxtclb,
+                prvclb: previousButtonCallback,
+                nxtclb: nextButtonCallback,
                 qtnIdx: qtnIdx,
               )
             ],
@@ -155,24 +155,25 @@ class AnsCard extends StatelessWidget {
 
 class ScoreCard extends StatefulWidget {
   int qtnNum, active;
-  Question question;
-  Function updtScr;
+  final Question question;
+  final Function updateScore;
   ScoreCard(
       {required this.qtnNum,
       required this.question,
       required this.active,
-      required this.updtScr});
+      required this.updateScore});
 
   @override
   _ScoreCardState createState() => _ScoreCardState();
 }
 
 class _ScoreCardState extends State<ScoreCard> {
-  int atv = 0;
+  int active = 0;
+
   void callback(int index) {
     setState(() {
       widget.active = index;
-      widget.updtScr(index);
+      widget.updateScore(index);
     });
   }
 
@@ -205,7 +206,74 @@ class _ScoreCardState extends State<ScoreCard> {
           onTap: () {},
           child: IconButton(
             onPressed: () {
-              return showDialogFunc(context);
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return Dialog(
+                    child: SingleChildScrollView(
+                      child: Container(
+                        // margin: EdgeInsets.all(30),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.symmetric(vertical: 25),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    "Marking Scheme",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      color: Colors.black.withOpacity(0.7),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 20),
+                                      decoration: BoxDecoration(
+                                        color: kRed.withOpacity(0.7),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: kRed.withOpacity(1),
+                                            blurRadius: 10,
+                                          ),
+                                        ],
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        "GOT IT",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            InfoWrapper(0),
+                            InfoWrapper(1),
+                            InfoWrapper(2),
+                            InfoWrapper(3),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
             },
             icon: SvgPicture.asset(
               "assets/icons/info-btn.svg",
@@ -216,137 +284,41 @@ class _ScoreCardState extends State<ScoreCard> {
       ],
     );
   }
-
-  showDialogFunc(context) {
-    Size size = MediaQuery.of(context).size;
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return Container(
-          // height: 20,
-          // width: 20,
-          margin: EdgeInsets.all(30),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(
-                      "Marking Scheme",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Colors.black.withOpacity(0.7),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                        decoration: BoxDecoration(
-                          color: Color(0xffD92136).withOpacity(0.7),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xffD92136).withOpacity(1),
-                              blurRadius: 10,
-                            ),
-                          ],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          "GOT IT",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              ScoreDescriptionCard(index: 0, height: size.height * 0.11),
-              ScoreDescriptionCard(index: 1, height: size.height * 0.18),
-              ScoreDescriptionCard(index: 2, height: size.height * 0.21),
-              ScoreDescriptionCard(index: 3, height: size.height * 0.18),
-            ],
-          ),
-        );
-      },
-    );
-  }
 }
 
-class ScoreDescriptionCard extends StatelessWidget {
-  final int index;
-  final double height;
-  ScoreDescriptionCard({required this.index, required this.height});
-  List<String> markingscheme = [
-    "The student does not understand the question, even when it is repeated, or gives the wrong answer or no response.",
-    "The student responds in short words/phrases and/or inaccurate answers. The student shows hesitation, a limited range of vocabulary, inability to extend answers and pronunciation that impedes understanding. (Example: eat breakfast, go college)",
-    "The student is able to comprehend the question and form longer answers- The student is able to self-correct occasional errors. The student avoids complex vocabulary and their pronunciation is easy to understand.\nExample: I eat breakfast. I go to college",
-    "The student is able to comprehend the question and extend their answers using complex vocabulary and grammatical structures where appropriate.\nExample: 1 usually go to college at around 7 am. I eat breakfast and drink some tea.",
-  ];
-
+class InfoWrapper extends StatelessWidget {
+  int index;
+  InfoWrapper(this.index);
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
-      height: height,
-      width: double.infinity,
-      margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.all(13),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
         color: Color(0xff1F78B4),
+        borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Color(0xff1F78B4).withOpacity(1),
+            color: Color(0xff1F78B4).withOpacity(0.8).withOpacity(1),
             blurRadius: 10,
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Container(
-            constraints: BoxConstraints(minWidth: 40),
-            height: double.infinity,
-            alignment: Alignment.center,
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.white,
-            ),
-            child: Text(
-              index.toString(),
-              style: TextStyle(
-                color: Color(0xff1F78B4),
-                fontWeight: FontWeight.w900,
-                fontSize: 30,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              markingscheme[index],
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+                text: 'Award $index marks if:\n',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17)),
+            TextSpan(
+                text: '${markingScheme[index]}',
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w400)),
+          ],
+        ),
       ),
     );
   }
@@ -569,10 +541,6 @@ class LevelCard extends StatelessWidget {
 }
 
 class MenteeProfileBanner extends StatelessWidget {
-  const MenteeProfileBanner({
-    Key? key,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(

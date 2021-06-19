@@ -13,31 +13,24 @@ class SignUp extends StatefulWidget {
   _SignUpState createState() => _SignUpState();
 }
 
-class _SignUpState extends State<SignUp> {
-  bool loading = false;
-  String email = '',
-      password = '',
-      uid = '',
-      batch = '',
-      firstName = '',
-      lastName = '',
-      organization = '',
-      gender = 'male';
+bool loading = false;
+String email = '',
+    password = '',
+    uid = '',
+    batch = '',
+    firstName = '',
+    lastName = '',
+    organization = '',
+    gender = 'male';
 
-  void emailCallback(String inputEmail) => email = inputEmail;
-  void passwordCallback(String inputPassword) => password = inputPassword;
-  void batchCallback(String inputBatch) => batch = inputBatch;
-  void firstNameCallback(String inputFirstName) => firstName = inputFirstName;
-  void lastNameCallback(String inputLastName) => lastName = inputLastName;
-  void organizationCallback(String inputLastName) =>
-      organization = inputLastName;
+class _SignUpState extends State<SignUp> {
   void genderCallback(String inputGender) {
     setState(() {
       gender = inputGender;
     });
   }
 
-  void signUpcbk() async {
+  void singUpCallback() async {
     final firestore = FirebaseFirestore.instance;
     final auth = Authentication();
     try {
@@ -66,7 +59,7 @@ class _SignUpState extends State<SignUp> {
       setState(() {
         loading = false;
       });
-      //   print(e);
+      print(e);
     }
   }
 
@@ -84,17 +77,11 @@ class _SignUpState extends State<SignUp> {
                     TitleBar(),
                     AvatarWrapper(
                         genderCallback: genderCallback, gender: gender),
-                    NameWrapper(
-                      firstNameCallback: firstNameCallback,
-                      lastNameCallback: lastNameCallback,
-                    ),
-                    OrgBchWrapper(
-                      batchCallback: batchCallback,
-                      organizationCallback: organizationCallback,
-                    ),
-                    EmailInputForm(callback: emailCallback),
-                    PasswordInputForm(callback: passwordCallback),
-                    LoginWrapper(callback: signUpcbk)
+                    NameWrapper(),
+                    OrganizationBatchWrapper(),
+                    EmailInputForm(),
+                    PasswordInputForm(),
+                    LoginWrapper(callback: singUpCallback)
                   ],
                 ),
               ),
@@ -143,7 +130,7 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Color(0xffD92136).withOpacity(0.8),
+                            color: kRed.withOpacity(0.8),
                             blurRadius: 45,
                           )
                         ],
@@ -163,7 +150,7 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Color(0xff003670).withOpacity(0.8),
+                            color: kBlue.withOpacity(0.8),
                             blurRadius: 50,
                             spreadRadius: 10,
                           )
@@ -180,9 +167,6 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
 }
 
 class NameWrapper extends StatelessWidget {
-  final Function firstNameCallback, lastNameCallback;
-  NameWrapper(
-      {required this.firstNameCallback, required this.lastNameCallback});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -220,7 +204,7 @@ class NameWrapper extends StatelessWidget {
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (String val) => firstNameCallback,
+                  onChanged: (String val) => firstName = val,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -263,19 +247,19 @@ class NameWrapper extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(
-                    color: Color(0xffD92136).withOpacity(0.7),
+                    color: kRed.withOpacity(0.7),
                     width: 3,
                   ),
                   borderRadius: BorderRadius.circular(5),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0xffD92136).withOpacity(0.7),
+                      color: kRed.withOpacity(0.7),
                       blurRadius: 6,
                     ),
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (String val) => lastNameCallback,
+                  onChanged: (String val) => lastName = val,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -301,10 +285,7 @@ class NameWrapper extends StatelessWidget {
   }
 }
 
-class OrgBchWrapper extends StatelessWidget {
-  final Function batchCallback, organizationCallback;
-  OrgBchWrapper(
-      {required this.batchCallback, required this.organizationCallback});
+class OrganizationBatchWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -343,7 +324,7 @@ class OrgBchWrapper extends StatelessWidget {
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (String val) => organizationCallback,
+                  onChanged: (String val) => organization = val,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -396,7 +377,7 @@ class OrgBchWrapper extends StatelessWidget {
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (String val) => batchCallback,
+                  onChanged: (String val) => batch = val,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -409,7 +390,7 @@ class OrgBchWrapper extends StatelessWidget {
                     ),
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
-                    hintText: "Apr2021",
+                    hintText: "APR2021",
                     hintStyle: TextStyle(
                       color: Colors.grey[400],
                       fontWeight: FontWeight.w600,
@@ -466,15 +447,13 @@ class TitleBar extends StatelessWidget {
 }
 
 class EmailInputForm extends StatelessWidget {
-  final Function callback;
-  EmailInputForm({required this.callback});
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.only(top: 25),
       width: size.width * 0.7,
       child: TextFormField(
-        onChanged: (val) => callback(val),
+        onChanged: (val) => email = val,
         keyboardType: TextInputType.emailAddress,
         style: TextStyle(
           color: Colors.white,
@@ -493,13 +472,13 @@ class EmailInputForm extends StatelessWidget {
             borderRadius: BorderRadius.all(
               Radius.circular(8.0),
             ),
-            borderSide: BorderSide(color: Color(0x00003670), width: 0),
+            borderSide: BorderSide(color: kBlue, width: 0),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(8.0),
             ),
-            borderSide: BorderSide(color: Color(0x00003670), width: 0),
+            borderSide: BorderSide(color: kBlue, width: 0),
           ),
         ),
       ),
@@ -508,15 +487,13 @@ class EmailInputForm extends StatelessWidget {
 }
 
 class PasswordInputForm extends StatelessWidget {
-  final Function callback;
-  PasswordInputForm({required this.callback});
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.only(top: 10),
       width: size.width * 0.7,
       child: TextFormField(
-        onChanged: (val) => callback(val),
+        onChanged: (val) => password = val,
         obscureText: true,
         style: TextStyle(
           color: Color(0xffAFAFAD),
@@ -525,7 +502,6 @@ class PasswordInputForm extends StatelessWidget {
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey.withOpacity(0.27),
-          // border: OutlineInputBorder(),
           hintText: 'Password',
           hintStyle: TextStyle(
             color: Color(0xffAFAFAD),
@@ -535,13 +511,13 @@ class PasswordInputForm extends StatelessWidget {
             borderRadius: BorderRadius.all(
               Radius.circular(8.0),
             ),
-            borderSide: BorderSide(color: Color(0x00003670), width: 0),
+            borderSide: BorderSide(color: kBlue, width: 0),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(8.0),
             ),
-            borderSide: BorderSide(color: Color(0x00003670), width: 0),
+            borderSide: BorderSide(color: kBlue, width: 0),
           ),
         ),
       ),
@@ -563,7 +539,7 @@ class LoginWrapper extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               minimumSize: Size(size.width * 0.5, size.height * 0.06),
-              primary: Color(0xffD92136).withOpacity(0.65),
+              primary: kRed.withOpacity(0.65),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

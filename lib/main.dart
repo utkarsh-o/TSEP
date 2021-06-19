@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:tsep/screens/FAQ-page.dart';
-import 'package:tsep/screens/guidelines-page.dart';
-import 'package:tsep/screens/info-page.dart';
-import 'package:tsep/screens/login-page.dart';
-import 'package:tsep/screens/mentee-details-page.dart';
-import 'package:tsep/screens/mentees-list-page.dart';
-import 'package:tsep/screens/mentor-profile-template.dart';
-import 'package:tsep/screens/mentor-profile.dart';
-import 'package:tsep/screens/schedule-complete.dart';
-import 'package:tsep/screens/schedule-new-lecture.dart';
-import 'package:tsep/screens/schedule-page.dart';
-import 'package:tsep/screens/signup-page.dart';
-import 'package:tsep/screens/test-screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../screens/FAQ-page.dart';
+import '../screens/guidelines-page.dart';
+import '../screens/login-page.dart';
+import '../screens/mentor-profile.dart';
+import '../screens/schedule-complete.dart';
+import '../screens/signup-page.dart';
+import '../screens/info-page.dart';
+import '../screens/mentee-details-page.dart';
+import '../screens/mentees-list-page.dart';
+import '../screens/schedule-new-lecture.dart';
+import '../screens/schedule-page.dart';
+import '../screens/test-screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +42,8 @@ class TSEP extends StatelessWidget {
         MentorProfile.route: (context) => MentorProfile(),
         SignUp.route: (context) => SignUp(),
         ScheduleComplete.route: (context) => ScheduleComplete(),
+        FAQPage.route: (context) => FAQPage(),
+        GuidelinesPage.route: (context) => GuidelinesPage(),
       },
       theme: ThemeData(fontFamily: 'Montserrat'),
       // home: user ? MentorProfile() : LoginPage(),

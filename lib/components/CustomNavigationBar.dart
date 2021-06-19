@@ -1,15 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tsep/local-data/constants.dart';
-import 'package:tsep/screens/info-page.dart';
-import 'package:tsep/screens/login-page.dart';
-import 'package:tsep/screens/mentees-list-page.dart';
-import 'package:tsep/screens/mentor-profile-template.dart';
-import 'package:tsep/screens/mentor-profile.dart';
-import 'package:tsep/screens/schedule-new-lecture.dart';
-import 'package:tsep/screens/schedule-page.dart';
-import 'package:tsep/screens/test-screen.dart';
+import '../local-data/constants.dart';
+import '../screens/info-page.dart';
+import '../screens/mentees-list-page.dart';
+import '../screens/mentor-profile.dart';
+import '../screens/schedule-new-lecture.dart';
+import '../screens/schedule-page.dart';
+import '../screens/test-screen.dart';
 
 class CustomBottomNavBar extends StatefulWidget {
   int active = 0;

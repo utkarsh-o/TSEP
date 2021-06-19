@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../screens/edit_lecture.dart';
 import '../local-data/constants.dart';
 import '../logic/cached-data.dart';
 import '../logic/data-processing.dart';
@@ -20,53 +21,9 @@ class SchedulePage extends StatefulWidget {
 List<Schedule> scheduleList = [];
 
 class _SchedulePageState extends State<SchedulePage> {
-  // Just Kept here for reference, using StreamBuilder instead not
-  // Future<Widget> sync {
-  //   DateTime today = DateTime.now();
-  //   DateTime _firstDayOfTheweek =
-  //       today.subtract(new Duration(days: today.weekday));
-  //   DateTime startDate = _firstDayOfTheweek.add(Duration(days: 1));
-  //   DateTime endDate = _firstDayOfTheweek.add(Duration(days: 7));
-  //   List<Widget> ScheduleList = [];
-  //   await for (var snapshot
-  //       in firestore.collection('MentorData/${uid}/Schedule').snapshots()) {
-  //     for (var schedule in snapshot.docs) {
-  //       var lectureTime = schedule.get('LectureTime').toDate();
-  //       if (lectureTime.isAfter(startDate) && lectureTime.isBefore(endDate)) {
-  //         Schedule s = Schedule(
-  //           mentee: schedule.get('MenteeName'),
-  //           lesson: schedule.get('LessonNumber'),
-  //           duration: schedule.get('Duration'),
-  //           timing: schedule.get('LectureTime'),
-  //         );
-  //         ScheduleList.add(new ScheduleCard(
-  //           s: s,
-  //         ));
-  //       }
-  //     }
-  //   }
-  //   return new ListView(children: ScheduleList);
-  // }
-
   @override
   Widget build(BuildContext context) {
-    @override
     Size size = MediaQuery.of(context).size;
-    // Deprecitated, using streamBuilder now !
-    // Widget getSchedule() {
-    //   DateTime today = DateTime.now();
-    //   DateTime _firstDayOfTheweek =
-    //       today.subtract(new Duration(days: today.weekday));
-    //   DateTime startDate = _firstDayOfTheweek.add(Duration(days: 1));
-    //   DateTime endDate = _firstDayOfTheweek.add(Duration(days: 7));
-    //
-    //   List<Widget> ScheduleList = [];
-    //   for (var sche in schedule) {
-    //     if (sche.timing.isAfter(startDate) && sche.timing.isBefore(endDate))
-    //       ScheduleList.add(new ScheduleCard(s: sche));
-    //   }
-    //   return new ListView(children: ScheduleList);
-    // }
 
     Widget getDayCards() {
       DateTime today = DateTime.now();
@@ -111,29 +68,31 @@ class _SchedulePageState extends State<SchedulePage> {
                       .subtract(Duration(
                           hours: TimeOfDay.now().hour,
                           minutes: TimeOfDay.now().minute));
-                  DateTime endDate = _firstDayOfTheweek.add(Duration(days: 7));
+                  DateTime endDate = _firstDayOfTheweek
+                      .add(Duration(days: 7))
+                      .add(Duration(hours: 24 - TimeOfDay.now().hour));
                   List<Widget> scheduleCardList = [];
                   if (snapshot.hasData) {
                     scheduleList.clear();
                     final schedules = snapshot.data!.docs;
                     for (var schedule in schedules) {
+                      DateTime timing = schedule.get('LectureTime').toDate();
+                      if (timing.isAfter(endDate)) break;
                       var lectureTime = schedule.get('LectureTime').toDate();
                       Schedule s = Schedule(
                         mentee: schedule.get('MenteeName'),
                         lesson: schedule.get('LectureNumber'),
                         duration: schedule.get('Duration'),
-                        timing: schedule.get('LectureTime').toDate(),
+                        timing: timing,
                         mentorScheduleID: schedule.id,
                         menteeScheduleID: schedule.get('MenteeScheduleID'),
                         menteeUID: schedule.get('MenteeUID'),
                       );
                       scheduleList.add(s);
-                      if (lectureTime.isAfter(startDate) &&
-                          lectureTime.isBefore(endDate)) {
+                      if (lectureTime.isAfter(startDate))
                         scheduleCardList.add(
-                          new ScheduleCard(schedule: s),
+                          ScheduleCard(schedule: s),
                         );
-                      }
                     }
                   }
                   return Column(
@@ -224,11 +183,11 @@ class ScheduleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     var weekday = DateFormat('EEE').format(schedule.timing);
     var lesson = schedule.lesson;
-    String starttime = DateFormat('hh:mm').format(schedule.timing);
-    starttime = starttime.replaceAll("AM", "am").replaceAll("PM", "pm");
-    String endtime = DateFormat('hh:mm a')
+    String startTime = DateFormat('hh:mm').format(schedule.timing);
+    startTime = startTime.replaceAll("AM", "am").replaceAll("PM", "pm");
+    String endTime = DateFormat('hh:mm a')
         .format(schedule.timing.add(Duration(minutes: schedule.duration)));
-    endtime = endtime.replaceAll("AM", "am").replaceAll("PM", "pm");
+    endTime = endTime.replaceAll("AM", "am").replaceAll("PM", "pm");
     Size size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () {
@@ -247,7 +206,7 @@ class ScheduleCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Delete Lecture",
+                          "Modify Lecture",
                           style: TextStyle(
                               color: Color(0xffD92136).withOpacity(0.6),
                               fontWeight: FontWeight.bold,
@@ -262,7 +221,7 @@ class ScheduleCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            "Are you sure? this action cannot be undone.",
+                            "Deleted Lectures cannot be restored",
                             style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 17,
@@ -271,7 +230,7 @@ class ScheduleCard extends StatelessWidget {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        CancelDeleteWrapper(
+                        EditDeleteWrapper(
                           schedule: schedule,
                         ),
                       ],
@@ -359,7 +318,7 @@ class ScheduleCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8.0, vertical: 5),
                     child: Text(
-                      "$starttime - $endtime",
+                      "$startTime - $endTime",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black.withOpacity(0.8),
@@ -533,7 +492,7 @@ class TitleBar extends StatelessWidget {
   }
 }
 
-class CancelDeleteWrapper extends StatelessWidget {
+class EditDeleteWrapper extends StatelessWidget {
   deleteSchedule(String mentorSchID, String menteeUID, String menteeSchID) {
     firestore
         .collection('MenteeInfo/$menteeUID/Schedule')
@@ -546,7 +505,7 @@ class CancelDeleteWrapper extends StatelessWidget {
   }
 
   Schedule schedule;
-  CancelDeleteWrapper({required this.schedule});
+  EditDeleteWrapper({required this.schedule});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -556,12 +515,24 @@ class CancelDeleteWrapper extends StatelessWidget {
         children: [
           InkWell(
             onTap: () {
-              Navigator.of(context).pop();
+              // Navigator.of(context).pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return EditLecture(
+                      menteeScheduleID: schedule.menteeScheduleID,
+                      mentorScheduleID: schedule.mentorScheduleID,
+                      menteeUID: schedule.menteeUID,
+                    );
+                  },
+                ),
+              );
             },
             child: Container(
               child: Center(
                 child: Text(
-                  "CANCEL",
+                  "EDIT",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,

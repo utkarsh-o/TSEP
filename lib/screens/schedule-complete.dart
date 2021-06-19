@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+
+import '../local-data/constants.dart';
 import '../logic/cached-data.dart';
 import '../logic/data-processing.dart';
 import '../logic/firestore.dart';
-import '../screens/schedule-page.dart';
+import 'edit_lecture.dart';
 
 final firestore = FirebaseFirestore.instance;
 List<Schedule> scheduleList = [];
@@ -171,7 +173,7 @@ class ScheduleCard extends StatelessWidget {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        CanDelBtnWrapper(
+                        EditDeleteWrapper(
                           schedule: schedule,
                         ),
                       ],
@@ -309,9 +311,9 @@ class TotContriLesTauWrapper extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          TotContriLesTau(
+          PlannedCard(
               heading: "Planned Engagement", value: "${hours}hr ${minutes}min"),
-          TotContriLesTau(
+          PlannedCard(
               heading: "Planned Lessons", value: plannedLessons.toString()),
         ],
       ),
@@ -319,9 +321,9 @@ class TotContriLesTauWrapper extends StatelessWidget {
   }
 }
 
-class TotContriLesTau extends StatelessWidget {
+class PlannedCard extends StatelessWidget {
   final String heading, value;
-  TotContriLesTau({required this.heading, required this.value});
+  PlannedCard({required this.heading, required this.value});
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -376,20 +378,20 @@ class BreakLine extends StatelessWidget {
   }
 }
 
-class CanDelBtnWrapper extends StatelessWidget {
-  deleteSchedule(String MentorSchID, String MenteeUID, String MenteeSchID) {
+class EditDeleteWrapper extends StatelessWidget {
+  deleteSchedule(String mentorSchID, String menteeUID, String menteeSchID) {
     firestore
-        .collection('MenteeInfo/$MenteeUID/Schedule')
-        .doc(MenteeSchID)
+        .collection('MenteeInfo/$menteeUID/Schedule')
+        .doc(menteeSchID)
         .delete();
     firestore
         .collection('MentorData/$mentorUID/Schedule')
-        .doc(MentorSchID)
+        .doc(mentorSchID)
         .delete();
   }
 
   Schedule schedule;
-  CanDelBtnWrapper({required this.schedule});
+  EditDeleteWrapper({required this.schedule});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -399,12 +401,24 @@ class CanDelBtnWrapper extends StatelessWidget {
         children: [
           InkWell(
             onTap: () {
-              Navigator.of(context).pop();
+              // Navigator.of(context).pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return EditLecture(
+                      menteeScheduleID: schedule.menteeScheduleID,
+                      mentorScheduleID: schedule.mentorScheduleID,
+                      menteeUID: schedule.menteeUID,
+                    );
+                  },
+                ),
+              );
             },
             child: Container(
               child: Center(
                 child: Text(
-                  "CANCLE",
+                  "EDIT",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -447,12 +461,12 @@ class CanDelBtnWrapper extends StatelessWidget {
               height: size.height * 0.042,
               width: size.width * 0.3,
               decoration: BoxDecoration(
-                color: Color(0xffD92136).withOpacity(0.7),
+                color: kRed.withOpacity(0.7),
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(4),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xffD92136).withOpacity(0.7),
+                    color: kRed.withOpacity(0.7),
                     blurRadius: 10,
                   ),
                 ],
