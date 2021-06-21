@@ -24,6 +24,7 @@ class ProfileHandler {
       final User user = await auth.getCurrentUser();
       uid = user.uid;
       mentorUID = uid;
+      mentorEmail = user.email ?? 'email';
     } catch (error) {
       print('MentorProfile error -> $error');
     }
@@ -32,17 +33,20 @@ class ProfileHandler {
   getMentorProfileData(VoidCallback callback) async {
     await for (var snapshot
         in firestore.collection('MentorData').doc(uid).snapshots()) {
+      var firstName = snapshot.get('FirstName').toString();
+      var lastName = snapshot.get('LastName').toString();
       mentorProfileData = MentorProfileData(
         batchName: snapshot.get('BatchName').toString(),
-        firstName: snapshot.get('FirstName').toString(),
+        firstName: firstName,
         idNumber: snapshot.get('IDNumber'),
-        lastName: snapshot.get('LastName').toString(),
+        lastName: lastName,
         organization: snapshot.get('Organization').toString(),
         email: snapshot.get('email'),
         joiningDate: snapshot.get('JoiningDate').toDate(),
         gender: snapshot.get('Gender'),
       );
       joiningDate = snapshot.get('JoiningDate').toDate();
+      mentorName = "$firstName $lastName";
       callback();
     }
   }

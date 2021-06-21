@@ -1,10 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../components/loading.dart';
 import '../local-data/constants.dart';
-import '../logic/authentication.dart';
 import '../screens/login-page.dart';
 
 class SignUp extends StatefulWidget {
@@ -16,12 +16,19 @@ class SignUp extends StatefulWidget {
 bool loading = false;
 String email = '',
     password = '',
-    uid = '',
+    // uid = '',
     batch = '',
     firstName = '',
     lastName = '',
     organization = '',
     gender = 'male';
+TextEditingController firstNameController = TextEditingController();
+TextEditingController lastNameController = TextEditingController();
+TextEditingController organizationController = TextEditingController();
+TextEditingController batchController = TextEditingController();
+TextEditingController emailController = TextEditingController();
+TextEditingController passwordController = TextEditingController();
+String? uid = '';
 
 class _SignUpState extends State<SignUp> {
   void genderCallback(String inputGender) {
@@ -30,30 +37,53 @@ class _SignUpState extends State<SignUp> {
     });
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    firstNameController.clear();
+    lastNameController.clear();
+    organizationController.clear();
+    batchController.clear();
+    emailController.clear();
+    passwordController.clear();
+  }
+
   void singUpCallback() async {
+    final auth = FirebaseAuth.instance;
     final firestore = FirebaseFirestore.instance;
-    final auth = Authentication();
+    // final auth = Authentication();
     try {
+      print(emailController.text);
+      print(passwordController.text);
+      print(firstNameController.text);
+      print(lastNameController.text);
+      print(organizationController.text);
+      print(batchController.text);
       setState(() {
         loading = true;
       });
-      final newUser = auth.signupUser(email, password).user;
-      if (newUser != null) {
-        uid = newUser.uid;
+
+      final newUser = await auth.createUserWithEmailAndPassword(
+          email: emailController.text, password: passwordController.text);
+      if (newUser.user != null) {
+        uid = newUser.user?.uid;
         setState(() {
           loading = false;
         });
-        firestore.collection('/MentorData').doc(uid).set({
-          'BatchName': batch,
-          'FirstName': firstName,
+        await firestore.collection('/MentorData').doc(uid).set({
+          'BatchName': batchController.text,
+          'FirstName': firstNameController.text,
           'IDNumber': -1,
           'JoiningDate': Timestamp.fromDate(DateTime.now()),
-          'LastName': lastName,
-          'Organization': organization,
-          'email': email,
+          'LastName': lastNameController.text,
+          'Organization': organizationController.text,
+          'email': emailController.text,
           'Gender': gender,
         });
-        Navigator.pushNamed(context, LoginPage.route);
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return LoginPage();
+        }));
       }
     } catch (e) {
       setState(() {
@@ -204,7 +234,7 @@ class NameWrapper extends StatelessWidget {
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (String val) => firstName = val,
+                  controller: firstNameController,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -259,7 +289,7 @@ class NameWrapper extends StatelessWidget {
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (String val) => lastName = val,
+                  controller: lastNameController,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -324,7 +354,7 @@ class OrganizationBatchWrapper extends StatelessWidget {
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (String val) => organization = val,
+                  controller: organizationController,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -377,7 +407,7 @@ class OrganizationBatchWrapper extends StatelessWidget {
                   ],
                 ),
                 child: TextFormField(
-                  onChanged: (String val) => batch = val,
+                  controller: batchController,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: size.width * 0.037,
@@ -453,7 +483,7 @@ class EmailInputForm extends StatelessWidget {
       margin: EdgeInsets.only(top: 25),
       width: size.width * 0.7,
       child: TextFormField(
-        onChanged: (val) => email = val,
+        controller: emailController,
         keyboardType: TextInputType.emailAddress,
         style: TextStyle(
           color: Colors.white,
@@ -493,7 +523,7 @@ class PasswordInputForm extends StatelessWidget {
       margin: EdgeInsets.only(top: 10),
       width: size.width * 0.7,
       child: TextFormField(
-        onChanged: (val) => password = val,
+        controller: passwordController,
         obscureText: true,
         style: TextStyle(
           color: Color(0xffAFAFAD),

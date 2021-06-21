@@ -27,8 +27,7 @@ String firstName = '',
     uid = '',
     gender = '',
     lastInteraction = '',
-    nextInteraction = '',
-    mentorName = '';
+    nextInteraction = '';
 double lecturesPerWeek = 0, hoursPerWeek = 0;
 int idNumber = 0, mentees = 7;
 DateTime JoiningDate = DateTime.now();
@@ -325,7 +324,7 @@ class MentorProfileBanner extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      "$lastInteraction ago",
+                      "$lastInteraction",
                       style: TextStyle(
                           color: kGreen.withOpacity(0.6),
                           fontSize: 11,

@@ -45,9 +45,9 @@ String formatLastInteraction(Duration result) {
     return "-";
   } else {
     if (result.inHours > 24) {
-      return "${(result.inHours / 24).floor()} days, ${result.inHours % 24} hours";
+      return "${(result.inHours / 24).floor()} days, ${result.inHours % 24} hours ago";
     } else
-      return "${result.inHours} hours";
+      return "${result.inHours} hours ago";
   }
 }
 

@@ -4,8 +4,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tsep/local-data/constants.dart';
-import 'package:tsep/logic/data-processing.dart';
+import '../local-data/constants.dart';
+import '../logic/data-processing.dart';
 import '../logic/cached-data.dart';
 import '../screens/mentor-profile.dart';
 
@@ -23,16 +23,20 @@ class _ScheduleNewState extends State<ScheduleNew> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      pickedTime = TimeOfDay.now();
-      pickedDate = DateTime.now();
-      footnotescontroller.clear();
-      pickedDuration = 30;
-      displayLesson = 'lesson 1';
-      DisplayName =
-          "${menteesList.first.firstName} ${menteesList.first.lastName}";
-      pickedMentee = DisplayName;
-    });
+    if (menteesList.length >= 1) {
+      setState(() {
+        print(menteesList.length);
+        print(menteesList == []);
+        pickedTime = TimeOfDay.now();
+        pickedDate = DateTime.now();
+        footnotescontroller.clear();
+        pickedDuration = 30;
+        displayLesson = 'lesson 1';
+        DisplayName =
+            "${menteesList.first.firstName} ${menteesList.first.lastName}";
+        pickedMentee = DisplayName;
+      });
+    }
   }
 
   @override
@@ -153,7 +157,9 @@ class CancleScheduleBtn extends StatelessWidget {
               menteesList.forEach((mentee) {
                 if (mentee.fullName == pickedMentee) menteeUID = mentee.uid;
               });
-              await firestore.collection('/MenteeInfo/menteeUID/Schedule').add({
+              await firestore
+                  .collection('/MenteeInfo/$menteeUID/Schedule')
+                  .add({
                 "Duration": pickedDuration,
                 "LessonNumber": pickedLesson,
                 "LectureTime": Timestamp.fromDate(pickedDateTime),

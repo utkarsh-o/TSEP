@@ -14,12 +14,12 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  String email = '', password = '';
-  bool loading = false;
+TextEditingController emailController = TextEditingController();
+TextEditingController passwordController = TextEditingController();
+final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  void emailCallback(String inputEmail) => email = inputEmail;
-  void passwordCallback(String inputPass) => password = inputPass;
+class _LoginPageState extends State<LoginPage> {
+  bool loading = false;
 
   void loginCallback() async {
     final auth = Authentication();
@@ -27,7 +27,8 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         loading = true;
       });
-      final newUser = await auth.loginUser(email, password);
+      final newUser =
+          await auth.loginUser(emailController.text, passwordController.text);
       if (newUser != null) Navigator.pushNamed(context, MentorProfile.route);
     } catch (e) {
       setState(() {
@@ -54,9 +55,9 @@ class _LoginPageState extends State<LoginPage> {
                       SignupWrapper(),
                       MntrMenteeWrapper(),
                       SizedBox(height: size.height * 0.025),
-                      EmailInputForm(callback: emailCallback),
+                      EmailInputForm(),
                       SizedBox(height: size.height * 0.0125),
-                      PasswordInputForm(callback: passwordCallback),
+                      PasswordInputForm(),
                       frgtPassWrapper(),
                       LoginWrapper(callback: loginCallback),
                       FooterText(),
@@ -101,7 +102,12 @@ class LoginWrapper extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            onPressed: callback,
+            onPressed: () {
+              if (!formKey.currentState!.validate()) {
+                return;
+              }
+              callback();
+            },
             child: Text('Login'),
           ),
           IconButton(
@@ -131,7 +137,7 @@ class frgtPassWrapper extends StatelessWidget {
           ),
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: () => showSnackBar(context),
           child: Text(
             "Reset",
             style: TextStyle(
@@ -284,32 +290,40 @@ class mainLogo extends StatelessWidget {
 
 class EmailInputForm extends StatelessWidget {
   @override
-  final Function callback;
-  EmailInputForm({required this.callback});
   Widget build(BuildContext context) {
-    return TextFormField(
-      onChanged: (val) => callback(val),
-      keyboardType: TextInputType.emailAddress,
-      style: TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.w600,
-      ),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: kBlue.withOpacity(0.7),
-        // border: OutlineInputBorder(),
-        hintText: 'Email',
-        hintStyle: TextStyle(
+    return Form(
+      key: formKey,
+      child: TextFormField(
+        controller: emailController,
+        validator: (String? val) {
+          String value = val ?? 'test';
+          if (value.isNotEmpty && value.length > 5 && value != 'test')
+            return null;
+          else
+            return 'Invalid Input';
+        },
+        keyboardType: TextInputType.emailAddress,
+        style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w600,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-          borderSide: BorderSide(color: Color(0x00003670), width: 0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-          borderSide: BorderSide(color: Color(0x00003670), width: 0),
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: kBlue.withOpacity(0.7),
+          // border: OutlineInputBorder(),
+          hintText: 'Email',
+          hintStyle: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+            borderSide: BorderSide(color: Color(0x00003670), width: 0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+            borderSide: BorderSide(color: Color(0x00003670), width: 0),
+          ),
         ),
       ),
     );
@@ -318,11 +332,9 @@ class EmailInputForm extends StatelessWidget {
 
 class PasswordInputForm extends StatelessWidget {
   @override
-  final Function callback;
-  PasswordInputForm({required this.callback});
   Widget build(BuildContext context) {
     return TextFormField(
-      onChanged: (val) => callback(val),
+      controller: passwordController,
       obscureText: true,
       style: TextStyle(
         color: Color(0xffAFAFAD),
@@ -352,4 +364,24 @@ class PasswordInputForm extends StatelessWidget {
       ),
     );
   }
+}
+
+void showSnackBar(BuildContext context) {
+  final scaffold = ScaffoldMessenger.of(context);
+  scaffold.showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      elevation: 3,
+      backgroundColor: kRed.withOpacity(0.7),
+      content: const Text(
+        'Please enter your email address.',
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: scaffold.hideCurrentSnackBar,
+        textColor: Colors.black54,
+      ),
+    ),
+  );
 }

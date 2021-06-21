@@ -96,6 +96,54 @@ class _MenteeDetailsState extends State<MenteeDetails> {
                     .orderBy('LectureTime')
                     .snapshots(),
                 builder: (context, snapshot) {
+                  if (initialLevel == 'TBD') {
+                    return Column(
+                      children: [
+                        MenteeProfile(
+                          lessonsScheduled: 0,
+                        ),
+                        SizedBox(height: size.height * 0.02),
+                        BatchJoinProfWrapper(),
+                        SizedBox(height: size.height * 0.02),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return TestScreen(
+                                menteeUID: menteeUID,
+                              );
+                            }));
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(top: 20),
+                            child: Center(
+                              child: Text(
+                                "Take Pre-Program Test",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                              ),
+                            ),
+                            height: size.height * 0.08,
+                            width: size.width * 0.6,
+                            decoration: BoxDecoration(
+                              color: kLightBlue,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: kLightBlue,
+                                  blurRadius: 10,
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
                   List<Widget> lessonList = [];
                   int index = 1;
                   if (snapshot.hasData) {
@@ -121,9 +169,7 @@ class _MenteeDetailsState extends State<MenteeDetails> {
                       SizedBox(height: size.height * 0.02),
                       BatchJoinProfWrapper(),
                       SizedBox(height: size.height * 0.02),
-                      Column(
-                        children: lessonList,
-                      )
+                      ...lessonList,
                     ],
                   );
                 },

@@ -1,7 +1,6 @@
 import 'firestore.dart';
 
-String mentorUID = '';
-
+String mentorName = '', mentorEmail = '', mentorUID = '';
 MentorProfileData mentorProfileData = MentorProfileData(
   batchName: 'batchName',
   firstName: 'firstName',
