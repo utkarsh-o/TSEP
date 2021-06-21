@@ -4,9 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tsep/local-data/constants.dart';
 
+import '../local-data/constants.dart';
 import '../components/CustomNavigationBar.dart';
 import '../local-data/line_titles.dart';
 import '../logic/authentication.dart';
@@ -119,7 +118,6 @@ class ActivityPlot extends StatelessWidget {
   final List<Color> hoursRedGradient = [
     const Color(0xffD92136).withOpacity(0.7),
     const Color(0xffD92136).withOpacity(0.7),
-    // const Color(0xffD92136),
   ];
   List<LineChartBarData> linechartbardata() {
     final lessons = LineChartBarData(
@@ -134,7 +132,7 @@ class ActivityPlot extends StatelessWidget {
       ),
       shadow: BoxShadow(
         blurRadius: 6,
-        color: Color(0xff1F78B4),
+        color: kLightBlue,
       ),
     );
     final hours = LineChartBarData(
@@ -150,7 +148,7 @@ class ActivityPlot extends StatelessWidget {
       ),
       shadow: BoxShadow(
         blurRadius: 6,
-        color: Color(0xffD92136).withOpacity(0.85),
+        color: kRed.withOpacity(0.85),
       ),
     );
     return [lessons, hours];
@@ -503,12 +501,12 @@ class DecComRepDropContainer extends StatelessWidget {
             height: size.height * 0.08,
             width: size.width * 0.4,
             decoration: BoxDecoration(
-              color: Color(0xff1F78B4),
+              color: kLightBlue,
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xff1F78B4),
+                  color: kLightBlue,
                   blurRadius: 10,
                 )
               ],

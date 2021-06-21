@@ -3,69 +3,69 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:tsep/screens/mentor-profile.dart';
 
-class Schedule {
-  String mentee, lesson, menteeUID, mentorScheduleID, menteeScheduleID;
-  DateTime timing;
-  int duration;
-
-  Schedule({
-    required this.menteeUID,
-    required this.menteeScheduleID,
-    required this.mentorScheduleID,
-    required this.mentee,
-    required this.lesson,
-    required this.duration,
-    required this.timing,
-  });
-}
-
-class Mentee {
-  String name, uid;
-  Mentee({required this.name, required this.uid});
-}
-
-List<Schedule> scheduleList = [];
-List<Mentee> menteeList = [];
-int ttllsns = 0;
-int schlsns = 0;
-Duration getttlctr(List<Schedule> schedule) {
-  Duration ttlctr = Duration();
-  DateTime today = DateTime.now();
-  ttllsns = 0;
-  for (var s in schedule)
-    if (s.timing.add(Duration(minutes: s.duration)).isBefore(today)) {
-      ttlctr += Duration(minutes: s.duration);
-      ttllsns++;
-    }
-  return ttlctr;
-}
-
-Duration getschcnt(List<Schedule> schedule) {
-  Duration schcnt = Duration();
-  DateTime today = DateTime.now();
-  schlsns = 0;
-  for (var s in schedule) {
-    schcnt += Duration(minutes: s.duration);
-    schlsns++;
-  }
-  return schcnt;
-}
-
-bool iseventful(List<Schedule> schedule, DateTime today) {
-  for (var s in schedule)
-    if (s.timing.day == today.day &&
-        s.timing.month == today.month &&
-        s.timing.year == today.year) return true;
-  return false;
-}
-
-bool isactive(DateTime date) {
-  DateTime today = DateTime.now();
-  if (today.year == date.year &&
-      today.day == date.day &&
-      today.month == date.month) return true;
-  return false;
-}
+// class Schedule {
+//   String mentee, lesson, menteeUID, mentorScheduleID, menteeScheduleID;
+//   DateTime timing;
+//   int duration;
+//
+//   Schedule({
+//     required this.menteeUID,
+//     required this.menteeScheduleID,
+//     required this.mentorScheduleID,
+//     required this.mentee,
+//     required this.lesson,
+//     required this.duration,
+//     required this.timing,
+//   });
+// }
+//
+// class Mentee {
+//   String name, uid;
+//   Mentee({required this.name, required this.uid});
+// }
+//
+// List<Schedule> scheduleList = [];
+// List<Mentee> menteeList = [];
+// int ttllsns = 0;
+// int schlsns = 0;
+// Duration getttlctr(List<Schedule> schedule) {
+//   Duration ttlctr = Duration();
+//   DateTime today = DateTime.now();
+//   ttllsns = 0;
+//   for (var s in schedule)
+//     if (s.timing.add(Duration(minutes: s.duration)).isBefore(today)) {
+//       ttlctr += Duration(minutes: s.duration);
+//       ttllsns++;
+//     }
+//   return ttlctr;
+// }
+//
+// Duration getschcnt(List<Schedule> schedule) {
+//   Duration schcnt = Duration();
+//   DateTime today = DateTime.now();
+//   schlsns = 0;
+//   for (var s in schedule) {
+//     schcnt += Duration(minutes: s.duration);
+//     schlsns++;
+//   }
+//   return schcnt;
+// }
+//
+// bool iseventful(List<Schedule> schedule, DateTime today) {
+//   for (var s in schedule)
+//     if (s.timing.day == today.day &&
+//         s.timing.month == today.month &&
+//         s.timing.year == today.year) return true;
+//   return false;
+// }
+//
+// bool isactive(DateTime date) {
+//   DateTime today = DateTime.now();
+//   if (today.year == date.year &&
+//       today.day == date.day &&
+//       today.month == date.month) return true;
+//   return false;
+// }
 
 // String getLastInteraction() {
 //   Duration result = Duration(days: 1000);

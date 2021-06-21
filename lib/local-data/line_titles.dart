@@ -6,7 +6,6 @@ class LineTitles {
         show: true,
         bottomTitles: SideTitles(
           showTitles: true,
-          // reservedSize: 35,
           getTextStyles: (value) => const TextStyle(
             color: Color(0xff68737d),
             fontWeight: FontWeight.w900,
@@ -38,7 +37,6 @@ class LineTitles {
             }
             return '';
           },
-          // margin: 8,
         ),
         leftTitles: SideTitles(
           showTitles: true,
@@ -60,15 +58,9 @@ class LineTitles {
                 return '3';
               case 4:
                 return '4';
-              // case 5:
-              //   return '2.5';
-              // case 6:
-              //   return '3';
             }
             return '';
           },
-          // reservedSize: 35,
-          // margin: 12,
         ),
       );
 }

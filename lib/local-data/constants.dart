@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../logic/firestore.dart';
 
 const Color kBlue = Color(0xff003670);
+const Color kLightBlue = Color(0xff1F78B4);
 const Color kRed = Color(0xffD92136);
 const Color kGreen = Color(0xff34A853);
 
@@ -22,4 +24,31 @@ List<String> questions = [
   'How do you think Mumbai will change in the next 20 years?',
   'What advice would you give to someone visiting Mumbai or India?',
   'Tell me about the main news stories in our country at the moment.',
+];
+
+List<Lesson> lessonData = [
+  Lesson(title: 'Introduction', duration: '30mins'),
+  Lesson(title: 'Routines and Habits', duration: '30mins'),
+  Lesson(title: 'About your hobbies', duration: '30mins'),
+  Lesson(title: 'Talking about Past Experiences', duration: '30mins'),
+  Lesson(title: 'Describing places', duration: '30mins'),
+  Lesson(title: 'In the news', duration: '30mins'),
+  Lesson(title: 'Opinions about the news', duration: '30mins'),
+  Lesson(title: 'About the films', duration: '30mins'),
+  Lesson(title: 'Social Media - Pros and Cons', duration: '30mins'),
+  Lesson(title: 'Social Media - Dos and Don\'ts', duration: '30mins'),
+  Lesson(title: 'Technology then and now', duration: '30mins'),
+  Lesson(title: 'Global cities and workplaces', duration: '30mins'),
+  Lesson(title: 'Planning for the future', duration: '30mins'),
+  Lesson(title: 'Time management', duration: '30mins'),
+  Lesson(title: 'Mumbai 2050', duration: '30mins'),
+  Lesson(title: 'What ails our society', duration: '30mins'),
+  Lesson(title: 'What we can do as citizens', duration: '30mins'),
+  Lesson(title: 'My vision for India', duration: '30mins'),
+  Lesson(title: 'Gender Equality', duration: '30mins'),
+  Lesson(title: 'Inclusivity at the workplace', duration: '30mins'),
+  Lesson(title: 'Conversation to seek information', duration: '30mins'),
+  Lesson(title: 'An interview', duration: '30mins'),
+  Lesson(title: 'Back to the future', duration: '30mins'),
+  Lesson(title: 'Imagine and Predict', duration: '30mins'),
 ];

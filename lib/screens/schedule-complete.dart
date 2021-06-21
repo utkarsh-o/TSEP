@@ -50,7 +50,7 @@ class _ScheduleCompleteState extends State<ScheduleComplete> {
                         }
                       Schedule sch = Schedule(
                         mentee: menteeName,
-                        lesson: schedule.get('LectureNumber'),
+                        lesson: schedule.get('LessonNumber'),
                         duration: schedule.get('Duration'),
                         timing: schedule.get('LectureTime').toDate(),
                         mentorScheduleID: schedule.id,
@@ -157,7 +157,7 @@ class ScheduleCard extends StatelessWidget {
                         Text(
                           "Modify Lecture",
                           style: TextStyle(
-                              color: Color(0xffD92136).withOpacity(0.6),
+                              color: kRed.withOpacity(0.6),
                               fontWeight: FontWeight.bold,
                               fontSize: 20),
                         ),
@@ -166,7 +166,7 @@ class ScheduleCard extends StatelessWidget {
                           padding:
                               EdgeInsets.symmetric(horizontal: 13, vertical: 7),
                           decoration: BoxDecoration(
-                            color: Color(0xff1F78B4).withOpacity(0.2),
+                            color: kLightBlue.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -174,7 +174,7 @@ class ScheduleCard extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 17,
-                              color: Color(0xff1F78B4).withOpacity(0.9),
+                              color: kLightBlue.withOpacity(0.9),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -250,7 +250,7 @@ class ScheduleCard extends StatelessWidget {
                       height: 3,
                     ),
                     Text(
-                      "$weekday, $lesson",
+                      "$weekday, lesson $lesson",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 10,
@@ -437,12 +437,12 @@ class EditDeleteWrapper extends StatelessWidget {
                   height: size.height * 0.042,
                   width: size.width * 0.3,
                   decoration: BoxDecoration(
-                    color: Color(0xff1F78B4),
+                    color: kLightBlue,
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(4),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xff1F78B4),
+                        color: kLightBlue,
                         blurRadius: 10,
                       )
                     ],

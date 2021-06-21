@@ -51,6 +51,9 @@ String formatLastInteraction(Duration result) {
   }
 }
 
+int parseIntFromString(String s) =>
+    int.parse(s.replaceAll(new RegExp(r'[^0-9]'), ''));
+
 String formatNextInteraction(Duration result) {
   if (result == Duration(days: 1000)) {
     return "-";

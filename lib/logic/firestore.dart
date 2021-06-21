@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'authentication.dart';
 import 'cached-data.dart';
 import 'data-processing.dart';
@@ -57,7 +57,7 @@ class ProfileHandler {
       for (var schedule in schedules) {
         Schedule sch = Schedule(
           mentee: schedule.get('MenteeName'),
-          lesson: schedule.get('LectureNumber'),
+          lesson: schedule.get('LessonNumber'),
           duration: schedule.get('Duration'),
           timing: schedule.get('LectureTime').toDate(),
           mentorScheduleID: schedule.id,
@@ -108,7 +108,6 @@ class ProfileHandler {
           menteesList.add(mnt);
         });
       }
-      print('test123');
       callback();
     }
   }
@@ -141,9 +140,9 @@ class MentorScheduleData {
 }
 
 class Schedule {
-  String mentee, lesson, menteeUID, mentorScheduleID, menteeScheduleID;
+  String mentee, menteeUID, mentorScheduleID, menteeScheduleID;
   DateTime timing;
-  int duration;
+  int duration, lesson;
 
   Schedule({
     required this.menteeUID,
@@ -186,4 +185,9 @@ class Response {
   int score;
   String answer, question;
   Response({required this.score, required this.answer, required this.question});
+}
+
+class Lesson {
+  String title, duration;
+  Lesson({required this.title, required this.duration});
 }

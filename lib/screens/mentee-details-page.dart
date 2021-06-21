@@ -6,7 +6,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tsep/screens/test-screen.dart';
+import 'package:tsep/local-data/constants.dart';
+import '../screens/test-screen.dart';
 import '../logic/cached-data.dart';
 
 final auth = FirebaseAuth.instance;
@@ -96,16 +97,16 @@ class _MenteeDetailsState extends State<MenteeDetails> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   List<Widget> lessonList = [];
+                  int index = 1;
                   if (snapshot.hasData) {
                     engagement = 0;
                     final lessons = snapshot.data!.docs;
-                    int index = 1;
                     for (var lesson in lessons) {
                       if (lesson.get('MenteeUID') == widget.menteeUID) {
                         engagement += lesson.get('Duration');
                         lessonList.add(LessonList(
                             index: index++,
-                            lesson: lesson.get('LectureNumber'),
+                            lesson: lesson.get('LessonNumber'),
                             date: DateFormat('EEE, d MMMM')
                                 .format(lesson.get('LectureTime').toDate()),
                             lessonLength: lesson.get('Duration').toString()));
@@ -114,7 +115,9 @@ class _MenteeDetailsState extends State<MenteeDetails> {
                   }
                   return Column(
                     children: [
-                      MenteeProfile(),
+                      MenteeProfile(
+                        lessonsScheduled: index > 0 ? index - 1 : index,
+                      ),
                       SizedBox(height: size.height * 0.02),
                       BatchJoinProfWrapper(),
                       SizedBox(height: size.height * 0.02),
@@ -196,8 +199,8 @@ class BreakLine extends StatelessWidget {
 }
 
 class LessonList extends StatelessWidget {
-  final String lesson, date, lessonLength;
-  final int index;
+  final date, lessonLength;
+  final int index, lesson;
   LessonList(
       {required this.lesson,
       required this.date,
@@ -206,7 +209,6 @@ class LessonList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int lessNum = int.parse(lesson.replaceAll(RegExp('[^0-9]'), ''));
     Size size = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 25),
@@ -257,7 +259,7 @@ class LessonList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Lesson $lessNum",
+                    "Lesson $latestLecture",
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
@@ -295,6 +297,8 @@ class LessonList extends StatelessWidget {
 }
 
 class MenteeProfile extends StatelessWidget {
+  int lessonsScheduled;
+  MenteeProfile({required this.lessonsScheduled});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -361,9 +365,9 @@ class MenteeProfile extends StatelessWidget {
                   ),
                   Container(
                     child: EngLessonCards(
-                      heading: "Progress",
-                      value: "lesson $latestLecture",
-                      valueColor: Color(0xff1F78B4).withOpacity(0.9),
+                      heading: "Lessons",
+                      value: lessonsScheduled.toString(),
+                      valueColor: kLightBlue.withOpacity(0.9),
                     ),
                   ),
                 ],

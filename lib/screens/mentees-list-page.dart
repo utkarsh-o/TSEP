@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tsep/local-data/constants.dart';
-import 'package:tsep/logic/data-processing.dart';
+import '../local-data/constants.dart';
+import '../logic/data-processing.dart';
 import '../components/CustomNavigationBar.dart';
 import '../logic/cached-data.dart';
 import '../screens/mentee-details-page.dart';
 
-bool Assigned = true;
+bool assigned = true;
 
 class MenteesPage extends StatefulWidget {
   @override
@@ -18,8 +18,9 @@ class MenteesPage extends StatefulWidget {
 class _MenteesPageState extends State<MenteesPage> {
   void initState() {
     super.initState();
-    Assigned = false;
+    assigned = false;
     parseMenteeList();
+    getDataStream();
   }
 
   List<Widget> menteeCards = [];
@@ -31,10 +32,20 @@ class _MenteesPageState extends State<MenteesPage> {
           lesson: mentee.latestLecture,
           level: mentee.initialLevel,
           uid: mentee.uid,
+          phone: mentee.phoneNumber,
         ),
       );
     }
-    Assigned = menteeCards.length > 0 ? true : false;
+    assigned = menteeCards.length > 0 ? true : false;
+  }
+
+  getDataStream() async {
+    await for (var snapshot
+        in firestore.collection('MentorData/$mentorUID/Mentees').snapshots()) {
+      setState(() {
+        super.setState(() {});
+      });
+    }
   }
 
   @override
@@ -48,7 +59,7 @@ class _MenteesPageState extends State<MenteesPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 TitleBar(),
-                !Assigned
+                !assigned
                     ? Container(
                         margin: EdgeInsets.symmetric(
                             vertical: size.height * 0.2,
@@ -65,7 +76,7 @@ class _MenteesPageState extends State<MenteesPage> {
                               textAlign: TextAlign.center,
                             ),
                             SizedBox(height: size.height * 0.05),
-                            SpinKitFadingCube(
+                            SpinKitSquareCircle(
                               color: Color(0xff003670).withOpacity(0.5),
                               size: 70,
                             ),
@@ -119,12 +130,13 @@ class TitleBar extends StatelessWidget {
 
 class MenteeCard extends StatelessWidget {
   final String name, level, uid;
-  final int lesson;
+  final int lesson, phone;
   MenteeCard(
       {required this.name,
       required this.level,
       required this.lesson,
-      required this.uid});
+      required this.uid,
+      required this.phone});
 
   @override
   Widget build(BuildContext context) {
@@ -230,10 +242,10 @@ class MenteeCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: screenWidthInt * 0.01),
               child: Text(
-                "LESSON $lesson",
+                phone.toString(),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: kBlue,
+                  color: kGreen,
                 ),
               ),
             ),

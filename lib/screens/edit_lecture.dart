@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tsep/local-data/constants.dart';
+import 'package:tsep/logic/data-processing.dart';
 import '../logic/cached-data.dart';
 import '../screens/mentor-profile.dart';
 
@@ -25,7 +27,7 @@ String footnotes = "",
     menteeScheduleID = '',
     mentorScheduleID = '',
     menteeUID = '';
-String? pickedLesson = 'lesson 1';
+int pickedLesson = -1;
 
 class _EditLectureState extends State<EditLecture> {
   final firestore = FirebaseFirestore.instance;
@@ -43,7 +45,7 @@ class _EditLectureState extends State<EditLecture> {
         pickedDate = time;
         footnotesController.text = value.get('FootNotes');
         pickedDuration = value.get('Duration');
-        pickedLesson = value.get('LectureNumber');
+        pickedLesson = value.get('LessonNumber');
         pickedMentee = value.get('MenteeName');
       });
     });
@@ -137,20 +139,20 @@ class CancelConfirmWrapper extends StatelessWidget {
                   .doc(menteeScheduleID)
                   .update({
                 "Duration": pickedDuration,
-                "LectureNumber": pickedLesson,
+                "LessonNumber": pickedLesson,
                 "LectureTime": Timestamp.fromDate(pickedDateTime),
                 "MentorName": mentorName,
-                "FootNotes": footnotes,
+                "FootNotes": footnotesController.text,
               });
               firestore
                   .collection('/MentorData/$mentorUID/Schedule')
                   .doc(mentorScheduleID)
                   .update({
                 "Duration": pickedDuration,
-                "LectureNumber": pickedLesson,
+                "LessonNumber": pickedLesson,
                 "LectureTime": Timestamp.fromDate(pickedDateTime),
                 "MenteeName": pickedMentee,
-                "FootNotes": footnotes,
+                "FootNotes": footnotesController.text,
                 "MenteeScheduleID": menteeScheduleID,
                 "MenteeUID": menteeUID
               });
@@ -171,12 +173,12 @@ class CancelConfirmWrapper extends StatelessWidget {
               height: size.height * 0.07,
               width: size.width * 0.4,
               decoration: BoxDecoration(
-                color: Color(0xff1F78B4),
+                color: kLightBlue,
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xff1F78B4),
+                    color: kLightBlue,
                     blurRadius: 10,
                   ),
                 ],
@@ -304,10 +306,10 @@ class FootNotesData extends StatelessWidget {
         color: Colors.white,
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Color(0xff1F78B4).withOpacity(0.8), width: 3),
+        border: Border.all(color: kLightBlue.withOpacity(0.8), width: 3),
         boxShadow: [
           BoxShadow(
-            color: Color(0xff1F78B4).withOpacity(0.7),
+            color: kLightBlue.withOpacity(0.7),
             blurRadius: 6,
           ),
         ],
@@ -488,21 +490,23 @@ class MenteeLessonWrapper extends StatefulWidget {
   _MenteeLessonWrapperState createState() => _MenteeLessonWrapperState();
 }
 
+String? displayLesson = 'lesson 1';
+
 class _MenteeLessonWrapperState extends State<MenteeLessonWrapper> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    List<String> lessons = [
-      'lesson 1',
-      'lesson 2',
-      'lesson 3',
-      'lesson 4',
-      'lesson 5',
-      'lesson 6',
-      'lesson 7',
-      'lesson 8',
-      'lesson 9',
-      'lesson 10',
+    List<int> lessons = [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
     ];
     // List<String> mentees = ['Iron Man'];
 
@@ -574,16 +578,17 @@ class _MenteeLessonWrapperState extends State<MenteeLessonWrapper> {
                     color: Colors.black.withOpacity(0.6),
                     fontFamily: 'Montserrat'),
                 isExpanded: true,
-                value: pickedLesson,
-                items: lessons.map((String value) {
+                value: displayLesson,
+                items: lessons.map((int value) {
                   return DropdownMenuItem<String>(
-                    child: Text(value),
-                    value: value,
+                    child: Text("lesson $value"),
+                    value: "lesson $value",
                   );
                 }).toList(),
                 onChanged: (String? value) {
                   setState(() {
-                    pickedLesson = value;
+                    pickedLesson = parseIntFromString(value ?? '1');
+                    displayLesson = value;
                   });
                 },
                 underline: Container(

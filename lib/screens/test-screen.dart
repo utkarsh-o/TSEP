@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tsep/screens/edit_lecture.dart';
 import '../logic/cached-data.dart';
 import '../logic/firestore.dart';
 import '../local-data/constants.dart';
@@ -87,7 +86,7 @@ class _TestScreenState extends State<TestScreen> {
   getLevel() {
     var fraction = currentScored / currentMax;
     currentLevel = fraction <= 1 / 3
-        ? "NOVICE"
+        ? "ELEMENTARY"
         : fraction <= 2 / 3
             ? "PRE-INTERMEDIATE"
             : "INTERMEDIATE";
@@ -211,7 +210,7 @@ class AnsCard extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Color(0xff1F78B4).withOpacity(0.8), width: 2),
+        border: Border.all(color: kLightBlue.withOpacity(0.8), width: 2),
       ),
       child: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -260,7 +259,7 @@ class _ScoreCardState extends State<ScoreCard> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Color(0xff1F78B4).withOpacity(0.3),
+            color: kLightBlue.withOpacity(0.3),
             shape: BoxShape.rectangle,
             borderRadius: BorderRadius.circular(6),
           ),
@@ -309,6 +308,7 @@ class _ScoreCardState extends State<ScoreCard> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
+                                      clearForm();
                                       Navigator.pop(context);
                                     },
                                     child: Container(
@@ -369,11 +369,11 @@ class InfoWrapper extends StatelessWidget {
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       padding: EdgeInsets.all(13),
       decoration: BoxDecoration(
-        color: Color(0xff1F78B4),
+        color: kLightBlue,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Color(0xff1F78B4).withOpacity(0.8).withOpacity(1),
+            color: kLightBlue.withOpacity(0.8).withOpacity(1),
             blurRadius: 10,
           ),
         ],
@@ -412,7 +412,7 @@ class ScoreNum extends StatelessWidget {
         width: MediaQuery.of(context).size.height * 0.03,
         decoration: active == num
             ? BoxDecoration(
-                color: Color(0xff1F78B4).withOpacity(1),
+                color: kLightBlue.withOpacity(1),
                 borderRadius: BorderRadius.circular(4),
               )
             : null,
@@ -566,7 +566,6 @@ class LevelCard extends StatelessWidget {
   LevelCard({required this.currentMax, required this.currentScored});
   @override
   Widget build(BuildContext context) {
-    var frac = currentScored / currentMax;
     Size size = MediaQuery.of(context).size;
     return Container(
       child: Column(
@@ -580,12 +579,12 @@ class LevelCard extends StatelessWidget {
           ),
           Container(
             decoration: BoxDecoration(
-              color: Color(0xff1F78B4).withOpacity(0.08),
+              color: kLightBlue.withOpacity(0.08),
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(6),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xff1F78B4).withOpacity(0.4),
+                  color: kLightBlue.withOpacity(0.4),
                   blurRadius: 4,
                 )
               ],
@@ -675,6 +674,7 @@ class TitleBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: IconButton(
             onPressed: () {
+              clearForm();
               Navigator.pop(context);
             },
             icon: SvgPicture.asset(
@@ -783,6 +783,7 @@ class PrevNxtBtn extends StatelessWidget {
             onTap: questionIndex == 9
                 ? () {
                     submitCallback();
+                    clearForm();
                     Navigator.pop(context);
                   }
                 : nextCallback,
@@ -800,12 +801,12 @@ class PrevNxtBtn extends StatelessWidget {
               height: size.height * 0.07,
               width: size.width * 0.4,
               decoration: BoxDecoration(
-                color: Color(0xff1F78B4),
+                color: kLightBlue,
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xff1F78B4),
+                    color: kLightBlue,
                     blurRadius: 10,
                   ),
                 ],

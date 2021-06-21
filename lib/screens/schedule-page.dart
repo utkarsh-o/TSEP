@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../screens/edit_lecture.dart';
@@ -60,15 +61,55 @@ class _SchedulePageState extends State<SchedulePage> {
                     .orderBy('LectureTime')
                     .snapshots(),
                 builder: (context, snapshot) {
+                  if (mentorSchedule.length == 0) {
+                    return Column(
+                      children: [
+                        getDayCards(),
+                        BreakLine(),
+                        TotalContributionLessonsTaughtWrapper(
+                            schedule: scheduleList),
+                        BreakLine(),
+                        Container(
+                          margin: EdgeInsets.only(top: 30),
+                          child: Text(
+                            "No lectured scheduled this week",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black.withOpacity(0.8),
+                              fontSize: 14,
+                            ),
+                          ),
+                        )
+                      ],
+                    );
+                  }
+                  if (snapshot.connectionState != ConnectionState.active) {
+                    return Column(
+                      children: [
+                        getDayCards(),
+                        BreakLine(),
+                        TotalContributionLessonsTaughtWrapper(
+                            schedule: scheduleList),
+                        BreakLine(),
+                        Container(
+                          margin: EdgeInsets.only(top: 30),
+                          child: SpinKitSquareCircle(
+                            color: Color(0xffD92136).withOpacity(0.7),
+                            size: 50,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
                   DateTime today = DateTime.now();
-                  DateTime _firstDayOfTheweek =
+                  DateTime _firstDayOfTheWeek =
                       today.subtract(new Duration(days: today.weekday));
-                  DateTime startDate = _firstDayOfTheweek
+                  DateTime startDate = _firstDayOfTheWeek
                       .add(Duration(days: 1))
                       .subtract(Duration(
                           hours: TimeOfDay.now().hour,
                           minutes: TimeOfDay.now().minute));
-                  DateTime endDate = _firstDayOfTheweek
+                  DateTime endDate = _firstDayOfTheWeek
                       .add(Duration(days: 7))
                       .add(Duration(hours: 24 - TimeOfDay.now().hour));
                   List<Widget> scheduleCardList = [];
@@ -87,13 +128,14 @@ class _SchedulePageState extends State<SchedulePage> {
                       var lectureTime = schedule.get('LectureTime').toDate();
                       Schedule s = Schedule(
                         mentee: menteeName,
-                        lesson: schedule.get('LectureNumber'),
+                        lesson: schedule.get('LessonNumber'),
                         duration: schedule.get('Duration'),
                         timing: timing,
                         mentorScheduleID: schedule.id,
                         menteeScheduleID: schedule.get('MenteeScheduleID'),
                         menteeUID: schedule.get('MenteeUID'),
                       );
+
                       scheduleList.add(s);
                       if (lectureTime.isAfter(startDate))
                         scheduleCardList.add(
@@ -307,7 +349,7 @@ class ScheduleCard extends StatelessWidget {
                       height: 3,
                     ),
                     Text(
-                      "$weekday, $lesson",
+                      "$weekday, lesson $lesson",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 10,
@@ -551,12 +593,12 @@ class EditDeleteWrapper extends StatelessWidget {
                   height: size.height * 0.042,
                   width: size.width * 0.3,
                   decoration: BoxDecoration(
-                    color: Color(0xff1F78B4),
+                    color: kLightBlue,
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(4),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xff1F78B4),
+                        color: kLightBlue,
                         blurRadius: 10,
                       )
                     ],

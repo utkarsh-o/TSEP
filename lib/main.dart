@@ -7,12 +7,6 @@ import '../screens/login-page.dart';
 import '../screens/mentor-profile.dart';
 import '../screens/schedule-complete.dart';
 import '../screens/signup-page.dart';
-import '../screens/info-page.dart';
-import '../screens/mentee-details-page.dart';
-import '../screens/mentees-list-page.dart';
-import '../screens/schedule-new-lecture.dart';
-import '../screens/schedule-page.dart';
-import '../screens/test-screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +40,6 @@ class TSEP extends StatelessWidget {
         GuidelinesPage.route: (context) => GuidelinesPage(),
       },
       theme: ThemeData(fontFamily: 'Montserrat'),
-      // home: user ? MentorProfile() : LoginPage(),
       initialRoute: user ? MentorProfile.route : LoginPage.route,
     );
   }
