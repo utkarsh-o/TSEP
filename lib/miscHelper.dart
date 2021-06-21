@@ -41,3 +41,21 @@
 //   }
 //   return new ListView(children: ScheduleList);
 // }
+
+// {'Responses':FieldValue.arrayUnion(
+// [{'Question': responses[x].question,
+// 'Answer': responses[x].answer,
+// 'Score': responses[x].score}]
+// )}
+//
+// Map<String,dynamic>test = {'test':123};
+
+// {
+// '${x.toString()}': FieldValue.arrayUnion([
+// {
+// 'Question': responses[x].question,
+// 'Answer': responses[x].answer,
+// 'Score': responses[x].score
+// }
+// ])
+// }

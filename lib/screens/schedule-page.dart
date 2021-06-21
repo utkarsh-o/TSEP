@@ -76,11 +76,17 @@ class _SchedulePageState extends State<SchedulePage> {
                     scheduleList.clear();
                     final schedules = snapshot.data!.docs;
                     for (var schedule in schedules) {
+                      String menteeName = '';
+                      for (var mentee in menteesList)
+                        if (mentee.uid == schedule.get('MenteeUID')) {
+                          menteeName = mentee.fullName;
+                          break;
+                        }
                       DateTime timing = schedule.get('LectureTime').toDate();
                       if (timing.isAfter(endDate)) break;
                       var lectureTime = schedule.get('LectureTime').toDate();
                       Schedule s = Schedule(
-                        mentee: schedule.get('MenteeName'),
+                        mentee: menteeName,
                         lesson: schedule.get('LectureNumber'),
                         duration: schedule.get('Duration'),
                         timing: timing,
@@ -198,7 +204,7 @@ class ScheduleCard extends StatelessWidget {
                 child: Container(
                   decoration:
                       BoxDecoration(borderRadius: BorderRadius.circular(15)),
-                  height: size.height * 0.2,
+                  height: size.height * 0.27,
                   child: Container(
                     margin: EdgeInsets.symmetric(horizontal: 30),
                     child: Column(
@@ -208,7 +214,7 @@ class ScheduleCard extends StatelessWidget {
                         Text(
                           "Modify Lecture",
                           style: TextStyle(
-                              color: Color(0xffD92136).withOpacity(0.6),
+                              color: kBlue.withOpacity(0.8),
                               fontWeight: FontWeight.bold,
                               fontSize: 20),
                         ),
@@ -217,7 +223,7 @@ class ScheduleCard extends StatelessWidget {
                           padding:
                               EdgeInsets.symmetric(horizontal: 13, vertical: 7),
                           decoration: BoxDecoration(
-                            color: Color(0xff1F78B4).withOpacity(0.2),
+                            color: kRed.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -225,7 +231,7 @@ class ScheduleCard extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 17,
-                              color: Color(0xff1F78B4).withOpacity(0.9),
+                              color: kRed.withOpacity(0.7),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -510,61 +516,96 @@ class EditDeleteWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          InkWell(
-            onTap: () {
-              // Navigator.of(context).pop();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return EditLecture(
-                      menteeScheduleID: schedule.menteeScheduleID,
-                      mentorScheduleID: schedule.mentorScheduleID,
-                      menteeUID: schedule.menteeUID,
-                    );
-                  },
-                ),
-              );
-            },
-            child: Container(
-              child: Center(
-                child: Text(
-                  "EDIT",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18),
-                ),
-              ),
-              height: size.height * 0.042,
-              width: size.width * 0.3,
-              decoration: BoxDecoration(
-                color: Color(0xff1F78B4),
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(4),
-                boxShadow: [
-                  BoxShadow(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              InkWell(
+                onTap: () {
+                  // Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return EditLecture(
+                          menteeScheduleID: schedule.menteeScheduleID,
+                          mentorScheduleID: schedule.mentorScheduleID,
+                          menteeUID: schedule.menteeUID,
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: Container(
+                  child: Center(
+                    child: Text(
+                      "EDIT",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    ),
+                  ),
+                  height: size.height * 0.042,
+                  width: size.width * 0.3,
+                  decoration: BoxDecoration(
                     color: Color(0xff1F78B4),
-                    blurRadius: 10,
-                  )
-                ],
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xff1F78B4),
+                        blurRadius: 10,
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
+              InkWell(
+                onTap: () {
+                  deleteSchedule(schedule.mentorScheduleID, schedule.menteeUID,
+                      schedule.menteeScheduleID);
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  child: Center(
+                    child: Text(
+                      "DELETE",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    ),
+                  ),
+                  height: size.height * 0.042,
+                  width: size.width * 0.3,
+                  decoration: BoxDecoration(
+                    color: kRed.withOpacity(0.7),
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: kRed.withOpacity(0.7),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
           InkWell(
             onTap: () {
-              deleteSchedule(schedule.mentorScheduleID, schedule.menteeUID,
-                  schedule.menteeScheduleID);
               Navigator.pop(context);
             },
             child: Container(
+              margin: EdgeInsets.only(top: 10),
               child: Center(
                 child: Text(
-                  "DELETE",
+                  "DONE",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -573,14 +614,14 @@ class EditDeleteWrapper extends StatelessWidget {
                 ),
               ),
               height: size.height * 0.042,
-              width: size.width * 0.3,
+              width: double.infinity,
               decoration: BoxDecoration(
-                color: kRed.withOpacity(0.7),
+                color: kGreen.withOpacity(0.9),
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(4),
                 boxShadow: [
                   BoxShadow(
-                    color: kRed.withOpacity(0.7),
+                    color: kGreen.withOpacity(0.9),
                     blurRadius: 10,
                   ),
                 ],

@@ -42,8 +42,14 @@ class _ScheduleCompleteState extends State<ScheduleComplete> {
                     final schedules = snapshot.data!.docs;
                     int index = 1;
                     for (var schedule in schedules) {
+                      String menteeName = '';
+                      for (var mentee in menteesList)
+                        if (mentee.uid == schedule.get('MenteeUID')) {
+                          menteeName = mentee.fullName;
+                          break;
+                        }
                       Schedule sch = Schedule(
-                        mentee: schedule.get('MenteeName'),
+                        mentee: menteeName,
                         lesson: schedule.get('LectureNumber'),
                         duration: schedule.get('Duration'),
                         timing: schedule.get('LectureTime').toDate(),
@@ -141,7 +147,7 @@ class ScheduleCard extends StatelessWidget {
                 child: Container(
                   decoration:
                       BoxDecoration(borderRadius: BorderRadius.circular(15)),
-                  height: size.height * 0.2,
+                  height: size.height * 0.27,
                   child: Container(
                     margin: EdgeInsets.symmetric(horizontal: 30),
                     child: Column(
@@ -149,7 +155,7 @@ class ScheduleCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Delete Lecture",
+                          "Modify Lecture",
                           style: TextStyle(
                               color: Color(0xffD92136).withOpacity(0.6),
                               fontWeight: FontWeight.bold,
@@ -164,7 +170,7 @@ class ScheduleCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            "Are you sure? this action cannot be undone.",
+                            "Deleted Lectures cannot be restored",
                             style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 17,
@@ -396,61 +402,96 @@ class EditDeleteWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          InkWell(
-            onTap: () {
-              // Navigator.of(context).pop();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return EditLecture(
-                      menteeScheduleID: schedule.menteeScheduleID,
-                      mentorScheduleID: schedule.mentorScheduleID,
-                      menteeUID: schedule.menteeUID,
-                    );
-                  },
-                ),
-              );
-            },
-            child: Container(
-              child: Center(
-                child: Text(
-                  "EDIT",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18),
-                ),
-              ),
-              height: size.height * 0.042,
-              width: size.width * 0.3,
-              decoration: BoxDecoration(
-                color: Color(0xff1F78B4),
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(4),
-                boxShadow: [
-                  BoxShadow(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              InkWell(
+                onTap: () {
+                  // Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return EditLecture(
+                          menteeScheduleID: schedule.menteeScheduleID,
+                          mentorScheduleID: schedule.mentorScheduleID,
+                          menteeUID: schedule.menteeUID,
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: Container(
+                  child: Center(
+                    child: Text(
+                      "EDIT",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    ),
+                  ),
+                  height: size.height * 0.042,
+                  width: size.width * 0.3,
+                  decoration: BoxDecoration(
                     color: Color(0xff1F78B4),
-                    blurRadius: 10,
-                  )
-                ],
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xff1F78B4),
+                        blurRadius: 10,
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
+              InkWell(
+                onTap: () {
+                  deleteSchedule(schedule.mentorScheduleID, schedule.menteeUID,
+                      schedule.menteeScheduleID);
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  child: Center(
+                    child: Text(
+                      "DELETE",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    ),
+                  ),
+                  height: size.height * 0.042,
+                  width: size.width * 0.3,
+                  decoration: BoxDecoration(
+                    color: kRed.withOpacity(0.7),
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: kRed.withOpacity(0.7),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
           InkWell(
             onTap: () {
-              deleteSchedule(schedule.mentorScheduleID, schedule.menteeUID,
-                  schedule.menteeScheduleID);
               Navigator.pop(context);
             },
             child: Container(
+              margin: EdgeInsets.only(top: 10),
               child: Center(
                 child: Text(
-                  "DELETE",
+                  "DONE",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -459,14 +500,14 @@ class EditDeleteWrapper extends StatelessWidget {
                 ),
               ),
               height: size.height * 0.042,
-              width: size.width * 0.3,
+              width: double.infinity,
               decoration: BoxDecoration(
-                color: kRed.withOpacity(0.7),
+                color: kGreen.withOpacity(0.9),
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(4),
                 boxShadow: [
                   BoxShadow(
-                    color: kRed.withOpacity(0.7),
+                    color: kGreen.withOpacity(0.9),
                     blurRadius: 10,
                   ),
                 ],

@@ -1,50 +1,131 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tsep/screens/edit_lecture.dart';
+import '../logic/cached-data.dart';
+import '../logic/firestore.dart';
 import '../local-data/constants.dart';
-import '../local-data/questions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TestScreen extends StatefulWidget {
-  const TestScreen({Key? key}) : super(key: key);
-
+  final String menteeUID;
+  TestScreen({required this.menteeUID});
   @override
   _TestScreenState createState() => _TestScreenState();
 }
 
+Mentee menteeData = Mentee(
+    uid: '',
+    firstName: '',
+    latestLecture: -1,
+    batchName: '',
+    joiningDate: DateTime.now(),
+    lastName: '',
+    fullName: '',
+    initialLevel: '',
+    gender: '',
+    organization: '',
+    idNumber: -1,
+    phoneNumber: -1);
+
+List<Response> responses = List<Response>.generate(
+    10, (index) => Response(score: 0, answer: '', question: questions[index]));
+int questionIndex = 0, activeScore = 0, currentScored = 0, currentMax = 0;
+TextEditingController responseFieldController = TextEditingController();
+List<int> scores = List<int>.generate(10, (index) => 0);
+List<bool> checked = List<bool>.generate(10, (index) => false);
+String currentLevel = '-', menteeUID = '';
+
+clearForm() {
+  questionIndex = 0;
+  activeScore = 0;
+  currentScored = 0;
+  currentMax = 0;
+  responseFieldController.clear();
+  scores = List<int>.generate(10, (index) => 0);
+  checked = List<bool>.generate(10, (index) => false);
+  currentLevel = '-';
+}
+
 class _TestScreenState extends State<TestScreen> {
-  int activeScore = 0, currentScored = 0, currentMax = 0;
-  var scores = List<int>.generate(10, (index) => 0);
-  var checked = List<bool>.generate(10, (index) => false);
-  Question question = new Question();
-  int qtnIdx = 0;
+  submitForm() {
+    responses[questionIndex] = Response(
+        score: scores[questionIndex],
+        answer: responseFieldController.text,
+        question: questions[questionIndex]);
+    final firestore = FirebaseFirestore.instance;
+    firestore
+        .collection('MenteeInfo/$menteeUID/PreTestData')
+        .doc('responses')
+        .set({
+      'Responses': responses
+          .map((e) =>
+              {'Question': e.question, 'Answer': e.answer, 'Score': e.score})
+          .toList(),
+    });
+    firestore
+        .collection('MenteeInfo')
+        .doc(menteeUID)
+        .update({'InitialLevel': currentLevel});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getMentee();
+  }
+
+  getMentee() {
+    for (Mentee mentee in menteesList) {
+      if (mentee.uid == widget.menteeUID) {
+        menteeData = mentee;
+        menteeUID = widget.menteeUID;
+      }
+    }
+  }
+
+  getLevel() {
+    var fraction = currentScored / currentMax;
+    currentLevel = fraction <= 1 / 3
+        ? "NOVICE"
+        : fraction <= 2 / 3
+            ? "PRE-INTERMEDIATE"
+            : "INTERMEDIATE";
+  }
 
   void nextButtonCallback() {
+    responses[questionIndex] = Response(
+        score: scores[questionIndex],
+        answer: responseFieldController.text,
+        question: questions[questionIndex]);
     setState(() {
-      // if (qtnIdx >= 10) qtnIdx = 9;
-      if (checked[qtnIdx]) {
-        activeScore = scores[qtnIdx];
+      updateTotalScores();
+      questionIndex += questionIndex + 1 > 9 ? 0 : 1;
+      if (checked[questionIndex]) {
+        responseFieldController.text = responses[questionIndex].answer;
+        activeScore = scores[questionIndex];
       } else {
         activeScore = 0;
-        checked[qtnIdx] = true;
+        checked[questionIndex] = true;
+        responseFieldController.clear();
       }
-      qtnIdx += qtnIdx + 1 > 9 ? 0 : 1;
-      updateTotalScores();
     });
   }
 
   void previousButtonCallback() {
+    responses[questionIndex].answer = responseFieldController.text;
     setState(() {
-      qtnIdx--;
-      if (qtnIdx < 0) qtnIdx = 0;
-      activeScore = scores[qtnIdx];
-      updateTotalScores();
+      questionIndex--;
+      if (questionIndex < 0) questionIndex = 0;
+      activeScore = scores[questionIndex];
+      responseFieldController.text = responses[questionIndex].answer;
     });
   }
 
-  void upateScore(int score) {
-    scores[qtnIdx] = score;
-    checked[qtnIdx] = true;
+  void updateScore(int score) {
     setState(() {
+      scores[questionIndex] = score;
+      checked[questionIndex] = true;
       activeScore = score;
       updateTotalScores();
     });
@@ -54,6 +135,7 @@ class _TestScreenState extends State<TestScreen> {
     setState(() {
       currentScored = scores.reduce((a, b) => a + b);
       currentMax = checked.where((item) => item == true).length * 3;
+      getLevel();
     });
   }
 
@@ -88,17 +170,14 @@ class _TestScreenState extends State<TestScreen> {
                 child: Column(
                   children: [
                     QuestionCard(
-                      question: question,
-                      idx: qtnIdx,
+                      index: questionIndex,
                     ),
                     SizedBox(
                       height: 25,
                     ),
                     ScoreCard(
-                      question: question,
-                      qtnNum: qtnIdx,
                       active: activeScore,
-                      updateScore: upateScore,
+                      updateScore: updateScore,
                     ),
                     SizedBox(
                       height: 25,
@@ -109,9 +188,10 @@ class _TestScreenState extends State<TestScreen> {
               ),
               BreakLine(),
               PrevNxtBtn(
-                prvclb: previousButtonCallback,
-                nxtclb: nextButtonCallback,
-                qtnIdx: qtnIdx,
+                previousCallback: previousButtonCallback,
+                nextCallback: nextButtonCallback,
+                questionIndex: questionIndex,
+                submitCallback: submitForm,
               )
             ],
           ),
@@ -126,7 +206,6 @@ class AnsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      // alignment: Alignment.center,
       height: size.height * 0.25,
       width: size.width * 0.85,
       decoration: BoxDecoration(
@@ -137,6 +216,7 @@ class AnsCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: TextField(
+          controller: responseFieldController,
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
           expands: true,
@@ -154,14 +234,9 @@ class AnsCard extends StatelessWidget {
 }
 
 class ScoreCard extends StatefulWidget {
-  int qtnNum, active;
-  final Question question;
+  int active;
   final Function updateScore;
-  ScoreCard(
-      {required this.qtnNum,
-      required this.question,
-      required this.active,
-      required this.updateScore});
+  ScoreCard({required this.active, required this.updateScore});
 
   @override
   _ScoreCardState createState() => _ScoreCardState();
@@ -179,7 +254,6 @@ class _ScoreCardState extends State<ScoreCard> {
 
   @override
   Widget build(BuildContext context) {
-    // Question _question = Question();
     Size size = MediaQuery.of(context).size;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -360,9 +434,8 @@ class ScoreNum extends StatelessWidget {
 }
 
 class QuestionCard extends StatelessWidget {
-  final int idx;
-  final Question question;
-  QuestionCard({required this.idx, required this.question});
+  final int index;
+  QuestionCard({required this.index});
   @override
   Widget build(BuildContext context) {
     // Question _question = Question();
@@ -385,7 +458,7 @@ class QuestionCard extends StatelessWidget {
           ),
           child: Center(
             child: Text(
-              (idx + 1).toString(),
+              (index + 1).toString(),
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -396,7 +469,7 @@ class QuestionCard extends StatelessWidget {
         Container(
           constraints: BoxConstraints(maxWidth: size.width * 0.75),
           child: Text(
-            question.statement[idx],
+            questions[index],
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
         )
@@ -521,11 +594,7 @@ class LevelCard extends StatelessWidget {
             width: size.width * 0.45,
             child: Center(
               child: Text(
-                frac <= 1 / 3
-                    ? "NOVICE"
-                    : frac <= 2 / 3
-                        ? "PRE-INTERMEDIATE"
-                        : "INTERMEDIATE",
+                currentLevel,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -550,21 +619,19 @@ class MenteeProfileBanner extends StatelessWidget {
           Column(
             children: [
               Text(
-                "Spider Man",
+                menteeData.fullName,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
               Text(
-                "+91 9876543210",
+                "+91 ${menteeData.phoneNumber.toString()}",
                 style: TextStyle(
-                    color: Color(0xff269200),
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold),
+                    color: kGreen, fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ],
           ),
-          DetailsWidget(heading: "Type", value: "Pre-Program"),
-          DetailsWidget(heading: "Batch", value: "B72"),
-          DetailsWidget(heading: "Age", value: "17"),
+          DetailsWidget(heading: "Batch", value: menteeData.batchName),
+          DetailsWidget(
+              heading: "ID Number", value: menteeData.idNumber.toString()),
         ],
       ),
     );
@@ -589,7 +656,7 @@ class DetailsWidget extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            color: Color(0xffD92136).withOpacity(0.8),
+            color: kRed.withOpacity(0.8),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -601,10 +668,8 @@ class DetailsWidget extends StatelessWidget {
 class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    Size size = MediaQuery.of(context).size;
     return Row(
-      // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -614,7 +679,7 @@ class TitleBar extends StatelessWidget {
             },
             icon: SvgPicture.asset(
               "assets/icons/back-tb.svg",
-              height: screenWidth * 0.07,
+              height: size.width * 0.07,
             ),
           ),
         ),
@@ -629,14 +694,14 @@ class TitleBar extends StatelessWidget {
           ),
         ),
         SizedBox(
-          width: screenWidth * 0.42,
-          height: screenHeight * 0.12,
+          width: size.width * 0.42,
+          height: size.height * 0.12,
         ),
         IconButton(
           onPressed: () {},
           icon: SvgPicture.asset(
             "assets/icons/edit-tb.svg",
-            height: screenWidth * 0.07,
+            height: size.height * 0.07,
           ),
         ),
       ],
@@ -657,7 +722,7 @@ class BreakLine extends StatelessWidget {
         borderRadius: BorderRadius.circular(3),
         boxShadow: [
           BoxShadow(
-            color: Color(0xff003670).withOpacity(0.1),
+            color: kBlue.withOpacity(0.1),
             blurRadius: 10,
           ),
         ],
@@ -667,10 +732,13 @@ class BreakLine extends StatelessWidget {
 }
 
 class PrevNxtBtn extends StatelessWidget {
-  final VoidCallback prvclb, nxtclb;
-  final int qtnIdx;
+  final VoidCallback previousCallback, nextCallback, submitCallback;
+  final int questionIndex;
   PrevNxtBtn(
-      {required this.prvclb, required this.nxtclb, required this.qtnIdx});
+      {required this.previousCallback,
+      required this.nextCallback,
+      required this.questionIndex,
+      required this.submitCallback});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -679,15 +747,16 @@ class PrevNxtBtn extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           InkWell(
-            onTap: qtnIdx == 0
+            onTap: questionIndex == 0
                 ? () {
+                    clearForm();
                     Navigator.pop(context);
                   }
-                : prvclb,
+                : previousCallback,
             child: Container(
               child: Center(
                 child: Text(
-                  qtnIdx == 0 ? "EXIT" : "PREVIOUS",
+                  questionIndex == 0 ? "EXIT" : "PREVIOUS",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -698,12 +767,12 @@ class PrevNxtBtn extends StatelessWidget {
               height: size.height * 0.07,
               width: size.width * 0.4,
               decoration: BoxDecoration(
-                color: Color(0xffD92136).withOpacity(0.7),
+                color: kRed.withOpacity(0.7),
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xffD92136).withOpacity(0.7),
+                    color: kRed.withOpacity(0.7),
                     blurRadius: 10,
                   )
                 ],
@@ -711,15 +780,16 @@ class PrevNxtBtn extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: qtnIdx == 9
+            onTap: questionIndex == 9
                 ? () {
+                    submitCallback();
                     Navigator.pop(context);
                   }
-                : nxtclb,
+                : nextCallback,
             child: Container(
               child: Center(
                 child: Text(
-                  qtnIdx == 9 ? "FINISH" : "NEXT",
+                  questionIndex == 9 ? "FINISH" : "NEXT",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,

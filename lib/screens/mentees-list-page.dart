@@ -155,7 +155,7 @@ class MenteeCard extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) {
                       return MenteeDetails(
-                        MenteeUID: uid,
+                        menteeUID: uid,
                       );
                     },
                   ),
@@ -197,7 +197,7 @@ class MenteeCard extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) {
                         return MenteeDetails(
-                          MenteeUID: uid,
+                          menteeUID: uid,
                         );
                       },
                     ),

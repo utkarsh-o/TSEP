@@ -6,66 +6,77 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tsep/screens/test-screen.dart';
+import '../logic/cached-data.dart';
 
 final auth = FirebaseAuth.instance;
 final firestore = FirebaseFirestore.instance;
 
 class MenteeDetails extends StatefulWidget {
-  String MenteeUID;
-  MenteeDetails({required this.MenteeUID});
+  String menteeUID;
+  MenteeDetails({required this.menteeUID});
 
   @override
   _MenteeDetailsState createState() => _MenteeDetailsState();
 }
 
-String FirstName = '',
-    LastName = '',
-    BatchName = '',
-    Gender = '',
-    InitialLevel = '',
-    MentorUID = '',
-    MenteeName = '';
-int PhoneNumber = -1, IDNumber = -1, LastLecture = -1;
-num Engagement = 0;
-DateTime JoiningDate = DateTime.now();
+String firstName = '',
+    lastName = '',
+    batchName = '',
+    gender = '',
+    initialLevel = '',
+    menteeName = '',
+    menteeUID = '';
+int phoneNumber = -1, idNumber = -1, latestLecture = -1;
+num engagement = 0;
+DateTime joiningDate = DateTime.now();
 
 class _MenteeDetailsState extends State<MenteeDetails> {
-  void getCurrentUser() async {
-    try {
-      final user = await auth.currentUser;
-      if (user != null) {
-        MentorUID = user.uid;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getCurrentUser();
+    getMenteeDetails();
     getDataStream();
   }
 
   getDataStream() async {
     await for (var snapshot in firestore
         .collection('MenteeInfo')
-        .doc(widget.MenteeUID)
+        .doc(widget.menteeUID)
         .snapshots()) {
       setState(() {
-        BatchName = snapshot.get('BatchName').toString();
-        FirstName = snapshot.get('FirstName').toString();
-        IDNumber = snapshot.get('IDNumber');
-        LastName = snapshot.get('LastName').toString();
-        JoiningDate = snapshot.get('JoiningDate').toDate();
-        Gender = snapshot.get('Gender');
-        PhoneNumber = snapshot.get('PhoneNumber');
-        InitialLevel = snapshot.get('InitialLevel');
-        LastLecture = snapshot.get('LatestLecture');
-        MenteeName = "$FirstName $LastName";
+        super.setState(() {});
+        batchName = snapshot.get('BatchName').toString();
+        firstName = snapshot.get('FirstName').toString();
+        idNumber = snapshot.get('IDNumber');
+        lastName = snapshot.get('LastName').toString();
+        joiningDate = snapshot.get('JoiningDate').toDate();
+        gender = snapshot.get('Gender');
+        phoneNumber = snapshot.get('PhoneNumber');
+        initialLevel = snapshot.get('InitialLevel');
+        latestLecture = snapshot.get('LatestLecture');
+        menteeName = "$firstName $lastName";
       });
+    }
+  }
+
+  getMenteeDetails() {
+    for (var mentee in menteesList) {
+      if (mentee.uid == widget.menteeUID) {
+        setState(() {
+          menteeUID = mentee.uid;
+          batchName = mentee.batchName;
+          firstName = mentee.firstName;
+          idNumber = mentee.idNumber;
+          lastName = mentee.lastName;
+          joiningDate = mentee.joiningDate;
+          gender = mentee.gender;
+          phoneNumber = mentee.phoneNumber;
+          initialLevel = mentee.initialLevel;
+          latestLecture = mentee.latestLecture;
+          menteeName = mentee.fullName;
+        });
+      }
     }
   }
 
@@ -80,17 +91,20 @@ class _MenteeDetailsState extends State<MenteeDetails> {
               TitleBar(),
               StreamBuilder<QuerySnapshot>(
                 stream: firestore
-                    .collection('MentorData/$MentorUID/Schedule')
+                    .collection('MentorData/$mentorUID/Schedule')
+                    .orderBy('LectureTime')
                     .snapshots(),
                 builder: (context, snapshot) {
                   List<Widget> lessonList = [];
                   if (snapshot.hasData) {
-                    Engagement = 0;
+                    engagement = 0;
                     final lessons = snapshot.data!.docs;
+                    int index = 1;
                     for (var lesson in lessons) {
-                      if (lesson.get('MenteeName') == MenteeName) {
-                        Engagement += lesson.get('Duration');
+                      if (lesson.get('MenteeUID') == widget.menteeUID) {
+                        engagement += lesson.get('Duration');
                         lessonList.add(LessonList(
+                            index: index++,
                             lesson: lesson.get('LectureNumber'),
                             date: DateFormat('EEE, d MMMM')
                                 .format(lesson.get('LectureTime').toDate()),
@@ -133,13 +147,26 @@ class BatchJoinProfWrapper extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          BatchJoinProfAgeWidget(
-            heading: 'Batch',
-            value: BatchName,
+          InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return TestScreen(
+                  menteeUID: menteeUID,
+                );
+              }));
+            },
+            child: BatchJoinProfAgeWidget(
+              heading: 'Batch',
+              value: batchName,
+            ),
           ),
           BatchJoinProfAgeWidget(
             heading: 'Joining Proficiency',
-            value: InitialLevel,
+            value: initialLevel,
+          ),
+          BatchJoinProfAgeWidget(
+            heading: 'ID No.',
+            value: idNumber.toString(),
           ),
         ],
       ),
@@ -169,10 +196,13 @@ class BreakLine extends StatelessWidget {
 }
 
 class LessonList extends StatelessWidget {
-  final String lesson;
-  final String date, lessonLength;
+  final String lesson, date, lessonLength;
+  final int index;
   LessonList(
-      {required this.lesson, required this.date, required this.lessonLength});
+      {required this.lesson,
+      required this.date,
+      required this.lessonLength,
+      required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +241,7 @@ class LessonList extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  "$lessNum",
+                  index.toString(),
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -293,12 +323,12 @@ class MenteeProfile extends StatelessWidget {
               Container(
                 // width: double.infinity,
                 child: Text(
-                  "$FirstName $LastName",
+                  "$firstName $lastName",
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
               ),
               Text(
-                "joined ${DateFormat('d MMMM yyyy').format(JoiningDate)}",
+                "joined ${DateFormat('d MMMM yyyy').format(joiningDate)}",
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 10,
@@ -308,7 +338,7 @@ class MenteeProfile extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
-                  "+91 $PhoneNumber",
+                  "+91 $phoneNumber",
                   style: TextStyle(
                       color: Color(0xff269200),
                       fontSize: 12,
@@ -322,7 +352,7 @@ class MenteeProfile extends StatelessWidget {
                     child: EngLessonCards(
                       heading: "Engagement",
                       value:
-                          "${(Engagement / 60).floor()}hr ${Engagement % 60}min",
+                          "${(engagement / 60).floor()}hr ${engagement % 60}min",
                       valueColor: Color(0xffD92136).withOpacity(0.6),
                     ),
                   ),
@@ -331,8 +361,8 @@ class MenteeProfile extends StatelessWidget {
                   ),
                   Container(
                     child: EngLessonCards(
-                      heading: "Lessons",
-                      value: "$LastLecture",
+                      heading: "Progress",
+                      value: "lesson $latestLecture",
                       valueColor: Color(0xff1F78B4).withOpacity(0.9),
                     ),
                   ),

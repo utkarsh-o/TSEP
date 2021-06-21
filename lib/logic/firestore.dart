@@ -84,30 +84,31 @@ class ProfileHandler {
       menteesList.clear();
       final mentees = snapshot.docs;
       for (var mentee in mentees) {
-        var initialLevel;
-        var latestLecture;
         await firestore
             .collection('/MenteeInfo')
             .doc(mentee.id)
             .get()
             .then((value) {
-          initialLevel = value['InitialLevel'];
-          latestLecture = value['LatestLecture'];
+          String firstName = mentee.get('FirstName');
+          String lastName = mentee.get('LastName');
+          Mentee mnt = Mentee(
+            uid: mentee.id,
+            batchName: value['BatchName'],
+            firstName: firstName,
+            gender: value['Gender'],
+            idNumber: value['IDNumber'],
+            initialLevel: value['InitialLevel'],
+            joiningDate: value['JoiningDate'].toDate(),
+            lastName: lastName,
+            latestLecture: value['LatestLecture'],
+            organization: value['Organization'],
+            phoneNumber: value['PhoneNumber'],
+            fullName: "$firstName $lastName",
+          );
+          menteesList.add(mnt);
         });
-        var firstName = mentee.get('FirstName');
-        var lastName = mentee.get('LastName');
-        Mentee mnt = Mentee(
-          firstName: mentee.get('FirstName'),
-          uid: mentee.id,
-          joiningDate: mentee.get('JoiningDate').toDate(),
-          lastName: mentee.get('LastName'),
-          batchName: mentee.get('BatchName'),
-          fullName: "${firstName} ${lastName}",
-          initialLevel: initialLevel,
-          latestLecture: latestLecture,
-        );
-        menteesList.add(mnt);
       }
+      print('test123');
       callback();
     }
   }
@@ -156,16 +157,33 @@ class Schedule {
 }
 
 class Mentee {
-  String firstName, uid, lastName, batchName, fullName, initialLevel;
-  int latestLecture;
+  String firstName,
+      uid,
+      lastName,
+      batchName,
+      fullName,
+      initialLevel,
+      gender,
+      organization;
+  int latestLecture, phoneNumber, idNumber;
   DateTime joiningDate;
   Mentee(
       {required this.firstName,
+      required this.batchName,
       required this.uid,
       required this.joiningDate,
       required this.lastName,
-      required this.batchName,
       required this.fullName,
       required this.initialLevel,
-      required this.latestLecture});
+      required this.latestLecture,
+      required this.gender,
+      required this.organization,
+      required this.idNumber,
+      required this.phoneNumber});
+}
+
+class Response {
+  int score;
+  String answer, question;
+  Response({required this.score, required this.answer, required this.question});
 }

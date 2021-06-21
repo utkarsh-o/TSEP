@@ -6,11 +6,14 @@ class Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: SpinKitSquareCircle(
-          color: Color(0xffD92136).withOpacity(0.7),
-          size: 50,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Center(
+          child: SpinKitSquareCircle(
+            color: Color(0xffD92136).withOpacity(0.7),
+            size: 50,
+          ),
         ),
       ),
     );

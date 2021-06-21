@@ -72,16 +72,6 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
               ),
             );
           },
-          onLongPress: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return TestScreen();
-                },
-              ),
-            );
-          },
           child: Container(
             width: screenWidth / 5,
             margin: EdgeInsets.only(bottom: 30),
