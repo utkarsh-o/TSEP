@@ -145,6 +145,8 @@ class _TestScreenState extends State<TestScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisSize: MainAxisSize.max,
             children: [
               TitleBar(),
               MenteeProfileBanner(),
@@ -714,7 +716,7 @@ class BreakLine extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 20),
+      margin: EdgeInsets.symmetric(vertical: 15),
       height: 1,
       width: size.width,
       decoration: BoxDecoration(

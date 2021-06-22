@@ -45,19 +45,20 @@ class _MenteeDetailsState extends State<MenteeDetails> {
         .collection('MenteeInfo')
         .doc(widget.menteeUID)
         .snapshots()) {
-      setState(() {
-        super.setState(() {});
-        batchName = snapshot.get('BatchName').toString();
-        firstName = snapshot.get('FirstName').toString();
-        idNumber = snapshot.get('IDNumber');
-        lastName = snapshot.get('LastName').toString();
-        joiningDate = snapshot.get('JoiningDate').toDate();
-        gender = snapshot.get('Gender');
-        phoneNumber = snapshot.get('PhoneNumber');
-        initialLevel = snapshot.get('InitialLevel');
-        latestLecture = snapshot.get('LatestLecture');
-        menteeName = "$firstName $lastName";
-      });
+      if (mounted) {
+        setState(() {
+          batchName = snapshot.get('BatchName').toString();
+          firstName = snapshot.get('FirstName').toString();
+          idNumber = snapshot.get('IDNumber');
+          lastName = snapshot.get('LastName').toString();
+          joiningDate = snapshot.get('JoiningDate').toDate();
+          gender = snapshot.get('Gender');
+          phoneNumber = snapshot.get('PhoneNumber');
+          initialLevel = snapshot.get('InitialLevel');
+          latestLecture = snapshot.get('LatestLecture');
+          menteeName = "$firstName $lastName";
+        });
+      }
     }
   }
 
@@ -305,7 +306,7 @@ class LessonList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Lesson $latestLecture",
+                    "Lesson $lesson",
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
@@ -356,7 +357,10 @@ class MenteeProfile extends StatelessWidget {
           Container(
             height: size.height * 0.15,
             width: size.height * 0.15,
-            child: Image.asset("assets/vectors/mentee-profile.png"),
+            child: gender == 'male'
+                ? Image.asset("assets/vectors/Mentee(M)"
+                    ".png")
+                : Image.asset("assets/vectors/Mentee(F).png"),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [

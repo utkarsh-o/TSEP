@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../components/loading.dart';
@@ -16,7 +17,6 @@ class SignUp extends StatefulWidget {
 bool loading = false;
 String email = '',
     password = '',
-    // uid = '',
     batch = '',
     firstName = '',
     lastName = '',
@@ -29,6 +29,8 @@ TextEditingController batchController = TextEditingController();
 TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 String? uid = '';
+GlobalKey<FormState> _emailSignUpKey = GlobalKey<FormState>();
+GlobalKey<FormState> _passwordSingUpKey = GlobalKey<FormState>();
 
 class _SignUpState extends State<SignUp> {
   void genderCallback(String inputGender) {
@@ -50,9 +52,14 @@ class _SignUpState extends State<SignUp> {
   }
 
   void singUpCallback() async {
+    if (!_emailSignUpKey.currentState!.validate()) {
+      return;
+    }
+    if (!_passwordSingUpKey.currentState!.validate()) {
+      return;
+    }
     final auth = FirebaseAuth.instance;
     final firestore = FirebaseFirestore.instance;
-    // final auth = Authentication();
     try {
       print(emailController.text);
       print(passwordController.text);
@@ -63,7 +70,6 @@ class _SignUpState extends State<SignUp> {
       setState(() {
         loading = true;
       });
-
       final newUser = await auth.createUserWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
       if (newUser.user != null) {
@@ -81,15 +87,13 @@ class _SignUpState extends State<SignUp> {
           'email': emailController.text,
           'Gender': gender,
         });
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return LoginPage();
-        }));
+        Navigator.pop(context);
       }
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message.toString());
       setState(() {
         loading = false;
       });
-      print(e);
     }
   }
 
@@ -216,6 +220,7 @@ class NameWrapper extends StatelessWidget {
                     fontSize: 14),
               ),
               Container(
+                padding: EdgeInsets.symmetric(horizontal: 5),
                 margin: EdgeInsets.only(top: 7),
                 width: size.width * 0.45,
                 height: size.height * 0.05,
@@ -251,7 +256,7 @@ class NameWrapper extends StatelessWidget {
                     hintStyle: TextStyle(
                       color: Colors.grey[400],
                       fontWeight: FontWeight.w600,
-                      fontSize: size.width * 0.037,
+                      // fontSize: size.width * 0.037,
                     ),
                   ),
                 ),
@@ -482,33 +487,48 @@ class EmailInputForm extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(top: 25),
       width: size.width * 0.7,
-      child: TextFormField(
-        controller: emailController,
-        keyboardType: TextInputType.emailAddress,
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: kBlue.withOpacity(0.7),
-          // border: OutlineInputBorder(),
-          hintText: 'Email',
-          hintStyle: TextStyle(
+      child: Form(
+        key: _emailSignUpKey,
+        child: TextFormField(
+          controller: emailController,
+          validator: (String? val) {
+            String value = val ?? 'test';
+            if (value.isEmpty || value == 'test') {
+              return 'Please input email';
+            } else if (RegExp(
+                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                .hasMatch(value)) {
+              return null;
+            } else {
+              return 'Invalid email-address';
+            }
+          },
+          keyboardType: TextInputType.emailAddress,
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(8.0),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: kBlue.withOpacity(0.7),
+            // border: OutlineInputBorder(),
+            hintText: 'Email',
+            hintStyle: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
             ),
-            borderSide: BorderSide(color: kBlue, width: 0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(8.0),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(8.0),
+              ),
+              borderSide: BorderSide(color: kBlue, width: 0),
             ),
-            borderSide: BorderSide(color: kBlue, width: 0),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(8.0),
+              ),
+              borderSide: BorderSide(color: kBlue, width: 0),
+            ),
           ),
         ),
       ),
@@ -522,32 +542,45 @@ class PasswordInputForm extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(top: 10),
       width: size.width * 0.7,
-      child: TextFormField(
-        controller: passwordController,
-        obscureText: true,
-        style: TextStyle(
-          color: Color(0xffAFAFAD),
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.grey.withOpacity(0.27),
-          hintText: 'Password',
-          hintStyle: TextStyle(
+      child: Form(
+        key: _passwordSingUpKey,
+        child: TextFormField(
+          controller: passwordController,
+          validator: (String? val) {
+            String value = val ?? 'test';
+            if (value.isEmpty || value == 'test') {
+              return 'Please input password';
+            }
+            if (value.length < 6) {
+              return 'Minimum 6 characters needed';
+            } else
+              return null;
+          },
+          obscureText: true,
+          style: TextStyle(
             color: Color(0xffAFAFAD),
             fontWeight: FontWeight.w600,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(8.0),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey.withOpacity(0.27),
+            hintText: 'Password',
+            hintStyle: TextStyle(
+              color: Color(0xffAFAFAD),
+              fontWeight: FontWeight.w600,
             ),
-            borderSide: BorderSide(color: kBlue, width: 0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(8.0),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(8.0),
+              ),
+              borderSide: BorderSide(color: kBlue, width: 0),
             ),
-            borderSide: BorderSide(color: kBlue, width: 0),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(8.0),
+              ),
+              borderSide: BorderSide(color: kBlue, width: 0),
+            ),
           ),
         ),
       ),
@@ -581,4 +614,24 @@ class LoginWrapper extends StatelessWidget {
       ),
     );
   }
+}
+
+void showSnackBar(BuildContext context, String text) {
+  final scaffold = ScaffoldMessenger.of(context);
+  scaffold.showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      elevation: 3,
+      backgroundColor: kRed.withOpacity(0.7),
+      content: Text(
+        text,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: scaffold.hideCurrentSnackBar,
+        textColor: Colors.black54,
+      ),
+    ),
+  );
 }

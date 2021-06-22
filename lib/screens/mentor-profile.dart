@@ -78,12 +78,14 @@ class _MentorProfileState extends State<MentorProfile> {
     void logoutCallback() {
       final auth = Authentication();
       auth.signoutUser();
-      Navigator.pushNamed(context, '/');
+      Navigator.pushNamedAndRemoveUntil(
+          context, '/', (Route<dynamic> route) => false);
     }
 
     return Scaffold(
       body: SafeArea(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TitleBar(callback: logoutCallback),
             MentorProfileBanner(joiningDate: mentorProfileData.joiningDate),
@@ -247,15 +249,15 @@ class MentorProfileBanner extends StatelessWidget {
         DateFormat(' d MMMM').format(JoiningDate.add(Duration(days: 70)));
     Size size = MediaQuery.of(context).size;
     return Container(
-      height: size.height * 0.2,
+      // height: size.height * 0.2,
       margin: EdgeInsets.symmetric(horizontal: 15),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Container(
             // margin: EdgeInsets.only(right: size.width * 0.02),
-            height: double.infinity,
-            width: size.height * 0.16,
+            // height: double.infinity,
+            width: size.width * 0.25,
             child: gender == 'male'
                 ? Image.asset("assets/vectors/Mentor(M).png")
                 : Image.asset("assets/vectors/Mentor(F).png"),
@@ -486,7 +488,7 @@ class DecComRepDropContainer extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Container(
-            margin: EdgeInsets.only(top: 20),
+            margin: EdgeInsets.symmetric(vertical: 15),
             child: Center(
               child: Text(
                 "DECLARE\nCOMPLETION",
@@ -514,7 +516,7 @@ class DecComRepDropContainer extends StatelessWidget {
           InkWell(
             onTap: dropoutCallback,
             child: Container(
-              margin: EdgeInsets.only(top: 20),
+              margin: EdgeInsets.symmetric(vertical: 15),
               child: Center(
                 child: Text(
                   "REPORT\nDROPOUT",

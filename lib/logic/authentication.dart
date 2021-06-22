@@ -22,4 +22,8 @@ class Authentication {
     final user = _auth.currentUser;
     return user;
   }
+
+  resetPassword(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
 }

@@ -54,8 +54,18 @@
 // '${x.toString()}': FieldValue.arrayUnion([
 // {
 // 'Question': responses[x].question,
-// 'Answer': responses[x].answer,
+// 'Answer': responses[x].answer,◘
 // 'Score': responses[x].score
 // }
 // ])
+// }
+
+// rules_version = '2';
+// service cloud.firestore {
+// match /databases/{database}/documents {
+// match /{document=**} {
+// allow read, write: if
+// request.time < timestamp.date(2021, 7, 13);
+// }
+// }
 // }

@@ -1,7 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tsep/local-data/constants.dart';
+import '../local-data/constants.dart';
 
 import '../logic/authentication.dart';
 import '../components/loading.dart';
@@ -16,13 +17,38 @@ class LoginPage extends StatefulWidget {
 
 TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
-final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+GlobalKey<FormState> _emailLoginKey = GlobalKey<FormState>();
+GlobalKey<FormState> _passwordLoginKey = GlobalKey<FormState>();
+
+emailValidator(String? val) {
+  String value = val ?? 'test';
+  if (value.isEmpty || value == 'test') {
+    return 'Please input email';
+  } else if (RegExp(
+          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+      .hasMatch(value)) {
+    return null;
+  } else {
+    return 'Invalid email-address';
+  }
+}
+
+passwordValidator(String? val) {
+  String value = val ?? 'test';
+  if (value.isEmpty || value == 'test') {
+    return 'Please input password';
+  } else if (value.length < 6) {
+    return 'Password needs to be at least 6 characters long';
+  } else
+    return null;
+}
+
+final auth = Authentication();
 
 class _LoginPageState extends State<LoginPage> {
   bool loading = false;
 
   void loginCallback() async {
-    final auth = Authentication();
     try {
       setState(() {
         loading = true;
@@ -30,11 +56,11 @@ class _LoginPageState extends State<LoginPage> {
       final newUser =
           await auth.loginUser(emailController.text, passwordController.text);
       if (newUser != null) Navigator.pushNamed(context, MentorProfile.route);
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message.toString());
       setState(() {
         loading = false;
       });
-      print(e);
     }
   }
 
@@ -103,7 +129,10 @@ class LoginWrapper extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              if (!formKey.currentState!.validate()) {
+              // if (!emailKey.currentState!.validate()) {
+              //   return;
+              // }
+              if (!_passwordLoginKey.currentState!.validate()) {
                 return;
               }
               callback();
@@ -137,7 +166,13 @@ class frgtPassWrapper extends StatelessWidget {
           ),
         ),
         TextButton(
-          onPressed: () => showSnackBar(context),
+          onPressed: () async {
+            if (emailValidator(emailController.text) == null) {
+              showSnackBar(context, 'Reset email has been sent to your email');
+              await auth.resetPassword(emailController.text);
+            } else
+              showSnackBar(context, 'Please enter valid email address.');
+          },
           child: Text(
             "Reset",
             style: TextStyle(
@@ -292,16 +327,10 @@ class EmailInputForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: formKey,
+      key: _emailLoginKey,
       child: TextFormField(
         controller: emailController,
-        validator: (String? val) {
-          String value = val ?? 'test';
-          if (value.isNotEmpty && value.length > 5 && value != 'test')
-            return null;
-          else
-            return 'Invalid Input';
-        },
+        validator: (String? val) => emailValidator(val),
         keyboardType: TextInputType.emailAddress,
         style: TextStyle(
           color: Colors.white,
@@ -333,48 +362,52 @@ class EmailInputForm extends StatelessWidget {
 class PasswordInputForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: passwordController,
-      obscureText: true,
-      style: TextStyle(
-        color: Color(0xffAFAFAD),
-        fontWeight: FontWeight.w600,
-      ),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Color(0xffF5F5F5),
-        // border: OutlineInputBorder(),
-        hintText: 'Password',
-        hintStyle: TextStyle(
+    return Form(
+      key: _passwordLoginKey,
+      child: TextFormField(
+        controller: passwordController,
+        validator: (String? val) => passwordValidator(val),
+        obscureText: true,
+        style: TextStyle(
           color: Color(0xffAFAFAD),
           fontWeight: FontWeight.w600,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(12.0),
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Color(0xffF5F5F5),
+          // border: OutlineInputBorder(),
+          hintText: 'Password',
+          hintStyle: TextStyle(
+            color: Color(0xffAFAFAD),
+            fontWeight: FontWeight.w600,
           ),
-          borderSide: BorderSide(color: Color(0x00003670), width: 0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(12.0),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(12.0),
+            ),
+            borderSide: BorderSide(color: Color(0x00003670), width: 0),
           ),
-          borderSide: BorderSide(color: Color(0x00003670), width: 0),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(12.0),
+            ),
+            borderSide: BorderSide(color: Color(0x00003670), width: 0),
+          ),
         ),
       ),
     );
   }
 }
 
-void showSnackBar(BuildContext context) {
+void showSnackBar(BuildContext context, String text) {
   final scaffold = ScaffoldMessenger.of(context);
   scaffold.showSnackBar(
     SnackBar(
       behavior: SnackBarBehavior.floating,
       elevation: 3,
       backgroundColor: kRed.withOpacity(0.7),
-      content: const Text(
-        'Please enter your email address.',
+      content: Text(
+        text,
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       action: SnackBarAction(

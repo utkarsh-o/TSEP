@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tsep/screens/pdf.dart';
+// import 'package:tsep/screens/pdf.dart';
 import '../components/CustomNavigationBar.dart';
 import '../local-data/constants.dart';
 import '../screens/FAQ-page.dart';
 import '../screens/guidelines-page.dart';
-import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 
 class InfoPage extends StatelessWidget {
   const InfoPage({Key? key}) : super(key: key);
@@ -231,9 +230,9 @@ class LessonCard extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return PDFView(path: 'assets/lessons/Lesson$lesson.pdf');
-        }));
+        // Navigator.push(context, MaterialPageRoute(builder: (context) {
+        //   return PDFView(path: 'assets/lessons/Lesson$lesson.pdf');
+        // }));
       },
       child: Container(
         alignment: Alignment.center,

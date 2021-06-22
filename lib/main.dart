@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
+
 import '../screens/FAQ-page.dart';
 import '../screens/guidelines-page.dart';
 import '../screens/login-page.dart';
@@ -30,6 +32,8 @@ class TSEP extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
     return MaterialApp(
       routes: {
         '/': (context) => LoginPage(),
