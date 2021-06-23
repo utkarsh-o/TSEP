@@ -21,18 +21,17 @@ class EditLecture extends StatefulWidget {
 TimeOfDay pickedTime = TimeOfDay.now();
 DateTime pickedDate = DateTime.now();
 var footnotesController = TextEditingController();
-int pickedDuration = 0;
+int pickedDuration = 0, pickedLesson = -1;
 String footnotes = "",
     pickedMentee = '',
     menteeScheduleID = '',
     mentorScheduleID = '',
     menteeUID = '';
-int pickedLesson = -1;
 
 class _EditLectureState extends State<EditLecture> {
   final firestore = FirebaseFirestore.instance;
 
-  getDate() async {
+  getData() async {
     await firestore
         .collection('MentorData/$mentorUID/Schedule')
         .doc(widget.mentorScheduleID)
@@ -54,7 +53,7 @@ class _EditLectureState extends State<EditLecture> {
   @override
   void initState() {
     super.initState();
-    getDate();
+    getData();
     mentorScheduleID = widget.mentorScheduleID;
     menteeScheduleID = widget.menteeScheduleID;
     menteeUID = widget.menteeUID;

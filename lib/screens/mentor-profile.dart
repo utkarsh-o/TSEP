@@ -15,6 +15,7 @@ import '../logic/firestore.dart';
 
 class MentorProfile extends StatefulWidget {
   static String route = "MentorProfile";
+
   @override
   _MentorProfileState createState() => _MentorProfileState();
 }
@@ -34,6 +35,7 @@ DateTime JoiningDate = DateTime.now();
 
 class _MentorProfileState extends State<MentorProfile> {
   String email = '', password = '';
+
   @override
   void initState() {
     super.initState();
@@ -120,6 +122,7 @@ class ActivityPlot extends StatelessWidget {
     const Color(0xffD92136).withOpacity(0.7),
     const Color(0xffD92136).withOpacity(0.7),
   ];
+
   List<LineChartBarData> linechartbardata() {
     final lessons = LineChartBarData(
       spots: getLessonChartData(JoiningDate),
@@ -185,62 +188,66 @@ class ActivityPlot extends StatelessWidget {
 
 class TitleBar extends StatelessWidget {
   final VoidCallback callback;
+
   TitleBar({required this.callback});
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Container(
-          child: Text(
-            "Mentor Profile",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black.withOpacity(0.5),
-              fontSize: 16,
-            ),
-          ),
-        ),
-        SizedBox(
-          width: size.width * 0.2,
-          height: size.height * 0.12,
-        ),
-        InkWell(
-          onTap: callback,
-          child: Container(
-            decoration: BoxDecoration(
-              color: kRed.withOpacity(0.7),
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: kRed.withOpacity(0.7),
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-            padding: EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 10,
-            ),
+    return Container(
+      margin: EdgeInsets.symmetric(
+          horizontal: size.width * 0.1, vertical: size.height * 0.04),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
             child: Text(
-              "Logout",
+              "Mentor Profile",
               style: TextStyle(
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                color: Colors.black.withOpacity(0.5),
+                fontSize: 18,
               ),
             ),
           ),
-        )
-      ],
+          InkWell(
+            onTap: callback,
+            child: Container(
+              decoration: BoxDecoration(
+                color: kRed.withOpacity(0.7),
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: kRed.withOpacity(0.7),
+                    blurRadius: 10,
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 10,
+              ),
+              child: Text(
+                "Logout",
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
 
 class MentorProfileBanner extends StatelessWidget {
   final DateTime joiningDate;
+
   MentorProfileBanner({required this.joiningDate});
+
   @override
   Widget build(BuildContext context) {
     String formattedJoiningDate =
@@ -428,7 +435,9 @@ class OrgIDNumCard extends StatelessWidget {
 
 class InsideCard extends StatelessWidget {
   final String heading, value;
+
   InsideCard({required this.heading, required this.value});
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -479,7 +488,9 @@ class BreakLine extends StatelessWidget {
 
 class DecComRepDropContainer extends StatelessWidget {
   final VoidCallback dropoutCallback;
+
   DecComRepDropContainer({required this.dropoutCallback});
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;

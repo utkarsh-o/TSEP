@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../screens/post-session-survey.dart';
 import '../screens/edit_lecture.dart';
 import '../local-data/constants.dart';
 import '../logic/cached-data.dart';
@@ -94,7 +95,7 @@ class _SchedulePageState extends State<SchedulePage> {
                         Container(
                           margin: EdgeInsets.only(top: 30),
                           child: SpinKitSquareCircle(
-                            color: Color(0xffD92136).withOpacity(0.7),
+                            color: kRed.withOpacity(0.7),
                             size: 50,
                           ),
                         ),
@@ -134,6 +135,7 @@ class _SchedulePageState extends State<SchedulePage> {
                         mentorScheduleID: schedule.id,
                         menteeScheduleID: schedule.get('MenteeScheduleID'),
                         menteeUID: schedule.get('MenteeUID'),
+                        postSessionSurvey: schedule.get('PostSessionSurvey'),
                       );
 
                       scheduleList.add(s);
@@ -168,6 +170,7 @@ class _SchedulePageState extends State<SchedulePage> {
 
 class TotalContributionLessonsTaughtWrapper extends StatelessWidget {
   final List<Schedule> schedule;
+
   TotalContributionLessonsTaughtWrapper({
     required this.schedule,
   });
@@ -198,8 +201,10 @@ class TotalContributionLessonsTaughtWrapper extends StatelessWidget {
 
 class TotalContributionLessonTaughtCard extends StatelessWidget {
   final String heading, value;
+
   TotalContributionLessonTaughtCard(
       {required this.heading, required this.value});
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -226,7 +231,9 @@ class TotalContributionLessonTaughtCard extends StatelessWidget {
 
 class ScheduleCard extends StatelessWidget {
   final Schedule schedule;
+
   ScheduleCard({required this.schedule});
+
   @override
   Widget build(BuildContext context) {
     var weekday = DateFormat('EEE').format(schedule.timing);
@@ -236,6 +243,15 @@ class ScheduleCard extends StatelessWidget {
     String endTime = DateFormat('hh:mm a')
         .format(schedule.timing.add(Duration(minutes: schedule.duration)));
     endTime = endTime.replaceAll("AM", "am").replaceAll("PM", "pm");
+    bool surveyAvailable = false;
+    if (schedule.postSessionSurvey)
+      surveyAvailable = false;
+    else if (!schedule.postSessionSurvey &&
+        schedule.timing
+            .add(Duration(minutes: schedule.duration))
+            .isBefore(DateTime.now())) {
+      surveyAvailable = true;
+    }
     Size size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () {
@@ -278,7 +294,7 @@ class ScheduleCard extends StatelessWidget {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        EditDeleteWrapper(
+                        EditDeleteSurveyWrapper(
                           schedule: schedule,
                         ),
                       ],
@@ -310,22 +326,27 @@ class ScheduleCard extends StatelessWidget {
                 height: 35,
                 width: 40,
                 margin: EdgeInsets.only(right: 5, left: 15),
-                decoration: BoxDecoration(
-                  color: kBlue.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: kBlue.withOpacity(0.3),
-                      blurRadius: 10,
-                    ),
-                  ],
-                ),
+                decoration: !surveyAvailable
+                    ? BoxDecoration(
+                        color: kGreen,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: kBlue.withOpacity(0.3),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      )
+                    : BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: kGreen, width: 2),
+                      ),
                 child: Center(
                   child: Text(
                     DateFormat('d').format(schedule.timing),
                     style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                      color: !surveyAvailable ? Colors.white : kGreen,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
@@ -354,6 +375,22 @@ class ScheduleCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         fontSize: 10,
                         color: Colors.black.withOpacity(0.7),
+                      ),
+                    ),
+                    Visibility(
+                      visible: surveyAvailable,
+                      child: Column(
+                        children: [
+                          SizedBox(height: 6),
+                          Text(
+                            "Survey Available !",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                              color: kGreen.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -423,12 +460,14 @@ class BreakLine extends StatelessWidget {
 
 class DayCard extends StatelessWidget {
   final DateTime date;
+
   DayCard({
     required this.date,
   });
+
   @override
   Widget build(BuildContext context) {
-    bool active = isactive(date);
+    bool active = isActive(date);
     bool event = iseventful(scheduleList, date);
     Color fontColor = active ? Colors.white : Colors.black.withOpacity(0.7);
     Color eventColor =
@@ -492,55 +531,54 @@ class DayCard extends StatelessWidget {
 class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Container(
-          child: Text(
-            "Schedule",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black.withOpacity(0.5),
-              fontSize: 18,
-            ),
-          ),
-        ),
-        SizedBox(
-          width: screenWidth * 0.3,
-          height: screenHeight * 0.12,
-        ),
-        InkWell(
-          onTap: () {
-            Navigator.pushNamed(context, "ScheduleComplete");
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: kRed.withOpacity(0.7),
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: kRed.withOpacity(0.7),
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      margin: EdgeInsets.symmetric(
+          horizontal: size.width * 0.1, vertical: size.height * 0.04),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
             child: Text(
-              "Show All",
-              style:
-                  TextStyle(fontWeight: FontWeight.w800, color: Colors.white),
+              "Schedule",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black.withOpacity(0.5),
+                fontSize: 18,
+              ),
             ),
           ),
-        )
-      ],
+          InkWell(
+            onTap: () {
+              Navigator.pushNamed(context, "ScheduleComplete");
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: kRed.withOpacity(0.7),
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: kRed.withOpacity(0.7),
+                    blurRadius: 10,
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              child: Text(
+                "Show All",
+                style:
+                    TextStyle(fontWeight: FontWeight.w800, color: Colors.white),
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
 
-class EditDeleteWrapper extends StatelessWidget {
+class EditDeleteSurveyWrapper extends StatelessWidget {
   deleteSchedule(String mentorSchID, String menteeUID, String menteeSchID) {
     firestore
         .collection('MenteeInfo/$menteeUID/Schedule')
@@ -553,7 +591,9 @@ class EditDeleteWrapper extends StatelessWidget {
   }
 
   Schedule schedule;
-  EditDeleteWrapper({required this.schedule});
+
+  EditDeleteSurveyWrapper({required this.schedule});
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -641,13 +681,19 @@ class EditDeleteWrapper extends StatelessWidget {
           ),
           InkWell(
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return PostSessionSurvey(
+                  menteeScheduleID: menteeScheduleID,
+                  mentorScheduleID: mentorScheduleID,
+                  menteeUID: menteeUID,
+                );
+              }));
             },
             child: Container(
               margin: EdgeInsets.only(top: 10),
               child: Center(
                 child: Text(
-                  "DONE",
+                  "POST SESSION SURVEY",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,

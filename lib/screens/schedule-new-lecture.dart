@@ -16,7 +16,7 @@ class ScheduleNew extends StatefulWidget {
 
 String DisplayName = '';
 String? displayLesson = 'lesson 1';
-int pickedLesson = -1;
+int pickedLesson = 1;
 String? pickedMentee = 'Iron Man';
 
 class _ScheduleNewState extends State<ScheduleNew> {
@@ -25,11 +25,10 @@ class _ScheduleNewState extends State<ScheduleNew> {
     super.initState();
     if (menteesList.length >= 1) {
       setState(() {
-        print(menteesList.length);
-        print(menteesList == []);
         pickedTime = TimeOfDay.now();
         pickedDate = DateTime.now();
         footnotescontroller.clear();
+        pickedLesson = 1;
         pickedDuration = 30;
         displayLesson = 'lesson 1';
         DisplayName =
@@ -65,18 +64,34 @@ class _ScheduleNewState extends State<ScheduleNew> {
                       color: Color(0xff003670).withOpacity(0.5),
                       size: 70,
                     ),
-                    TextButton(
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(kRed.withOpacity(0.2))),
-                      onPressed: () {
-                        return Navigator.pop(context);
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
                       },
-                      child: Text("EXIT",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: kRed.withOpacity(0.8))),
+                      child: Container(
+                        padding: EdgeInsets.all(size.shortestSide * 0.05),
+                        child: Center(
+                          child: Text(
+                            "EXIT",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18),
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          color: kRed.withOpacity(0.7),
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: kRed.withOpacity(0.7),
+                              blurRadius: 10,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -106,6 +121,7 @@ class _ScheduleNewState extends State<ScheduleNew> {
 class CancleScheduleBtn extends StatelessWidget {
   @override
   final firestore = FirebaseFirestore.instance;
+
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
@@ -165,6 +181,7 @@ class CancleScheduleBtn extends StatelessWidget {
                 "LectureTime": Timestamp.fromDate(pickedDateTime),
                 "MentorName": mentorName,
                 "FootNotes": footnotes,
+                "PostSessionSurvey": false,
               }).then((var value) => menteeSchID = value.id);
               firestore.collection('/MentorData/$mentorUID/Schedule').add({
                 "Duration": pickedDuration,
@@ -173,7 +190,8 @@ class CancleScheduleBtn extends StatelessWidget {
                 "MenteeName": pickedMentee,
                 "FootNotes": footnotes,
                 "MenteeScheduleID": menteeSchID,
-                "MenteeUID": menteeUID
+                "MenteeUID": menteeUID,
+                "PostSessionSurvey": false,
               }).then((value) => mentorSchID = value.id);
               footnotes = "";
               Navigator.of(context).pop(context);
@@ -219,6 +237,7 @@ int pickedDuration = 0;
 
 class _DurationWrapperState extends State<DurationWrapper> {
   Duration active = Duration(minutes: 30);
+
   @override
   Widget build(BuildContext context) {
     void callback(Duration dur) {
@@ -272,8 +291,10 @@ class _DurationWrapperState extends State<DurationWrapper> {
 class DurationNum extends StatelessWidget {
   final Duration duration, active;
   final Function callback;
+
   DurationNum(
       {required this.active, required this.callback, required this.duration});
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -429,7 +450,9 @@ class _TimeDatePickerWrapperState extends State<TimeDatePickerWrapper> {
 class DatePicker extends StatelessWidget {
   final VoidCallback callback;
   final DateTime pickedDate;
+
   DatePicker({required this.callback, required this.pickedDate});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -480,7 +503,9 @@ class TimePicker extends StatelessWidget {
   @override
   final VoidCallback callback;
   final TimeOfDay pickedTime;
+
   TimePicker({required this.callback, required this.pickedTime});
+
   Widget build(BuildContext context) {
     String formatTimeOfDay(TimeOfDay tod) {
       final now = new DateTime.now();

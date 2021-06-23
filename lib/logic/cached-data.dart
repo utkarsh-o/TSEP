@@ -10,6 +10,10 @@ MentorProfileData mentorProfileData = MentorProfileData(
   idNumber: -1,
   lastName: 'lastName',
   organization: 'organization',
+  age: -1,
+  phoneNumber: 9876543210,
+  qualification: 'qualification',
+  specialization: 'specialization'
 );
 
 MentorScheduleData mentorScheduleData = MentorScheduleData(

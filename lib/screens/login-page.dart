@@ -11,6 +11,7 @@ import 'mentor-profile.dart';
 
 class LoginPage extends StatefulWidget {
   static String route = "LoginPage";
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -111,7 +112,9 @@ class FooterText extends StatelessWidget {
 
 class LoginWrapper extends StatelessWidget {
   final VoidCallback callback;
+
   LoginWrapper({required this.callback});
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -197,6 +200,7 @@ class MntrMenteeWrapper extends StatefulWidget {
 
 class _MntrMenteeWrapperState extends State<MntrMenteeWrapper> {
   String active = 'mentor';
+
   void onTap(String who) {
     setState(() {
       active = who;
@@ -228,11 +232,13 @@ class _MntrMenteeWrapperState extends State<MntrMenteeWrapper> {
 class MentorMenteeButton extends StatelessWidget {
   final String icon, who, active;
   final Function ontap;
+
   MentorMenteeButton(
       {required this.icon,
       required this.who,
       required this.active,
       required this.ontap});
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -302,7 +308,7 @@ class SignupWrapper extends StatelessWidget {
           ),
           SvgPicture.asset(
             "assets/tsep-logo.svg",
-            height: MediaQuery.of(context).size.height * 0.11,
+            height: MediaQuery.of(context).size.width * 0.21,
           ),
         ],
       ),

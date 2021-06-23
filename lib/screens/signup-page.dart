@@ -4,28 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../logic/data-processing.dart';
 import '../components/loading.dart';
 import '../local-data/constants.dart';
-import '../screens/login-page.dart';
 
 class SignUp extends StatefulWidget {
   static String route = "SignUp";
+
   @override
   _SignUpState createState() => _SignUpState();
 }
 
 bool loading = false;
-String email = '',
-    password = '',
-    batch = '',
-    firstName = '',
-    lastName = '',
-    organization = '',
-    gender = 'male';
+String gender = 'male';
 TextEditingController firstNameController = TextEditingController();
 TextEditingController lastNameController = TextEditingController();
 TextEditingController organizationController = TextEditingController();
 TextEditingController batchController = TextEditingController();
+TextEditingController ageController = TextEditingController();
+TextEditingController phoneNumberController = TextEditingController();
+TextEditingController qualificationController = TextEditingController();
+TextEditingController specializationController = TextEditingController();
 TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 String? uid = '';
@@ -41,7 +40,6 @@ class _SignUpState extends State<SignUp> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     firstNameController.clear();
     lastNameController.clear();
@@ -49,6 +47,11 @@ class _SignUpState extends State<SignUp> {
     batchController.clear();
     emailController.clear();
     passwordController.clear();
+    ageController.clear();
+    phoneNumberController.clear();
+    organizationController.clear();
+    specializationController.clear();
+    qualificationController.clear();
   }
 
   void singUpCallback() async {
@@ -61,12 +64,6 @@ class _SignUpState extends State<SignUp> {
     final auth = FirebaseAuth.instance;
     final firestore = FirebaseFirestore.instance;
     try {
-      print(emailController.text);
-      print(passwordController.text);
-      print(firstNameController.text);
-      print(lastNameController.text);
-      print(organizationController.text);
-      print(batchController.text);
       setState(() {
         loading = true;
       });
@@ -77,6 +74,8 @@ class _SignUpState extends State<SignUp> {
         setState(() {
           loading = false;
         });
+        int phoneNumber = parseIntFromString('${phoneNumberController.text}');
+        int age = parseIntFromString('${ageController.text}');
         await firestore.collection('/MentorData').doc(uid).set({
           'BatchName': batchController.text,
           'FirstName': firstNameController.text,
@@ -86,6 +85,10 @@ class _SignUpState extends State<SignUp> {
           'Organization': organizationController.text,
           'email': emailController.text,
           'Gender': gender,
+          'Age': age,
+          'PhoneNumber': phoneNumber,
+          'Qualification': qualificationController.text,
+          'Specialization': specializationController.text,
         });
         Navigator.pop(context);
       }
@@ -111,7 +114,7 @@ class _SignUpState extends State<SignUp> {
                     TitleBar(),
                     AvatarWrapper(
                         genderCallback: genderCallback, gender: gender),
-                    NameWrapper(),
+                    NameAgePhoneWrapper(),
                     OrganizationBatchWrapper(),
                     EmailInputForm(),
                     PasswordInputForm(),
@@ -127,7 +130,9 @@ class _SignUpState extends State<SignUp> {
 class AvatarWrapper extends StatefulWidget {
   final String gender;
   final Function genderCallback;
+
   AvatarWrapper({required this.gender, required this.genderCallback});
+
   @override
   _AvatarWrapperState createState() => _AvatarWrapperState();
 }
@@ -200,122 +205,125 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
   }
 }
 
-class NameWrapper extends StatelessWidget {
+class NameAgePhoneWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.only(top: 40),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: Column(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-                "First Name",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                    fontSize: 14),
+              RedBorderTextField(
+                heading: "First Name",
+                controller: firstNameController,
+                hint: "Chirag",
+                prefixIcon: true,
               ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 5),
-                margin: EdgeInsets.only(top: 7),
-                width: size.width * 0.45,
-                height: size.height * 0.05,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: kRed.withOpacity(0.7),
-                    width: 3,
-                  ),
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: kRed.withOpacity(0.7),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-                child: TextFormField(
-                  controller: firstNameController,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: size.width * 0.037,
-                    color: Colors.black.withOpacity(0.7),
-                  ),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.account_circle,
-                      color: Colors.black.withOpacity(0.6),
-                    ),
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    hintText: "Chirag",
-                    hintStyle: TextStyle(
-                      color: Colors.grey[400],
-                      fontWeight: FontWeight.w600,
-                      // fontSize: size.width * 0.037,
-                    ),
-                  ),
-                ),
-              )
+              RedBorderTextField(
+                heading: "Last Name",
+                controller: lastNameController,
+                hint: "Gupta",
+                prefixIcon: false,
+              ),
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          SizedBox(height: size.height * 0.01),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-                "Last Name",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                    fontSize: 14),
+              RedBorderTextField(
+                heading: "Age",
+                controller: ageController,
+                hint: "26",
+                prefixIcon: false,
               ),
-              Container(
-                padding: EdgeInsets.only(left: 15),
-                margin: EdgeInsets.only(top: 7),
-                alignment: Alignment.center,
-                width: size.width * 0.45,
-                height: size.height * 0.05,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: kRed.withOpacity(0.7),
-                    width: 3,
-                  ),
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: kRed.withOpacity(0.7),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-                child: TextFormField(
-                  controller: lastNameController,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: size.width * 0.037,
-                    color: Colors.black.withOpacity(0.7),
-                  ),
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    hintText: "Gupta",
-                    hintStyle: TextStyle(
-                      color: Colors.grey[400],
-                      fontWeight: FontWeight.w600,
-                      fontSize: size.width * 0.037,
-                    ),
-                  ),
-                ),
-              )
+              RedBorderTextField(
+                heading: "Phone Number",
+                controller: phoneNumberController,
+                hint: "9876543210",
+                prefixIcon: false,
+              ),
             ],
           ),
         ],
       ),
+    );
+  }
+}
+
+class RedBorderTextField extends StatelessWidget {
+  String heading, hint;
+  TextEditingController controller;
+  bool prefixIcon;
+
+  RedBorderTextField(
+      {required this.heading,
+      required this.controller,
+      required this.hint,
+      required this.prefixIcon});
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          heading,
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 14),
+        ),
+        Container(
+          alignment: Alignment.center,
+          padding: !prefixIcon ? EdgeInsets.only(left: 15) : null,
+          margin: EdgeInsets.only(top: 7),
+          width: size.width * 0.45,
+          height: size.height * 0.05,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: kRed.withOpacity(0.7),
+              width: 3,
+            ),
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: [
+              BoxShadow(
+                color: kRed.withOpacity(0.7),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: size.width * 0.037,
+              color: Colors.black.withOpacity(0.7),
+            ),
+            decoration: InputDecoration(
+              isDense: prefixIcon ? false : true,
+              contentPadding: EdgeInsets.zero,
+              prefixIcon: prefixIcon
+                  ? Icon(
+                      Icons.account_circle,
+                      color: Colors.black.withOpacity(0.6),
+                    )
+                  : null,
+              border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              hintText: hint,
+              hintStyle: TextStyle(
+                color: Colors.grey[400],
+                fontWeight: FontWeight.w600,
+                fontSize: size.width * 0.037,
+              ),
+            ),
+          ),
+        )
+      ],
     );
   }
 }
@@ -326,118 +334,183 @@ class OrganizationBatchWrapper extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.only(top: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: Column(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-                "Organization",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                    fontSize: 14),
+              BlueTextFieldWithIcon(
+                heading: 'Organization',
+                hint: 'Individual',
+                controller: organizationController,
+                prefixIcon: Icon(
+                  Icons.card_travel,
+                  color: Colors.black.withOpacity(0.6),
+                ),
               ),
-              Container(
-                margin: EdgeInsets.only(top: 7),
-                alignment: Alignment.center,
-                width: size.width * 0.45,
-                height: size.height * 0.05,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: kBlue.withOpacity(0.7),
-                    width: 3,
-                  ),
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: kBlue.withOpacity(0.7),
-                      blurRadius: 6,
-                    ),
-                  ],
+              BlueTextFieldWithIcon(
+                heading: 'Batch',
+                hint: 'APR2021',
+                controller: batchController,
+                prefixIcon: Icon(
+                  Icons.today,
+                  color: Colors.black.withOpacity(0.6),
                 ),
-                child: TextFormField(
-                  controller: organizationController,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: size.width * 0.037,
-                    color: Colors.black.withOpacity(0.7),
-                  ),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.card_travel,
-                      color: Colors.black.withOpacity(0.6),
-                    ),
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    hintText: "Individual",
-                    hintStyle: TextStyle(
-                      color: Colors.grey[400],
-                      fontWeight: FontWeight.w600,
-                      fontSize: size.width * 0.037,
-                    ),
-                  ),
-                ),
-              )
+              ),
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          SizedBox(height: size.height * 0.01),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-                "Batch",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                    fontSize: 14),
+              blueTextFieldWithoutIcon(
+                heading: 'Qualification',
+                hint: 'B.Tech CSE',
+                controller: qualificationController,
               ),
-              Container(
-                margin: EdgeInsets.only(top: 7),
-                width: size.width * 0.45,
-                height: size.height * 0.05,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: kBlue.withOpacity(0.7),
-                    width: 3,
-                  ),
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: kBlue.withOpacity(0.7),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-                child: TextFormField(
-                  controller: batchController,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: size.width * 0.037,
-                    color: Colors.black.withOpacity(0.7),
-                  ),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.today,
-                      color: Colors.black.withOpacity(0.6),
-                    ),
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    hintText: "APR2021",
-                    hintStyle: TextStyle(
-                      color: Colors.grey[400],
-                      fontWeight: FontWeight.w600,
-                      fontSize: size.width * 0.037,
-                    ),
-                  ),
-                ),
-              )
+              blueTextFieldWithoutIcon(
+                heading: 'Other Specializations',
+                hint: 'Financial Risk Management',
+                controller: specializationController,
+              ),
             ],
           ),
         ],
       ),
+    );
+  }
+}
+
+class BlueTextFieldWithIcon extends StatelessWidget {
+  String heading, hint;
+  TextEditingController controller;
+  Icon prefixIcon;
+
+  BlueTextFieldWithIcon(
+      {required this.heading,
+      required this.controller,
+      required this.hint,
+      required this.prefixIcon});
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          heading,
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 14),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 7),
+          alignment: Alignment.center,
+          width: size.width * 0.45,
+          height: size.height * 0.05,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: kBlue.withOpacity(0.7),
+              width: 3,
+            ),
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: [
+              BoxShadow(
+                color: kBlue.withOpacity(0.7),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: size.width * 0.037,
+              color: Colors.black.withOpacity(0.7),
+            ),
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.zero,
+              prefixIcon: prefixIcon,
+              border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              hintText: hint,
+              hintStyle: TextStyle(
+                color: Colors.grey[400],
+                fontWeight: FontWeight.w600,
+                fontSize: size.width * 0.037,
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class blueTextFieldWithoutIcon extends StatelessWidget {
+  String heading, hint;
+  TextEditingController controller;
+
+  blueTextFieldWithoutIcon({
+    required this.heading,
+    required this.controller,
+    required this.hint,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          heading,
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 14),
+        ),
+        Container(
+          padding: EdgeInsets.only(left: 15),
+          margin: EdgeInsets.only(top: 7),
+          alignment: Alignment.center,
+          width: size.width * 0.45,
+          height: size.height * 0.05,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: kBlue.withOpacity(0.7),
+              width: 3,
+            ),
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: [
+              BoxShadow(
+                color: kBlue.withOpacity(0.7),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: size.width * 0.037,
+              color: Colors.black.withOpacity(0.7),
+            ),
+            decoration: InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+              border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              hintText: hint,
+              hintStyle: TextStyle(
+                color: Colors.grey[400],
+                fontWeight: FontWeight.w600,
+                fontSize: size.width * 0.037,
+              ),
+            ),
+          ),
+        )
+      ],
     );
   }
 }
@@ -579,7 +652,7 @@ class PasswordInputForm extends StatelessWidget {
               borderRadius: BorderRadius.all(
                 Radius.circular(8.0),
               ),
-              borderSide: BorderSide(color: kBlue, width: 0),
+              borderSide: BorderSide(color: Color(0xffAFAFAD), width: 0),
             ),
           ),
         ),
@@ -590,7 +663,9 @@ class PasswordInputForm extends StatelessWidget {
 
 class LoginWrapper extends StatelessWidget {
   final VoidCallback callback;
+
   LoginWrapper({required this.callback});
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;

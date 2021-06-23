@@ -44,6 +44,10 @@ class ProfileHandler {
         email: snapshot.get('email'),
         joiningDate: snapshot.get('JoiningDate').toDate(),
         gender: snapshot.get('Gender'),
+        age: snapshot.get('Age'),
+        phoneNumber: snapshot.get('PhoneNumber'),
+        qualification: snapshot.get('Qualification'),
+        specialization: snapshot.get('Specialization'),
       );
       joiningDate = snapshot.get('JoiningDate').toDate();
       mentorName = "$firstName $lastName";
@@ -67,6 +71,7 @@ class ProfileHandler {
           mentorScheduleID: schedule.id,
           menteeScheduleID: schedule.get('MenteeScheduleID'),
           menteeUID: schedule.get('MenteeUID'),
+          postSessionSurvey: schedule.get('PostSessionSurvey'),
         );
         mentorSchedule.add(sch);
       }
@@ -118,24 +123,36 @@ class ProfileHandler {
 }
 
 class MentorProfileData {
-  final String batchName, firstName, lastName, organization, email, gender;
-  final int idNumber;
+  final String batchName,
+      firstName,
+      lastName,
+      organization,
+      email,
+      gender,
+      qualification,
+      specialization;
+  final int idNumber, phoneNumber, age;
   final DateTime joiningDate;
-  MentorProfileData({
-    required this.batchName,
-    required this.firstName,
-    required this.email,
-    required this.gender,
-    required this.joiningDate,
-    required this.idNumber,
-    required this.lastName,
-    required this.organization,
-  });
+
+  MentorProfileData(
+      {required this.batchName,
+      required this.firstName,
+      required this.email,
+      required this.gender,
+      required this.joiningDate,
+      required this.idNumber,
+      required this.lastName,
+      required this.organization,
+      required this.phoneNumber,
+      required this.age,
+      required this.qualification,
+      required this.specialization});
 }
 
 class MentorScheduleData {
   final Duration lastInteraction, nextInteraction;
   final double lecturesPerWeek, hoursPerWeek;
+
   MentorScheduleData(
       {required this.nextInteraction,
       required this.lastInteraction,
@@ -147,7 +164,7 @@ class Schedule {
   String mentee, menteeUID, mentorScheduleID, menteeScheduleID;
   DateTime timing;
   int duration, lesson;
-
+  bool postSessionSurvey;
   Schedule({
     required this.menteeUID,
     required this.menteeScheduleID,
@@ -156,6 +173,7 @@ class Schedule {
     required this.lesson,
     required this.duration,
     required this.timing,
+    required this.postSessionSurvey,
   });
 }
 
@@ -170,6 +188,7 @@ class Mentee {
       organization;
   int latestLecture, phoneNumber, idNumber;
   DateTime joiningDate;
+
   Mentee(
       {required this.firstName,
       required this.batchName,
@@ -188,10 +207,12 @@ class Mentee {
 class Response {
   int score;
   String answer, question;
+
   Response({required this.score, required this.answer, required this.question});
 }
 
 class Lesson {
   String title, duration;
+
   Lesson({required this.title, required this.duration});
 }

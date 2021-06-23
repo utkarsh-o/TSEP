@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../logic/cached-data.dart';
 import '../logic/firestore.dart';
 
@@ -99,7 +101,7 @@ bool iseventful(List<Schedule> schedule, DateTime today) {
   return false;
 }
 
-bool isactive(DateTime date) {
+bool isActive(DateTime date) {
   DateTime today = DateTime.now();
   if (today.year == date.year &&
       today.day == date.day &&
@@ -111,7 +113,7 @@ List<double> getLectureHourRate(
     DateTime joiningDate, List<Schedule> scheduleList) {
   int lecturesTaken = 0;
   Duration hoursTaken = Duration(seconds: 0);
-  int weekleft =
+  int weekLeft =
       10 - ((DateTime.now().difference(joiningDate).inDays) / 7).floor();
   for (var s in scheduleList) {
     if (s.timing.isBefore(DateTime.now())) {
@@ -119,13 +121,12 @@ List<double> getLectureHourRate(
       hoursTaken += Duration(minutes: s.duration);
     }
   }
-  double lecturesPerWeek = roundDouble((30 - lecturesTaken) / weekleft, 1);
-  double hoursPerWeek = roundDouble((15 - hoursTaken.inHours) / weekleft, 1);
+  double lecturesPerWeek = roundDouble((30 - lecturesTaken) / weekLeft, 1);
+  double hoursPerWeek = roundDouble((15 - hoursTaken.inHours) / weekLeft, 1);
   return [lecturesPerWeek, hoursPerWeek];
 }
 
 List<FlSpot> getLessonChartData(DateTime joiningDate) {
-  //TODO:initialize middle weeks without values to 0;
   List<FlSpot> result = [];
   Map<int, int> map = {
     1: 0,
@@ -153,6 +154,13 @@ List<FlSpot> getLessonChartData(DateTime joiningDate) {
   return result;
 }
 
+String formatTimeOfDay(TimeOfDay tod) {
+  final now = new DateTime.now();
+  final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+  final format = DateFormat.jm(); //"6:00 AM"
+  return format.format(dt);
+}
+
 List<FlSpot> getHourChartData(DateTime joiningDate) {
   //TODO:initialize middle weeks without values to 0;
   List<FlSpot> result = [];
@@ -169,7 +177,6 @@ List<FlSpot> getHourChartData(DateTime joiningDate) {
     10: 0,
   };
   for (var s in mentorSchedule) {
-    // if (s.timing.isBefore(DateTime.now())) {
     int week = (s.timing.difference(joiningDate).inDays / 7).floor() + 1;
     if (map.containsKey(week)) {
       map.update(week, (val) => val + s.duration / 60);

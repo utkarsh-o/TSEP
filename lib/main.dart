@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:tsep/screens/post-session-survey.dart';
 
 import '../screens/FAQ-page.dart';
 import '../screens/guidelines-page.dart';
@@ -28,6 +29,7 @@ void main() async {
 
 class TSEP extends StatelessWidget {
   final bool user;
+
   TSEP({required this.user});
 
   @override
@@ -35,6 +37,12 @@ class TSEP extends StatelessWidget {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
     return MaterialApp(
+      // home: PostSessionSurvey(
+      //   menteeUID: 'mFoaC9TQYDj3fc3Hm6MB',
+      //   menteeScheduleID: 'MB1w4O18QZ2druci9uLV',
+      //   mentorScheduleID: 'PFGCtGrOm7iKNJjdbR8H',
+      // ),
+      debugShowCheckedModeBanner: false,
       routes: {
         '/': (context) => LoginPage(),
         MentorProfile.route: (context) => MentorProfile(),

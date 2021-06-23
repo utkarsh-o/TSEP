@@ -56,6 +56,7 @@ class _ScheduleCompleteState extends State<ScheduleComplete> {
                         mentorScheduleID: schedule.id,
                         menteeScheduleID: schedule.get('MenteeScheduleID'),
                         menteeUID: schedule.get('MenteeUID'),
+                        postSessionSurvey: schedule.get('PostSessionSurvey'),
                       );
                       scheduleList.add(sch);
                       scheduleCardList.add(
@@ -137,6 +138,15 @@ class ScheduleCard extends StatelessWidget {
     String endTime = DateFormat('hh:mm a')
         .format(schedule.timing.add(Duration(minutes: schedule.duration)));
     endTime = endTime.replaceAll("AM", "am").replaceAll("PM", "pm");
+    bool surveyAvailable = false;
+    if (schedule.postSessionSurvey)
+      surveyAvailable = false;
+    else if (!schedule.postSessionSurvey &&
+        schedule.timing
+            .add(Duration(minutes: schedule.duration))
+            .isBefore(DateTime.now())) {
+      surveyAvailable = true;
+    }
     Size size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () {
@@ -211,22 +221,27 @@ class ScheduleCard extends StatelessWidget {
                 height: 35,
                 width: 40,
                 margin: EdgeInsets.only(right: 5, left: 15),
-                decoration: BoxDecoration(
-                  color: Color(0xff003670).withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0xff003670).withOpacity(0.3),
-                      blurRadius: 10,
-                    ),
-                  ],
-                ),
+                decoration: !surveyAvailable
+                    ? BoxDecoration(
+                        color: kGreen,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: kBlue.withOpacity(0.3),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      )
+                    : BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: kGreen, width: 2),
+                      ),
                 child: Center(
                   child: Text(
-                    index.toString(),
+                    DateFormat('d').format(schedule.timing),
                     style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                      color: !surveyAvailable ? Colors.white : kGreen,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
@@ -255,6 +270,22 @@ class ScheduleCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         fontSize: 10,
                         color: Colors.black.withOpacity(0.7),
+                      ),
+                    ),
+                    Visibility(
+                      visible: surveyAvailable,
+                      child: Column(
+                        children: [
+                          SizedBox(height: 6),
+                          Text(
+                            "Survey Available !",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                              color: kGreen.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -491,7 +522,7 @@ class EditDeleteWrapper extends StatelessWidget {
               margin: EdgeInsets.only(top: 10),
               child: Center(
                 child: Text(
-                  "DONE",
+                  "POST SESSION SURVEY",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
