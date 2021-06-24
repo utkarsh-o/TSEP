@@ -6,8 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../screens/report-dropout.dart';
-import '../screens/declare-completion.dart';
 import '../components/CustomNavigationBar.dart';
 import '../local-data/constants.dart';
 import '../local-data/line_titles.dart';
@@ -15,6 +13,8 @@ import '../logic/authentication.dart';
 import '../logic/cached-data.dart';
 import '../logic/data-processing.dart';
 import '../logic/firestore.dart';
+import '../screens/declare-completion.dart';
+import '../screens/report-dropout.dart';
 
 class MentorProfile extends StatefulWidget {
   static String route = "MentorProfile";
