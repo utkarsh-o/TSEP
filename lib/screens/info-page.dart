@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-// import 'package:tsep/screens/pdf.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../components/CustomNavigationBar.dart';
 import '../local-data/constants.dart';
+import '../logic/firestore.dart';
 import '../screens/FAQ-page.dart';
 import '../screens/guidelines-page.dart';
 
@@ -14,10 +16,12 @@ class InfoPage extends StatelessWidget {
     Widget getLessonList() {
       List<Widget> lessonList = [];
       for (var index = 0; index < lessonData.length; index++) {
-        lessonList.add(LessonCard(
-            lesson: index + 1,
-            title: lessonData[index].title,
-            duration: lessonData[index].duration));
+        lessonList.add(
+          LessonCard(
+            index: index + 1,
+            lesson: lessonData[index],
+          ),
+        );
       }
       return Column(children: lessonList);
     }
@@ -67,33 +71,25 @@ class ResourcesText extends StatelessWidget {
 class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Container(
-          child: Text(
-            "Information",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black.withOpacity(0.5),
-              fontSize: 16,
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      margin: EdgeInsets.symmetric(
+          horizontal: size.width * 0.1, vertical: size.height * 0.04),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            child: Text(
+              "Information",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black.withOpacity(0.5),
+                fontSize: 18,
+              ),
             ),
           ),
-        ),
-        SizedBox(
-          width: screenWidth * 0.4,
-          height: screenHeight * 0.12,
-        ),
-        InkWell(
-          onTap: () {},
-          child: SvgPicture.asset(
-            "assets/icons/settings-tb.svg",
-            height: screenWidth * 0.06,
-          ),
-        )
-      ],
+        ],
+      ),
     );
   }
 }
@@ -221,18 +217,16 @@ class BreakLine extends StatelessWidget {
 }
 
 class LessonCard extends StatelessWidget {
-  final int lesson;
-  final String title, duration;
-  LessonCard(
-      {required this.lesson, required this.title, required this.duration});
+  final int index;
+  final Lesson lesson;
+  LessonCard({required this.lesson, required this.index});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () {
-        // Navigator.push(context, MaterialPageRoute(builder: (context) {
-        //   return PDFView(path: 'assets/lessons/Lesson$lesson.pdf');
-        // }));
+        print(lesson.url);
+        _openPDF(lesson.url, context);
       },
       child: Container(
         alignment: Alignment.center,
@@ -269,7 +263,7 @@ class LessonCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    "$lesson",
+                    "$index",
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -284,7 +278,7 @@ class LessonCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Lesson $lesson",
+                      "Lesson $index",
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 15,
@@ -294,7 +288,7 @@ class LessonCard extends StatelessWidget {
                       height: 3,
                     ),
                     Text(
-                      "$title",
+                      "${lesson.title}",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 10,
@@ -307,7 +301,7 @@ class LessonCard extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(right: size.width * 0.06),
                 child: Text(
-                  "$duration",
+                  "${lesson.duration}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: kBlue,
@@ -320,4 +314,34 @@ class LessonCard extends StatelessWidget {
       ),
     );
   }
+}
+
+_openPDF(String url, BuildContext context) async {
+  print(url);
+  if (await canLaunch(url))
+    await launch(url);
+  else {
+    showSnackBar(context, 'Could not open document, please retry later.');
+    throw "Could not launch $url";
+  }
+}
+
+void showSnackBar(BuildContext context, String text) {
+  final scaffold = ScaffoldMessenger.of(context);
+  scaffold.showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      elevation: 3,
+      backgroundColor: kRed.withOpacity(0.7),
+      content: Text(
+        text,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: scaffold.hideCurrentSnackBar,
+        textColor: Colors.black54,
+      ),
+    ),
+  );
 }

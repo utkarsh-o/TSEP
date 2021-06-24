@@ -1,14 +1,15 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tsep/local-data/constants.dart';
-import '../screens/test-screen.dart';
+
 import '../logic/cached-data.dart';
+import '../screens/test-screen.dart';
 
 final auth = FirebaseAuth.instance;
 final firestore = FirebaseFirestore.instance;
@@ -358,9 +359,9 @@ class MenteeProfile extends StatelessWidget {
             height: size.height * 0.15,
             width: size.height * 0.15,
             child: gender == 'male'
-                ? Image.asset("assets/vectors/Mentee(M)"
+                ? Image.asset("assets/vectors/Mentee(M)normal"
                     ".png")
-                : Image.asset("assets/vectors/Mentee(F).png"),
+                : Image.asset("assets/vectors/Mentee(F)normal.png"),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [

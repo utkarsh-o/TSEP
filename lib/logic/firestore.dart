@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'authentication.dart';
 import 'cached-data.dart';
 import 'data-processing.dart';
@@ -16,7 +17,7 @@ class ProfileHandler {
     await getCurrentUser();
     getMentorScheduleData(callback);
     getMentorProfileData(callback);
-    await getMenteeData(callback);
+    getMenteeData(callback);
   }
 
   getCurrentUser() async {
@@ -72,6 +73,7 @@ class ProfileHandler {
           menteeScheduleID: schedule.get('MenteeScheduleID'),
           menteeUID: schedule.get('MenteeUID'),
           postSessionSurvey: schedule.get('PostSessionSurvey'),
+          footNotes: schedule.get('FootNotes'),
         );
         mentorSchedule.add(sch);
       }
@@ -113,12 +115,44 @@ class ProfileHandler {
             organization: value['Organization'],
             phoneNumber: value['PhoneNumber'],
             fullName: "$firstName $lastName",
+            totalEngagementLectures: 0,
+            totalEngagementTime: Duration(minutes: 0),
           );
           menteesList.add(mnt);
         });
       }
       callback();
     }
+  }
+
+  DeclareCompletionData(VoidCallback callback) async {
+    await for (var snapshot in firestore
+        .collection('MentorData/$mentorUID/Schedule')
+        .orderBy('LectureTime')
+        .snapshots()) {
+      for (Mentee mentee in menteesList) {
+        mentee.totalEngagementLectures = 0;
+        mentee.totalEngagementTime = Duration(minutes: 0);
+      }
+      final schedules = snapshot.docs;
+      for (var schedule in schedules) {
+        for (Mentee mentee in menteesList) {
+          if (mentee.uid == schedule.get('MenteeUID')) {
+            mentee.totalEngagementLectures++;
+            mentee.totalEngagementTime +=
+                Duration(minutes: schedule.get('Duration'));
+          }
+        }
+      }
+      callback();
+    }
+  }
+
+  DropMentee(Mentee mentee) {
+    firestore
+        .collection('MentorData/$mentorUID/Mentees')
+        .doc(mentee.uid)
+        .delete();
   }
 }
 
@@ -161,7 +195,7 @@ class MentorScheduleData {
 }
 
 class Schedule {
-  String mentee, menteeUID, mentorScheduleID, menteeScheduleID;
+  String mentee, menteeUID, mentorScheduleID, menteeScheduleID, footNotes;
   DateTime timing;
   int duration, lesson;
   bool postSessionSurvey;
@@ -174,6 +208,7 @@ class Schedule {
     required this.duration,
     required this.timing,
     required this.postSessionSurvey,
+    required this.footNotes,
   });
 }
 
@@ -186,22 +221,26 @@ class Mentee {
       initialLevel,
       gender,
       organization;
-  int latestLecture, phoneNumber, idNumber;
+  int latestLecture, phoneNumber, idNumber, totalEngagementLectures;
   DateTime joiningDate;
+  Duration totalEngagementTime;
 
-  Mentee(
-      {required this.firstName,
-      required this.batchName,
-      required this.uid,
-      required this.joiningDate,
-      required this.lastName,
-      required this.fullName,
-      required this.initialLevel,
-      required this.latestLecture,
-      required this.gender,
-      required this.organization,
-      required this.idNumber,
-      required this.phoneNumber});
+  Mentee({
+    required this.firstName,
+    required this.batchName,
+    required this.uid,
+    required this.joiningDate,
+    required this.lastName,
+    required this.fullName,
+    required this.initialLevel,
+    required this.latestLecture,
+    required this.gender,
+    required this.organization,
+    required this.idNumber,
+    required this.phoneNumber,
+    required this.totalEngagementLectures,
+    required this.totalEngagementTime,
+  });
 }
 
 class Response {
@@ -212,7 +251,7 @@ class Response {
 }
 
 class Lesson {
-  String title, duration;
+  String title, duration, url;
 
-  Lesson({required this.title, required this.duration});
+  Lesson({required this.title, required this.duration, required this.url});
 }

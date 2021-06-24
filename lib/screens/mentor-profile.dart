@@ -1,12 +1,15 @@
-import 'dart:ui';
 import 'dart:core';
+import 'dart:ui';
+
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:fl_chart/fl_chart.dart';
 
-import '../local-data/constants.dart';
+import '../screens/report-dropout.dart';
+import '../screens/declare-completion.dart';
 import '../components/CustomNavigationBar.dart';
+import '../local-data/constants.dart';
 import '../local-data/line_titles.dart';
 import '../logic/authentication.dart';
 import '../logic/cached-data.dart';
@@ -32,6 +35,7 @@ String firstName = '',
 double lecturesPerWeek = 0, hoursPerWeek = 0;
 int idNumber = 0, mentees = 7;
 DateTime JoiningDate = DateTime.now();
+final firestore = ProfileHandler();
 
 class _MentorProfileState extends State<MentorProfile> {
   String email = '', password = '';
@@ -39,7 +43,6 @@ class _MentorProfileState extends State<MentorProfile> {
   @override
   void initState() {
     super.initState();
-    final firestore = ProfileHandler();
     firestore.getData(parseData);
   }
 
@@ -102,9 +105,7 @@ class _MentorProfileState extends State<MentorProfile> {
               ),
             ),
             BreakLine(),
-            DecComRepDropContainer(
-              dropoutCallback: () {},
-            )
+            DecComRepDropContainer()
           ],
         ),
       ),
@@ -256,161 +257,160 @@ class MentorProfileBanner extends StatelessWidget {
         DateFormat(' d MMMM').format(JoiningDate.add(Duration(days: 70)));
     Size size = MediaQuery.of(context).size;
     return Container(
-      // height: size.height * 0.2,
       margin: EdgeInsets.symmetric(horizontal: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Container(
-            // margin: EdgeInsets.only(right: size.width * 0.02),
-            // height: double.infinity,
-            width: size.width * 0.25,
-            child: gender == 'male'
-                ? Image.asset("assets/vectors/Mentor(M).png")
-                : Image.asset("assets/vectors/Mentor(F).png"),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 50,
-                )
-              ],
+      child: IntrinsicHeight(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Container(
+              width: gender == 'female' ? size.width * 0.3 : size.width * 0.25,
+              child: gender == 'male'
+                  ? Image.asset("assets/vectors/Mentor(M).png")
+                  : Image.asset("assets/vectors/Mentor(F).png"),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 50,
+                  )
+                ],
+              ),
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                child: Text(
-                  "$firstName $lastName",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  child: Text(
+                    "$firstName $lastName",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-              Text(
-                "joined $formattedJoiningDate",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 10,
-                  color: Colors.black.withOpacity(0.6),
+                Text(
+                  "joined $formattedJoiningDate",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 10,
+                    color: Colors.black.withOpacity(0.6),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Row(
-                  children: [
-                    Text(
-                      "Mentees",
-                      style: TextStyle(
-                          color: Colors.black.withOpacity(0.6),
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      mentees.toString(),
-                      style: TextStyle(
-                          color: kBlue.withOpacity(0.6),
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Mentees",
+                        style: TextStyle(
+                            color: Colors.black.withOpacity(0.6),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        mentees.toString(),
+                        style: TextStyle(
+                            color: kBlue.withOpacity(0.6),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2.0),
-                child: Row(
-                  children: [
-                    Text(
-                      "Last interaction",
-                      style: TextStyle(
-                          color: Colors.black.withOpacity(0.6),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      "$lastInteraction",
-                      style: TextStyle(
-                          color: kGreen.withOpacity(0.6),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Last interaction",
+                        style: TextStyle(
+                            color: Colors.black.withOpacity(0.6),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        "$lastInteraction",
+                        style: TextStyle(
+                            color: kGreen.withOpacity(0.6),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2.0),
-                child: Row(
-                  children: [
-                    Text(
-                      "Next interaction",
-                      style: TextStyle(
-                          color: Colors.black.withOpacity(0.6),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      nextInteraction,
-                      style: TextStyle(
-                          color: kGreen.withOpacity(0.6),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Next interaction",
+                        style: TextStyle(
+                            color: Colors.black.withOpacity(0.6),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        nextInteraction,
+                        style: TextStyle(
+                            color: kGreen.withOpacity(0.6),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2.0),
-                child: Row(
-                  children: [
-                    Text(
-                      "Expected End of Program",
-                      style: TextStyle(
-                          color: Colors.black.withOpacity(0.6),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      "$formattedEndDate",
-                      style: TextStyle(
-                          color: kRed.withOpacity(0.6),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Expected End of Program",
+                        style: TextStyle(
+                            color: Colors.black.withOpacity(0.6),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        "$formattedEndDate",
+                        style: TextStyle(
+                            color: kRed.withOpacity(0.6),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2.0),
-                child: Row(
-                  children: [
-                    Text(
-                      "Required Lct/Hr per week",
-                      style: TextStyle(
-                          color: Colors.black.withOpacity(0.6),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      "$lecturesPerWeek / $hoursPerWeek",
-                      style: TextStyle(
-                          color: kRed.withOpacity(0.6),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Required Lct/Hr per week",
+                        style: TextStyle(
+                            color: Colors.black.withOpacity(0.6),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        "$lecturesPerWeek / $hoursPerWeek",
+                        style: TextStyle(
+                            color: kRed.withOpacity(0.6),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          )
-        ],
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -487,10 +487,6 @@ class BreakLine extends StatelessWidget {
 }
 
 class DecComRepDropContainer extends StatelessWidget {
-  final VoidCallback dropoutCallback;
-
-  DecComRepDropContainer({required this.dropoutCallback});
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -498,34 +494,50 @@ class DecComRepDropContainer extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(
-            margin: EdgeInsets.symmetric(vertical: 15),
-            child: Center(
-              child: Text(
-                "DECLARE\nCOMPLETION",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18),
+          InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return DeclareCompletion();
+              }));
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 15),
+              child: Center(
+                child: Text(
+                  "DECLARE\nCOMPLETION",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18),
+                ),
               ),
-            ),
-            height: size.height * 0.08,
-            width: size.width * 0.4,
-            decoration: BoxDecoration(
-              color: kLightBlue,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: kLightBlue,
-                  blurRadius: 10,
-                )
-              ],
+              height: size.height * 0.08,
+              width: size.width * 0.4,
+              decoration: BoxDecoration(
+                color: kLightBlue,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: kLightBlue,
+                    blurRadius: 10,
+                  )
+                ],
+              ),
             ),
           ),
           InkWell(
-            onTap: dropoutCallback,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return ReportDropout();
+                  },
+                ),
+              );
+            },
             child: Container(
               margin: EdgeInsets.symmetric(vertical: 15),
               child: Center(

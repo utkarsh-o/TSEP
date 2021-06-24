@@ -1,12 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tsep/local-data/constants.dart';
-import 'package:tsep/logic/data-processing.dart';
+
+import '../local-data/constants.dart';
 import '../logic/cached-data.dart';
-import '../screens/mentor-profile.dart';
+import '../logic/data-processing.dart';
 
 class EditLecture extends StatefulWidget {
   String mentorScheduleID, menteeScheduleID, menteeUID;

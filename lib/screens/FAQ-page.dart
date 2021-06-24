@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tsep/local-data/FAQ.dart';
+
+import '../local-data/FAQ.dart';
 
 class FAQPage extends StatelessWidget {
   static String route = "FAQPage";
@@ -63,7 +63,7 @@ class TitleBar extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black.withOpacity(0.5),
-              fontSize: 16,
+              fontSize: 18,
             ),
           ),
         ),

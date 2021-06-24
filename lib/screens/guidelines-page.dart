@@ -105,7 +105,7 @@ class TitleBar extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black.withOpacity(0.5),
-              fontSize: 16,
+              fontSize: 18,
             ),
           ),
         ),

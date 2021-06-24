@@ -1,10 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import '../local-data/constants.dart';
 import '../logic/cached-data.dart';
 import '../logic/firestore.dart';
-import '../local-data/constants.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TestScreen extends StatefulWidget {
   final String menteeUID;
@@ -25,7 +26,9 @@ Mentee menteeData = Mentee(
     gender: '',
     organization: '',
     idNumber: -1,
-    phoneNumber: -1);
+    phoneNumber: -1,
+    totalEngagementTime: Duration(minutes: 0),
+    totalEngagementLectures: 0);
 
 List<Response> responses = List<Response>.generate(
     10, (index) => Response(score: 0, answer: '', question: questions[index]));

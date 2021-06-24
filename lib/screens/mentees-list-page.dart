@@ -2,10 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../local-data/constants.dart';
-import '../logic/data-processing.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../components/CustomNavigationBar.dart';
+import '../local-data/constants.dart';
 import '../logic/cached-data.dart';
+import '../logic/data-processing.dart';
 import '../screens/mentee-details-page.dart';
 
 bool assigned = true;
@@ -97,33 +99,25 @@ class _MenteesPageState extends State<MenteesPage> {
 class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Container(
-          child: Text(
-            "Mentees",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black.withOpacity(0.5),
-              fontSize: 16,
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      margin: EdgeInsets.symmetric(
+          horizontal: size.width * 0.1, vertical: size.height * 0.04),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            child: Text(
+              "Mentees",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black.withOpacity(0.5),
+                fontSize: 18,
+              ),
             ),
           ),
-        ),
-        SizedBox(
-          width: screenWidth * 0.4,
-          height: screenHeight * 0.12,
-        ),
-        InkWell(
-          onTap: () {},
-          child: SvgPicture.asset(
-            "assets/icons/settings-tb.svg",
-            height: screenWidth * 0.06,
-          ),
-        )
-      ],
+        ],
+      ),
     );
   }
 }
@@ -223,7 +217,7 @@ class MenteeCard extends StatelessWidget {
                       name,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 13,
+                        fontSize: 16,
                       ),
                     ),
                     SizedBox(height: size.height * 0.003),
@@ -250,7 +244,9 @@ class MenteeCard extends StatelessWidget {
               ),
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                _launchCaller(phone);
+              },
               icon: SvgPicture.asset(
                 "assets/icons/phone-call.svg",
                 height: size.width * 0.06,
@@ -260,5 +256,14 @@ class MenteeCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+_launchCaller(num number) async {
+  final url = "tel:${number.toString()}";
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
   }
 }

@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+
 import '../local-data/constants.dart';
 import '../logic/cached-data.dart';
 import '../logic/data-processing.dart';
@@ -29,8 +30,8 @@ String pickedMentee = '',
 
 class _PostSessionSurveyState extends State<PostSessionSurvey> {
   final firestore = FirebaseFirestore.instance;
-
   getData() async {
+    print(widget.mentorScheduleID);
     await firestore
         .collection('MentorData/$mentorUID/Schedule')
         .doc(widget.mentorScheduleID)

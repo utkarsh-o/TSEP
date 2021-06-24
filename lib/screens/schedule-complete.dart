@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
+import '../screens/post-session-survey.dart';
 import '../local-data/constants.dart';
 import '../logic/cached-data.dart';
 import '../logic/data-processing.dart';
@@ -57,6 +58,7 @@ class _ScheduleCompleteState extends State<ScheduleComplete> {
                         menteeScheduleID: schedule.get('MenteeScheduleID'),
                         menteeUID: schedule.get('MenteeUID'),
                         postSessionSurvey: schedule.get('PostSessionSurvey'),
+                        footNotes: schedule.get('FootNotes'),
                       );
                       scheduleList.add(sch);
                       scheduleCardList.add(
@@ -200,7 +202,7 @@ class ScheduleCard extends StatelessWidget {
             });
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -213,116 +215,156 @@ class ScheduleCard extends StatelessWidget {
             ],
           ),
           width: size.width * 0.9,
-          height: size.height * 0.1,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+          constraints: BoxConstraints(minHeight: size.height * 0.09),
+          child: Column(
             children: [
-              Container(
-                height: 35,
-                width: 40,
-                margin: EdgeInsets.only(right: 5, left: 15),
-                decoration: !surveyAvailable
-                    ? BoxDecoration(
-                        color: kGreen,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: kBlue.withOpacity(0.3),
-                            blurRadius: 10,
-                          ),
-                        ],
-                      )
-                    : BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: kGreen, width: 2),
-                      ),
-                child: Center(
-                  child: Text(
-                    DateFormat('d').format(schedule.timing),
-                    style: TextStyle(
-                      color: !surveyAvailable ? Colors.white : kGreen,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                constraints: BoxConstraints(minWidth: size.width * 0.32),
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      schedule.mentee,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 3,
-                    ),
-                    Text(
-                      "$weekday, lesson $lesson",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
-                        color: Colors.black.withOpacity(0.7),
-                      ),
-                    ),
-                    Visibility(
-                      visible: surveyAvailable,
-                      child: Column(
-                        children: [
-                          SizedBox(height: 6),
-                          Text(
-                            "Survey Available !",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                              color: kGreen.withOpacity(0.7),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 5),
-                    child: Text(
-                      "$startTime - $endTime",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black.withOpacity(0.8),
+                  Container(
+                    height: 35,
+                    width: 40,
+                    margin: EdgeInsets.only(right: 5, left: 15),
+                    decoration: !surveyAvailable
+                        ? BoxDecoration(
+                            color: kGreen,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: kBlue.withOpacity(0.3),
+                                blurRadius: 10,
+                              ),
+                            ],
+                          )
+                        : BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: kGreen, width: 2),
+                          ),
+                    child: Center(
+                      child: Text(
+                        DateFormat('d').format(schedule.timing),
+                        style: TextStyle(
+                          color: !surveyAvailable ? Colors.white : kGreen,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),
-                  Row(
+                  Container(
+                    width: size.width * 0.34,
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          schedule.mentee,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Text(
+                          "$weekday, lesson $lesson",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                            color: Colors.black.withOpacity(0.7),
+                          ),
+                        ),
+                        SizedBox(height: 3),
+                        Text(
+                          lessonData[schedule.lesson].title,
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: kRed.withOpacity(0.7),
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Visibility(
+                          visible: surveyAvailable,
+                          child: Column(
+                            children: [
+                              SizedBox(height: 6),
+                              Text(
+                                "Survey Available !",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                  color: kGreen.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.access_time_filled,
-                        color: Color(0xff268200).withOpacity(0.7),
-                        size: 12,
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 5, 14, 5),
+                        child: Text(
+                          "$startTime - $endTime",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black.withOpacity(0.8),
+                          ),
+                        ),
                       ),
-                      Text(
-                        "  ${schedule.duration} mins",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xff269200).withOpacity(0.7),
-                            fontSize: 12),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_filled,
+                            color: Color(0xff268200).withOpacity(0.7),
+                            size: 12,
+                          ),
+                          Text(
+                            "  ${schedule.duration} mins",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xff269200).withOpacity(0.7),
+                                fontSize: 12),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ],
               ),
+              Visibility(
+                visible: schedule.footNotes != '',
+                child: Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(7),
+                    color: kBlue.withOpacity(0.15),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'FootNotes:',
+                        style: TextStyle(
+                            fontSize: 15,
+                            color: kBlue.withOpacity(0.9),
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        schedule.footNotes,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              )
             ],
           ),
         ),
@@ -517,6 +559,18 @@ class EditDeleteWrapper extends StatelessWidget {
           InkWell(
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return PostSessionSurvey(
+                      menteeScheduleID: schedule.menteeScheduleID,
+                      mentorScheduleID: schedule.mentorScheduleID,
+                      menteeUID: schedule.menteeUID,
+                    );
+                  },
+                ),
+              );
             },
             child: Container(
               margin: EdgeInsets.only(top: 10),

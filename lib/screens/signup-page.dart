@@ -1,12 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../logic/data-processing.dart';
+
 import '../components/loading.dart';
 import '../local-data/constants.dart';
+import '../logic/data-processing.dart';
 
 class SignUp extends StatefulWidget {
   static String route = "SignUp";
@@ -297,6 +298,7 @@ class RedBorderTextField extends StatelessWidget {
             ],
           ),
           child: TextFormField(
+            textAlignVertical: TextAlignVertical.center,
             controller: controller,
             style: TextStyle(
               fontWeight: FontWeight.w600,
@@ -304,7 +306,7 @@ class RedBorderTextField extends StatelessWidget {
               color: Colors.black.withOpacity(0.7),
             ),
             decoration: InputDecoration(
-              isDense: prefixIcon ? false : true,
+              isDense: true,
               contentPadding: EdgeInsets.zero,
               prefixIcon: prefixIcon
                   ? Icon(
@@ -405,7 +407,6 @@ class BlueTextFieldWithIcon extends StatelessWidget {
         ),
         Container(
           margin: EdgeInsets.only(top: 7),
-          alignment: Alignment.center,
           width: size.width * 0.45,
           height: size.height * 0.05,
           decoration: BoxDecoration(
@@ -423,6 +424,7 @@ class BlueTextFieldWithIcon extends StatelessWidget {
             ],
           ),
           child: TextFormField(
+            textAlignVertical: TextAlignVertical.center,
             controller: controller,
             style: TextStyle(
               fontWeight: FontWeight.w600,
@@ -430,6 +432,7 @@ class BlueTextFieldWithIcon extends StatelessWidget {
               color: Colors.black.withOpacity(0.7),
             ),
             decoration: InputDecoration(
+              isDense: true,
               contentPadding: EdgeInsets.zero,
               prefixIcon: prefixIcon,
               border: InputBorder.none,
