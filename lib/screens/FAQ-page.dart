@@ -93,7 +93,7 @@ class QACard extends StatelessWidget {
             ),
           ],
         ),
-        width: size.width * 0.85,
+        width: size.width * 0.9,
         child: Column(
           children: [
             Container(

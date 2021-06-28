@@ -251,7 +251,10 @@ class ScheduleCard extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    width: size.width * 0.34,
+                    constraints: BoxConstraints(
+                        minWidth: size.width * 0.30,
+                        maxWidth: size.width * 0.30),
+                    // width: size.width * 0.34,
                     margin: const EdgeInsets.symmetric(
                         horizontal: 10.0, vertical: 10),
                     child: Column(

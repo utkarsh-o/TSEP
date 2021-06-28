@@ -2,10 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../local-data/constants.dart';
 
-import '../logic/authentication.dart';
 import '../components/loading.dart';
+import '../local-data/constants.dart';
+import '../logic/authentication.dart';
 import '../screens/signup-page.dart';
 import 'mentor-profile.dart';
 
@@ -120,36 +120,29 @@ class LoginWrapper extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.only(bottom: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(size.width * 0.6, size.height * 0.06),
-              primary: kRed.withOpacity(0.65),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            onPressed: () {
-              // if (!emailKey.currentState!.validate()) {
-              //   return;
-              // }
-              if (!_passwordLoginKey.currentState!.validate()) {
-                return;
-              }
-              callback();
-            },
-            child: Text('Login'),
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(vertical: size.height * 0.016),
+          // minimumSize: Size(size.width * 0.6, size.height * 0.06),
+          primary: kRed.withOpacity(0.65),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: SvgPicture.asset(
-              "assets/icons/google-login.svg",
-              height: 40,
-            ),
-          )
-        ],
+        ),
+        onPressed: () {
+          if (!_emailLoginKey.currentState!.validate()) {
+            return;
+          }
+          if (!_passwordLoginKey.currentState!.validate()) {
+            return;
+          }
+          callback();
+        },
+        child: Text(
+          'Login',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

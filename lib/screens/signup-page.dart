@@ -686,7 +686,10 @@ class LoginWrapper extends StatelessWidget {
               ),
             ),
             onPressed: callback,
-            child: Text('Sign Up'),
+            child: Text(
+              'Sign Up',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),

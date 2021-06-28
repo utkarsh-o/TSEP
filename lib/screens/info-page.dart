@@ -245,10 +245,11 @@ class LessonCard extends StatelessWidget {
           width: size.width * 0.85,
           height: size.height * 0.1,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
-                margin: EdgeInsets.only(left: size.width * 0.06),
+                margin: EdgeInsets.only(
+                    left: size.width * 0.06, right: size.width * 0.04),
                 height: 35,
                 width: 40,
                 decoration: BoxDecoration(
@@ -272,7 +273,8 @@ class LessonCard extends StatelessWidget {
                 ),
               ),
               Container(
-                constraints: BoxConstraints(minWidth: 150),
+                constraints: BoxConstraints(
+                    maxWidth: size.width * 0.45, minWidth: size.width * 0.40),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,7 +283,7 @@ class LessonCard extends StatelessWidget {
                       "Lesson $index",
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 15,
+                        fontSize: 16,
                       ),
                     ),
                     SizedBox(
@@ -291,7 +293,7 @@ class LessonCard extends StatelessWidget {
                       "${lesson.title}",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 10,
+                        fontSize: 11,
                         color: Colors.black.withOpacity(0.7),
                       ),
                     ),
@@ -299,7 +301,8 @@ class LessonCard extends StatelessWidget {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(right: size.width * 0.06),
+                margin: EdgeInsets.only(
+                    left: size.width * 0.03, right: size.width * 0.03),
                 child: Text(
                   "${lesson.duration}",
                   style: TextStyle(

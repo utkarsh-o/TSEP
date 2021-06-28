@@ -355,10 +355,7 @@ class ScheduleCard extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    width: size.width * 0.34,
-                    // constraints: BoxConstraints(
-                    //     minWidth: size.width * 0.30,
-                    //     maxWidth: size.width * 0.36),
+                    constraints: BoxConstraints(maxWidth: size.width * 0.33),
                     margin: const EdgeInsets.symmetric(
                         horizontal: 10.0, vertical: 10),
                     child: Column(
@@ -369,7 +366,7 @@ class ScheduleCard extends StatelessWidget {
                           schedule.mentee,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 15,
+                            fontSize: 14,
                           ),
                         ),
                         SizedBox(height: 3),
@@ -412,7 +409,7 @@ class ScheduleCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 5, 14, 5),
+                        padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                         child: Text(
                           "$startTime - $endTime",
                           style: TextStyle(

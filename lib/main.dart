@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tsep/screens/post-session-survey.dart';
 
 import '../screens/FAQ-page.dart';
 import '../screens/guidelines-page.dart';
