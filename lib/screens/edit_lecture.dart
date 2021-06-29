@@ -18,6 +18,7 @@ class EditLecture extends StatefulWidget {
   _EditLectureState createState() => _EditLectureState();
 }
 
+Map<String, dynamic> oldData = {}, newData = {};
 TimeOfDay pickedTime = TimeOfDay.now();
 DateTime pickedDate = DateTime.now();
 var footnotesController = TextEditingController();
@@ -46,6 +47,13 @@ class _EditLectureState extends State<EditLecture> {
         pickedDuration = value.get('Duration');
         pickedLesson = value.get('LessonNumber');
         pickedMentee = value.get('MenteeName');
+        oldData = {
+          'LectureTime': time,
+          'FootNotes': value.get('FootNotes'),
+          'Duration': pickedDuration,
+          'LessonNumber': pickedLesson,
+          'MenteeName': pickedMentee
+        };
       });
     });
   }
@@ -154,6 +162,23 @@ class CancelConfirmWrapper extends StatelessWidget {
                 "FootNotes": footnotesController.text,
                 "MenteeScheduleID": menteeScheduleID,
                 "MenteeUID": menteeUID
+              });
+              newData = {
+                'Duration': pickedDuration,
+                'LessonNumber': pickedLesson,
+                'LectureTime': pickedDateTime,
+                'MenteeName': pickedMentee,
+                'FootNotes': footnotesController.text,
+                'MenteeScheduleID': menteeScheduleID,
+                'MenteeUID': menteeUID,
+              };
+              firestore.collection('Logs').add({
+                'Event': 'Edit Lecture Called',
+                'OldData': oldData,
+                'NewData': newData,
+                'UID': mentorUID,
+                'MentorName': mentorName,
+                'DateModified': DateTime.now(),
               });
               footnotes = "";
               Navigator.of(context).pop(context);

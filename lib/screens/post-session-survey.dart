@@ -19,6 +19,7 @@ class PostSessionSurvey extends StatefulWidget {
   _PostSessionSurveyState createState() => _PostSessionSurveyState();
 }
 
+Map<String, dynamic> oldData = {}, newData = {};
 TimeOfDay pickedTime = TimeOfDay.now();
 DateTime pickedDate = DateTime.now();
 var remarkController = TextEditingController();
@@ -46,6 +47,7 @@ class _PostSessionSurveyState extends State<PostSessionSurvey> {
         pickedLesson = value.get('LessonNumber');
         pickedMentee = value.get('MenteeName');
       });
+      oldData = {'Duration': pickedDuration};
     });
   }
 
@@ -138,6 +140,18 @@ class CancelConfirmWrapper extends StatelessWidget {
                 "Duration": pickedDuration,
                 "Remarks": remarkController.text,
                 "PostSessionSurvey": true,
+              });
+              newData = {
+                'Duration': pickedDuration,
+                'Remark': remarkController.text
+              };
+              firestore.collection('Logs').add({
+                'Event': 'Post Session Survey Filled',
+                'OldData': oldData,
+                'NewData': newData,
+                'UID': mentorUID,
+                'MentorName': mentorName,
+                'DateModified': DateTime.now(),
               });
               Navigator.of(context).pop(context);
             },

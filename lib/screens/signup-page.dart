@@ -91,6 +91,28 @@ class _SignUpState extends State<SignUp> {
           'Qualification': qualificationController.text,
           'Specialization': specializationController.text,
         });
+        firestore.collection('Logs').add({
+          'Event': 'New User SignUp',
+          'OldData': 'Does not exist',
+          'NewData': {
+            'BatchName': batchController.text,
+            'FirstName': firstNameController.text,
+            'IDNumber': -1,
+            'JoiningDate': Timestamp.fromDate(DateTime.now()),
+            'LastName': lastNameController.text,
+            'Organization': organizationController.text,
+            'email': emailController.text,
+            'Gender': gender,
+            'Age': age,
+            'PhoneNumber': phoneNumber,
+            'Qualification': qualificationController.text,
+            'Specialization': specializationController.text,
+          },
+          'UID': uid,
+          'MentorName':
+              '${firstNameController.text} ${lastNameController.text}',
+          'DateModified': DateTime.now(),
+        });
         Navigator.pop(context);
       }
     } on FirebaseAuthException catch (e) {

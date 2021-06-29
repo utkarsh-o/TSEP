@@ -1,13 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../local-data/constants.dart';
-import '../logic/data-processing.dart';
 import '../logic/cached-data.dart';
-import '../screens/mentor-profile.dart';
+import '../logic/data-processing.dart';
 
 class ScheduleNew extends StatefulWidget {
   @override
@@ -18,6 +18,7 @@ String DisplayName = '';
 String? displayLesson = 'lesson 1';
 int pickedLesson = 1;
 String? pickedMentee = 'Iron Man';
+Map<String, dynamic> oldData = {}, newData = {};
 
 class _ScheduleNewState extends State<ScheduleNew> {
   @override
@@ -193,6 +194,23 @@ class CancleScheduleBtn extends StatelessWidget {
                 "MenteeUID": menteeUID,
                 "PostSessionSurvey": false,
               }).then((value) => mentorSchID = value.id);
+              firestore.collection('Logs').add({
+                'Event': "New Session Scheduled",
+                'OldData': "Does not exist",
+                'NewData': {
+                  "Duration": pickedDuration,
+                  "LessonNumber": pickedLesson,
+                  "LectureTime": Timestamp.fromDate(pickedDateTime),
+                  "MenteeName": pickedMentee,
+                  "FootNotes": footnotes,
+                  "MenteeScheduleID": menteeSchID,
+                  "MenteeUID": menteeUID,
+                  "PostSessionSurvey": false,
+                },
+                'MentorName': mentorName,
+                'UID': mentorUID,
+                'DateModified': DateTime.now(),
+              });
               footnotes = "";
               Navigator.of(context).pop(context);
             },

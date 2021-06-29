@@ -15,6 +15,7 @@ import '../screens/post-session-survey.dart';
 
 final firestore = FirebaseFirestore.instance;
 bool loading = false;
+Map<String, dynamic> oldData = {}, newData = {};
 
 class SchedulePage extends StatefulWidget {
   @override
@@ -139,11 +140,12 @@ class _SchedulePageState extends State<SchedulePage> {
                           postSessionSurvey: schedule.get('PostSessionSurvey'),
                           footNotes: schedule.get('FootNotes'));
 
-                      scheduleList.add(s);
-                      if (lectureTime.isAfter(startDate))
+                      if (lectureTime.isAfter(startDate)) {
+                        scheduleList.add(s);
                         scheduleCardList.add(
                           ScheduleCard(schedule: s),
                         );
+                      }
                     }
                   }
                   return Column(
@@ -618,7 +620,25 @@ class TitleBar extends StatelessWidget {
 }
 
 class EditDeleteSurveyWrapper extends StatelessWidget {
-  deleteSchedule(String mentorSchID, String menteeUID, String menteeSchID) {
+  deleteSchedule(
+      String mentorSchID, String menteeUID, String menteeSchID) async {
+    await firestore
+        .collection('MentorData/$mentorUID/Schedule')
+        .doc(mentorSchID)
+        .get()
+        .then((var value) {
+      oldData = {
+        'Duration': value.get('Duration'),
+        'FootNotes': value.get('FootNotes'),
+        'LectureTime': value.get('LectureTime'),
+        'LessonNumber': value.get('LessonNumber'),
+        'MenteeName': value.get('MenteeName'),
+        'MenteeScheduleID': value.get('MenteeScheduleID'),
+        'MenteeUID': value.get('MenteeUID'),
+        'PostSessionSurvey': value.get('PostSessionSurvey'),
+        'MentorName': mentorName,
+      };
+    });
     firestore
         .collection('MenteeInfo/$menteeUID/Schedule')
         .doc(menteeSchID)
@@ -627,6 +647,14 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
         .collection('MentorData/$mentorUID/Schedule')
         .doc(mentorSchID)
         .delete();
+    firestore.collection('Logs').add({
+      'Event': "Session Deleted",
+      'OldData': oldData,
+      'NewData': 'Event Deleted',
+      'MentorName': mentorName,
+      'UID': mentorUID,
+      'DateModified': DateTime.now(),
+    });
   }
 
   Schedule schedule;
