@@ -6,6 +6,8 @@ import 'package:tsep/logic/cached-data.dart';
 import 'package:tsep/logic/firestore.dart';
 
 class ReportDropout extends StatefulWidget {
+  ProfileHandler firestore;
+  ReportDropout({required this.firestore});
   static String route = "ReportDropout";
   @override
   _ReportDropoutState createState() => _ReportDropoutState();
@@ -202,12 +204,13 @@ class DropoutWarningWrapper extends StatelessWidget {
                 size: 20,
               ),
               Text(
-                "  +91 9876543210",
+                " +91 9876543210",
                 style: TextStyle(color: kGreen, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Icon(
                 Icons.email,
@@ -215,7 +218,7 @@ class DropoutWarningWrapper extends StatelessWidget {
                 size: 20,
               ),
               Text(
-                "  support@kotakeducationfoundation.com",
+                " support@kotakeducationfoundation.com",
                 style: TextStyle(color: kGreen, fontWeight: FontWeight.bold),
               ),
             ],
@@ -256,7 +259,7 @@ class TitleBar extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black.withOpacity(0.5),
-                fontSize: 18,
+                fontSize: 17,
               ),
             ),
           ),
@@ -308,13 +311,15 @@ class ConfirmationWrapper extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  firestore.DropMentee(mentee);
                   Navigator.of(context).pop(context);
+                  firestore.DropMentee(mentee);
+                  showSnackBar(
+                      context, 'The declaration was filed successfully!');
                 },
                 child: Container(
                   child: Center(
                     child: Text(
-                      "DELETE",
+                      "CONFIRM",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           color: Colors.white,
@@ -343,4 +348,24 @@ class ConfirmationWrapper extends StatelessWidget {
       ),
     );
   }
+}
+
+void showSnackBar(BuildContext context, String text) {
+  final scaffold = ScaffoldMessenger.of(context);
+  scaffold.showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      elevation: 3,
+      backgroundColor: kRed.withOpacity(0.7),
+      content: Text(
+        text,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: scaffold.hideCurrentSnackBar,
+        textColor: Colors.black54,
+      ),
+    ),
+  );
 }

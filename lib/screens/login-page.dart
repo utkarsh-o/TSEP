@@ -56,7 +56,8 @@ class _LoginPageState extends State<LoginPage> {
       });
       final newUser =
           await auth.loginUser(emailController.text, passwordController.text);
-      if (newUser != null) Navigator.pushNamed(context, MentorProfile.route);
+      if (newUser != null)
+        Navigator.pushReplacementNamed(context, MentorProfile.route);
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message.toString());
       setState(() {

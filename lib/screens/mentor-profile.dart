@@ -33,7 +33,7 @@ String firstName = '',
     lastInteraction = '',
     nextInteraction = '';
 double lecturesPerWeek = 0, hoursPerWeek = 0;
-int idNumber = 0, mentees = 7;
+int idNumber = 0, mentees = 0;
 DateTime JoiningDate = DateTime.now();
 final firestore = ProfileHandler();
 
@@ -78,13 +78,11 @@ class _MentorProfileState extends State<MentorProfile> {
     });
   }
 
-  @override
   Widget build(BuildContext context) {
     void logoutCallback() {
       final auth = Authentication();
       auth.signoutUser();
-      Navigator.pushNamedAndRemoveUntil(
-          context, '/', (Route<dynamic> route) => false);
+      Navigator.pushReplacementNamed(context, '/');
     }
 
     return Scaffold(
@@ -497,7 +495,7 @@ class DecComRepDropContainer extends StatelessWidget {
           InkWell(
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return DeclareCompletion();
+                return DeclareCompletion(firestore: firestore);
               }));
             },
             child: Container(
@@ -533,7 +531,9 @@ class DecComRepDropContainer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return ReportDropout();
+                    return ReportDropout(
+                      firestore: firestore,
+                    );
                   },
                 ),
               );

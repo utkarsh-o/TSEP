@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../screens/FAQ-page.dart';
 import '../screens/guidelines-page.dart';
@@ -12,6 +13,7 @@ import '../screens/signup-page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   await Firebase.initializeApp();
   final auth = FirebaseAuth.instance;
   var user = auth.currentUser;

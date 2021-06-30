@@ -37,7 +37,7 @@ class _SchedulePageState extends State<SchedulePage> {
       dayList.add(SizedBox(width: size.width * 0.02));
       for (var index = 1; index <= 7; index++) {
         dayList.add(
-          new DayCard(
+          DayCard(
             date: _firstDayOfTheWeek.add(
               Duration(days: index),
             ),
@@ -321,7 +321,7 @@ class ScheduleCard extends StatelessWidget {
             ],
           ),
           width: size.width * 0.9,
-          constraints: BoxConstraints(minHeight: size.height * 0.09),
+          // constraints: BoxConstraints(minHeight: size.height * 0.09),
           child: Column(
             children: [
               Row(
@@ -356,87 +356,91 @@ class ScheduleCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Container(
-                    constraints: BoxConstraints(maxWidth: size.width * 0.33),
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 10.0, vertical: 10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          schedule.mentee,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
+                  Expanded(
+                    child: Container(
+                      constraints: BoxConstraints(
+                          maxWidth: size.width * 0.34,
+                          minWidth: size.width * 0.3),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 15),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            schedule.mentee,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 3),
-                        Text(
-                          "$weekday, lesson $lesson",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                            color: Colors.black.withOpacity(0.7),
+                          SizedBox(height: 3),
+                          Text(
+                            "$weekday, lesson $lesson",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                              color: Colors.black.withOpacity(0.7),
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 3),
-                        Text(
-                          lessonData[schedule.lesson].title,
-                          style: TextStyle(
-                              fontSize: 11,
-                              color: kRed.withOpacity(0.7),
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Visibility(
-                          visible: surveyAvailable,
-                          child: Column(
-                            children: [
-                              SizedBox(height: 6),
-                              Text(
-                                "Survey Available !",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                  color: kGreen.withOpacity(0.8),
+                          SizedBox(height: 3),
+                          Text(
+                            lessonData[schedule.lesson].title,
+                            style: TextStyle(
+                                fontSize: 11,
+                                color: kRed.withOpacity(0.7),
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Visibility(
+                            visible: surveyAvailable,
+                            child: Column(
+                              children: [
+                                SizedBox(height: 6),
+                                Text(
+                                  "Survey Available !",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                    color: kGreen.withOpacity(0.8),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
-                        child: Text(
+                  Container(
+                    margin: EdgeInsets.only(right: 15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
                           "$startTime - $endTime",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black.withOpacity(0.8),
                           ),
                         ),
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.access_time_filled,
-                            color: kGreen.withOpacity(0.8),
-                            size: 12,
-                          ),
-                          Text(
-                            "  ${schedule.duration} mins",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                color: kGreen.withOpacity(0.8),
-                                fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ],
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.access_time_filled,
+                              color: kGreen.withOpacity(0.8),
+                              size: 12,
+                            ),
+                            Text(
+                              "  ${schedule.duration} mins",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  color: kGreen.withOpacity(0.8),
+                                  fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -502,9 +506,7 @@ class BreakLine extends StatelessWidget {
 class DayCard extends StatelessWidget {
   final DateTime date;
 
-  DayCard({
-    required this.date,
-  });
+  DayCard({required this.date});
 
   @override
   Widget build(BuildContext context) {
@@ -672,7 +674,7 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () {
-                  // Navigator.of(context).pop();
+                  Navigator.of(context).pop();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -748,6 +750,7 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
           ),
           InkWell(
             onTap: () {
+              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(

@@ -6,6 +6,8 @@ import '../logic/cached-data.dart';
 import '../logic/firestore.dart';
 
 class DeclareCompletion extends StatefulWidget {
+  ProfileHandler firestore;
+  DeclareCompletion({required this.firestore});
   static String route = "DeclareCompletion";
   @override
   _DeclareCompletionState createState() => _DeclareCompletionState();
@@ -22,7 +24,10 @@ class _DeclareCompletionState extends State<DeclareCompletion> {
   List<Widget> displayMentees() {
     List<Widget> result = [];
     menteesList.forEach((Mentee mentee) {
-      result.add(MenteeInformationCard(mentee: mentee));
+      result.add(MenteeInformationCard(
+        mentee: mentee,
+        firestore: widget.firestore,
+      ));
     });
     setState(() {});
     return result;
@@ -45,8 +50,9 @@ class _DeclareCompletionState extends State<DeclareCompletion> {
 }
 
 class MenteeInformationCard extends StatelessWidget {
+  ProfileHandler firestore;
   Mentee mentee;
-  MenteeInformationCard({required this.mentee});
+  MenteeInformationCard({required this.mentee, required this.firestore});
   bool checkCompleted() {
     if (mentee.totalEngagementTime >= Duration(hours: 15) ||
         mentee.totalEngagementLectures >= 30)
@@ -110,13 +116,15 @@ class MenteeInformationCard extends StatelessWidget {
                   ),
                 ),
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     if (!completed) {
                       showSnackBar(context,
                           'Minimum requirements not met for the selected mentee');
-                    } else
+                    } else {
+                      firestore.DeclareCompletion(mentee);
                       showSnackBar(
                           context, 'The declaration was filed successfully!');
+                    }
                   },
                   child: Container(
                     margin: EdgeInsets.only(top: 10),

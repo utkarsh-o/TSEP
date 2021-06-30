@@ -251,92 +251,91 @@ class ScheduleCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Container(
-                    constraints: BoxConstraints(
-                        minWidth: size.width * 0.30,
-                        maxWidth: size.width * 0.30),
-                    // width: size.width * 0.34,
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 10.0, vertical: 10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          schedule.mentee,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
+                  Expanded(
+                    child: Container(
+                      constraints: BoxConstraints(
+                          maxWidth: size.width * 0.34,
+                          minWidth: size.width * 0.3),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 15),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            schedule.mentee,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
                           ),
-                        ),
-                        SizedBox(
-                          height: 3,
-                        ),
-                        Text(
-                          "$weekday, lesson $lesson",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                            color: Colors.black.withOpacity(0.7),
+                          SizedBox(height: 3),
+                          Text(
+                            "$weekday, lesson $lesson",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                              color: Colors.black.withOpacity(0.7),
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 3),
-                        Text(
-                          lessonData[schedule.lesson].title,
-                          style: TextStyle(
-                              fontSize: 11,
-                              color: kRed.withOpacity(0.7),
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Visibility(
-                          visible: surveyAvailable,
-                          child: Column(
-                            children: [
-                              SizedBox(height: 6),
-                              Text(
-                                "Survey Available !",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
-                                  color: kGreen.withOpacity(0.7),
+                          SizedBox(height: 3),
+                          Text(
+                            lessonData[schedule.lesson].title,
+                            style: TextStyle(
+                                fontSize: 11,
+                                color: kRed.withOpacity(0.7),
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Visibility(
+                            visible: surveyAvailable,
+                            child: Column(
+                              children: [
+                                SizedBox(height: 6),
+                                Text(
+                                  "Survey Available !",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                    color: kGreen.withOpacity(0.8),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 5, 14, 5),
-                        child: Text(
+                  Container(
+                    margin: EdgeInsets.only(right: size.width * 0.04),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
                           "$startTime - $endTime",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black.withOpacity(0.8),
                           ),
                         ),
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.access_time_filled,
-                            color: Color(0xff268200).withOpacity(0.7),
-                            size: 12,
-                          ),
-                          Text(
-                            "  ${schedule.duration} mins",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xff269200).withOpacity(0.7),
-                                fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ],
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.access_time_filled,
+                              color: kGreen.withOpacity(0.8),
+                              size: 12,
+                            ),
+                            Text(
+                              "  ${schedule.duration} mins",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  color: kGreen.withOpacity(0.8),
+                                  fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

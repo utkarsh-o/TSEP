@@ -149,10 +149,49 @@ class ProfileHandler {
   }
 
   DropMentee(Mentee mentee) {
-    firestore
-        .collection('MentorData/$mentorUID/Mentees')
-        .doc(mentee.uid)
-        .delete();
+    Map<String, dynamic> data = {
+      'DateModified': Timestamp.fromDate(DateTime.now()),
+      'EngagementTime': mentee.totalEngagementTime.inMinutes,
+      'LessonCount': mentee.totalEngagementLectures,
+      'MenteeName': mentee.fullName,
+      'MenteeUID': mentee.uid,
+      'MentorName': mentorName,
+      'MentorUID': mentorUID
+    };
+    firestore.collection('Dropout').add(data);
+    firestore.collection('Logs').add({
+      'DateModified': Timestamp.fromDate(DateTime.now()),
+      'Event': 'Dropout from Program',
+      'MentorName': mentorName,
+      'OldData': 'Does not exist',
+      'NewData': data,
+      'MentorUID': mentorUID,
+    });
+    // firestore
+    //     .collection('MentorData/$mentorUID/Mentees')
+    //     .doc(mentee.uid)
+    //     .delete();
+  }
+
+  DeclareCompletion(Mentee mentee) {
+    Map<String, dynamic> data = {
+      'DateModified': Timestamp.fromDate(DateTime.now()),
+      'EngagementTime': mentee.totalEngagementTime.inMinutes,
+      'LessonCount': mentee.totalEngagementLectures,
+      'MenteeName': mentee.fullName,
+      'MenteeUID': mentee.uid,
+      'MentorName': mentorName,
+      'MentorUID': mentorUID
+    };
+    firestore.collection('Completion').add(data);
+    firestore.collection('Logs').add({
+      'DateModified': Timestamp.fromDate(DateTime.now()),
+      'Event': 'Completion of Program',
+      'MentorName': mentorName,
+      'OldData': 'Does not exist',
+      'NewData': data,
+      'MentorUID': mentorUID,
+    });
   }
 }
 
