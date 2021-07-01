@@ -3,13 +3,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:tsep/screens/mentee-profile.dart';
 
 import '../screens/FAQ-page.dart';
 import '../screens/guidelines-page.dart';
 import '../screens/login-page.dart';
+import '../screens/mentee-signup-page.dart';
 import '../screens/mentor-profile.dart';
-import '../screens/schedule-complete.dart';
-import '../screens/signup-page.dart';
+import '../screens/mentor-signup-page.dart';
+import '../screens/mentor-schedule-complete.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,13 +44,15 @@ class TSEP extends StatelessWidget {
       routes: {
         '/': (context) => LoginPage(),
         MentorProfile.route: (context) => MentorProfile(),
-        SignUp.route: (context) => SignUp(),
-        ScheduleComplete.route: (context) => ScheduleComplete(),
+        MentorSignUp.route: (context) => MentorSignUp(),
+        MenteeSignUp.route: (context) => MenteeSignUp(),
+        MentorScheduleComplete.route: (context) => MentorScheduleComplete(),
         FAQPage.route: (context) => FAQPage(),
         GuidelinesPage.route: (context) => GuidelinesPage(),
+        MenteeProfile.route: (context) => MenteeProfile(),
       },
       theme: ThemeData(fontFamily: 'Montserrat'),
-      initialRoute: user ? MentorProfile.route : LoginPage.route,
+      initialRoute: user ? MenteeProfile.route : LoginPage.route,
     );
   }
 }

@@ -8,7 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 import '../local-data/constants.dart';
-import '../logic/cached-data.dart';
+import '../logic/mentor-cached-data.dart';
 import '../screens/test-screen.dart';
 
 final auth = FirebaseAuth.instance;
@@ -29,7 +29,7 @@ String firstName = '',
     initialLevel = '',
     menteeName = '',
     menteeUID = '';
-int phoneNumber = -1, idNumber = -1, latestLecture = -1;
+int phoneNumber = -1, idNumber = -1;
 num engagement = 0;
 DateTime joiningDate = DateTime.now();
 
@@ -56,7 +56,6 @@ class _MenteeDetailsState extends State<MenteeDetails> {
           gender = snapshot.get('Gender');
           phoneNumber = snapshot.get('PhoneNumber');
           initialLevel = snapshot.get('InitialLevel');
-          latestLecture = snapshot.get('LatestLecture');
           menteeName = "$firstName $lastName";
         });
       }
@@ -76,7 +75,6 @@ class _MenteeDetailsState extends State<MenteeDetails> {
           gender = mentee.gender;
           phoneNumber = mentee.phoneNumber;
           initialLevel = mentee.initialLevel;
-          latestLecture = mentee.latestLecture;
           menteeName = mentee.fullName;
         });
       }
@@ -101,7 +99,7 @@ class _MenteeDetailsState extends State<MenteeDetails> {
                   if (initialLevel == 'TBD') {
                     return Column(
                       children: [
-                        MenteeProfile(
+                        _MenteeProfile(
                           lessonsScheduled: 0,
                         ),
                         SizedBox(height: size.height * 0.02),
@@ -165,7 +163,7 @@ class _MenteeDetailsState extends State<MenteeDetails> {
                   }
                   return Column(
                     children: [
-                      MenteeProfile(
+                      _MenteeProfile(
                         lessonsScheduled: index > 0 ? index - 1 : index,
                       ),
                       SizedBox(height: size.height * 0.02),
@@ -344,9 +342,9 @@ class LessonList extends StatelessWidget {
   }
 }
 
-class MenteeProfile extends StatelessWidget {
+class _MenteeProfile extends StatelessWidget {
   int lessonsScheduled;
-  MenteeProfile({required this.lessonsScheduled});
+  _MenteeProfile({required this.lessonsScheduled});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;

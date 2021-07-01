@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../local-data/constants.dart';
-import '../logic/cached-data.dart';
-import '../logic/firestore.dart';
+import '../logic/mentor-cached-data.dart';
+import '../logic/mentor-firestore.dart';
 
 class TestScreen extends StatefulWidget {
   final String menteeUID;
@@ -17,7 +17,6 @@ class TestScreen extends StatefulWidget {
 Mentee menteeData = Mentee(
     uid: '',
     firstName: '',
-    latestLecture: -1,
     batchName: '',
     joiningDate: DateTime.now(),
     lastName: '',

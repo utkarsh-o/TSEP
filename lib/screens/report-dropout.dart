@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tsep/local-data/constants.dart';
-import 'package:tsep/logic/cached-data.dart';
-import 'package:tsep/logic/firestore.dart';
+import 'package:tsep/logic/mentor-cached-data.dart';
+import 'package:tsep/logic/mentor-firestore.dart';
 
 class ReportDropout extends StatefulWidget {
   ProfileHandler firestore;

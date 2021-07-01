@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'authentication.dart';
-import 'cached-data.dart';
-import 'data-processing.dart';
+import 'mentor-cached-data.dart';
+import 'mentor-data-processing.dart';
 
 class ProfileHandler {
   final firestore = FirebaseFirestore.instance;
@@ -111,7 +111,6 @@ class ProfileHandler {
             initialLevel: value['InitialLevel'],
             joiningDate: value['JoiningDate'].toDate(),
             lastName: lastName,
-            latestLecture: value['LatestLecture'],
             organization: value['Organization'],
             phoneNumber: value['PhoneNumber'],
             fullName: "$firstName $lastName",
@@ -165,7 +164,7 @@ class ProfileHandler {
       'MentorName': mentorName,
       'OldData': 'Does not exist',
       'NewData': data,
-      'MentorUID': mentorUID,
+      'UID': mentorUID,
     });
     // firestore
     //     .collection('MentorData/$mentorUID/Mentees')
@@ -190,7 +189,7 @@ class ProfileHandler {
       'MentorName': mentorName,
       'OldData': 'Does not exist',
       'NewData': data,
-      'MentorUID': mentorUID,
+      'UID': mentorUID,
     });
   }
 }
@@ -260,7 +259,7 @@ class Mentee {
       initialLevel,
       gender,
       organization;
-  int latestLecture, phoneNumber, idNumber, totalEngagementLectures;
+  int phoneNumber, idNumber, totalEngagementLectures;
   DateTime joiningDate;
   Duration totalEngagementTime;
 
@@ -272,7 +271,6 @@ class Mentee {
     required this.lastName,
     required this.fullName,
     required this.initialLevel,
-    required this.latestLecture,
     required this.gender,
     required this.organization,
     required this.idNumber,

@@ -3,30 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../screens/mentee-info-page.dart';
+import '../screens/mentee-profile.dart';
+import '../screens/mentee-schedule-page.dart';
 import '../local-data/constants.dart';
 import '../logic/ad_helper.dart';
-import '../screens/info-page.dart';
-import '../screens/mentees-list-page.dart';
-import '../screens/mentor-profile.dart';
-import '../screens/schedule-new-lecture.dart';
-import '../screens/schedule-page.dart';
 
-class CustomBottomNavBar extends StatefulWidget {
+class MenteeCustomBottomNavBar extends StatefulWidget {
   int active = 0;
-  CustomBottomNavBar({required this.active});
+  MenteeCustomBottomNavBar({required this.active});
   @override
-  _CustomBottomNavBarState createState() => _CustomBottomNavBarState();
+  _MenteeCustomBottomNavBarState createState() =>
+      _MenteeCustomBottomNavBarState();
 }
 
-class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
+class _MenteeCustomBottomNavBarState extends State<MenteeCustomBottomNavBar> {
   late BannerAd _ad;
   bool isLoaded = false;
   String email = '', password = '';
   List<Widget> pages = [
-    MentorProfile(),
-    SchedulePage(),
-    MenteesPage(),
-    InfoPage()
+    MenteeProfile(),
+    MenteeSchedulePage(),
+    MenteeInfoPage(),
   ];
   @override
   void initState() {
@@ -73,8 +71,6 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -82,57 +78,27 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            NavbarIconSmall(
-                icon: 'assets/icons/home-bnb.svg',
-                index: 0,
-                active: widget.active,
-                onPressed: setactv),
-            NavbarIconSmall(
-                icon: 'assets/icons/schedule-bnb.svg',
-                index: 1,
-                active: widget.active,
-                onPressed: setactv),
-            InkWell(
-              splashColor: kRed.withOpacity(0),
-              highlightColor: kRed.withOpacity(0),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return ScheduleNew();
-                    },
-                  ),
-                );
-              },
-              child: Container(
-                width: screenWidth / 5,
-                margin: EdgeInsets.only(bottom: 30),
-                child: SvgPicture.asset(
-                  "assets/icons/button-add.svg",
-                  height: screenHeight * 0.09,
-                ),
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: kRed.withOpacity(1),
-                      blurRadius: 20,
-                      spreadRadius: -15,
-                    ),
-                  ],
-                ),
-              ),
+            Expanded(
+              child: NavbarIconSmall(
+                  icon: 'assets/icons/home-bnb.svg',
+                  index: 0,
+                  active: widget.active,
+                  onPressed: setactv),
             ),
-            NavbarIconSmall(
-                icon: 'assets/icons/menteelist-bnb.svg',
-                index: 2,
-                active: widget.active,
-                onPressed: setactv),
-            NavbarIconSmall(
-                icon: 'assets/icons/info-bnb.svg',
-                index: 3,
-                active: widget.active,
-                onPressed: setactv),
+            Expanded(
+              child: NavbarIconSmall(
+                  icon: 'assets/icons/schedule-bnb.svg',
+                  index: 1,
+                  active: widget.active,
+                  onPressed: setactv),
+            ),
+            Expanded(
+              child: NavbarIconSmall(
+                  icon: 'assets/icons/info-bnb.svg',
+                  index: 2,
+                  active: widget.active,
+                  onPressed: setactv),
+            )
           ],
         ),
         isLoaded
@@ -162,13 +128,13 @@ class NavbarIconSmall extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
+    // double screenWidth = MediaQuery.of(context).size.width;
     return InkWell(
       splashColor: kRed.withOpacity(0),
       highlightColor: kRed.withOpacity(0),
       onTap: () => onPressed(index),
       child: Container(
-        width: screenWidth / 5,
+        // width: screenWidth / 5,
         decoration: BoxDecoration(
           border: Border(
             top: BorderSide(

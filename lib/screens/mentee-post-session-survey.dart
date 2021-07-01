@@ -3,20 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
+import '../logic/mentee-cached-data.dart';
+import '../logic/mentee-data-processing.dart';
 import '../local-data/constants.dart';
-import '../logic/cached-data.dart';
-import '../logic/data-processing.dart';
 
-class PostSessionSurvey extends StatefulWidget {
-  String mentorScheduleID, menteeScheduleID, menteeUID;
-  PostSessionSurvey(
-      {required this.menteeScheduleID,
-      required this.mentorScheduleID,
-      required this.menteeUID});
+class MenteePostSessionSurvey extends StatefulWidget {
+  String menteeScheduleID, mentorName;
+  MenteePostSessionSurvey(
+      {required this.menteeScheduleID, required this.mentorName});
   static String route = "PostSessionSurvey";
 
   @override
-  _PostSessionSurveyState createState() => _PostSessionSurveyState();
+  _MenteePostSessionSurveyState createState() =>
+      _MenteePostSessionSurveyState();
 }
 
 Map<String, dynamic> oldData = {}, newData = {};
@@ -24,18 +23,14 @@ TimeOfDay pickedTime = TimeOfDay.now();
 DateTime pickedDate = DateTime.now();
 var remarkController = TextEditingController();
 int pickedDuration = 0, pickedLesson = -1;
-String pickedMentee = '',
-    _menteeScheduleID = '',
-    _mentorScheduleID = '',
-    _menteeUID = '';
+String _menteeScheduleID = '';
 
-class _PostSessionSurveyState extends State<PostSessionSurvey> {
+class _MenteePostSessionSurveyState extends State<MenteePostSessionSurvey> {
   final firestore = FirebaseFirestore.instance;
   getData() async {
-    print(widget.mentorScheduleID);
     await firestore
-        .collection('MentorData/$mentorUID/Schedule')
-        .doc(widget.mentorScheduleID)
+        .collection('MenteeInfo/$menteeUID/Schedule')
+        .doc(widget.menteeScheduleID)
         .get()
         .then((var value) {
       DateTime time = DateTime.fromMicrosecondsSinceEpoch(
@@ -45,7 +40,6 @@ class _PostSessionSurveyState extends State<PostSessionSurvey> {
         pickedDate = time;
         pickedDuration = value.get('Duration');
         pickedLesson = value.get('LessonNumber');
-        pickedMentee = value.get('MenteeName');
       });
       oldData = {'Duration': pickedDuration};
     });
@@ -55,9 +49,7 @@ class _PostSessionSurveyState extends State<PostSessionSurvey> {
   void initState() {
     // TODO: implement initState
     getData();
-    _mentorScheduleID = widget.mentorScheduleID;
     _menteeScheduleID = widget.menteeScheduleID;
-    _menteeUID = widget.menteeUID;
   }
 
   @override
@@ -68,7 +60,7 @@ class _PostSessionSurveyState extends State<PostSessionSurvey> {
           child: Column(
             children: [
               TitleBar(),
-              MenteeLessonWrapper(),
+              MenteeLessonWrapper(mentorName: widget.mentorName),
               SizedBox(height: 20),
               TimeDatePickerWrapper(),
               BreakLine(),
@@ -126,16 +118,8 @@ class CancelConfirmWrapper extends StatelessWidget {
           InkWell(
             onTap: () async {
               await firestore
-                  .collection('/MenteeInfo/$_menteeUID/Schedule')
+                  .collection('/MenteeInfo/$menteeUID/Schedule')
                   .doc(_menteeScheduleID)
-                  .update({
-                "Duration": pickedDuration,
-                "Remarks": remarkController.text,
-                "PostSessionSurvey": true,
-              });
-              firestore
-                  .collection('/MentorData/$mentorUID/Schedule')
-                  .doc(_mentorScheduleID)
                   .update({
                 "Duration": pickedDuration,
                 "Remarks": remarkController.text,
@@ -146,11 +130,11 @@ class CancelConfirmWrapper extends StatelessWidget {
                 'Remark': remarkController.text
               };
               firestore.collection('Logs').add({
-                'Event': 'Post Session Survey Filled',
+                'Event': 'Post Session Survey Filled by Mentee',
                 'OldData': oldData,
                 'NewData': newData,
-                'UID': mentorUID,
-                'MentorName': mentorName,
+                'UID': menteeUID,
+                'MenteeName': menteeName,
                 'DateModified': DateTime.now(),
               });
               Navigator.of(context).pop(context);
@@ -441,6 +425,8 @@ class TimeDatePickerWrapper extends StatelessWidget {
 }
 
 class MenteeLessonWrapper extends StatelessWidget {
+  final String mentorName;
+  MenteeLessonWrapper({required this.mentorName});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -451,7 +437,7 @@ class MenteeLessonWrapper extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Mentee",
+              "Mentor",
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.grey,
@@ -465,7 +451,7 @@ class MenteeLessonWrapper extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                pickedMentee,
+                mentorName,
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,

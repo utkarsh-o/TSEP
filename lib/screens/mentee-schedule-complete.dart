@@ -2,26 +2,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:tsep/logic/mentee-cached-data.dart';
+import 'package:tsep/logic/mentee-data-processing.dart';
+import 'package:tsep/logic/mentee-firestore.dart';
 
 import '../local-data/constants.dart';
-import '../logic/cached-data.dart';
-import '../logic/data-processing.dart';
-import '../logic/firestore.dart';
-import '../screens/post-session-survey.dart';
 import 'edit_lecture.dart';
+import 'mentee-post-session-survey.dart';
 
 final firestore = FirebaseFirestore.instance;
 List<Schedule> scheduleList = [];
 Map<String, dynamic> oldData = {}, newData = {};
 
-class ScheduleComplete extends StatefulWidget {
+class MenteeScheduleComplete extends StatefulWidget {
   static String route = "ScheduleComplete";
 
   @override
-  _ScheduleCompleteState createState() => _ScheduleCompleteState();
+  _MenteeScheduleCompleteState createState() => _MenteeScheduleCompleteState();
 }
 
-class _ScheduleCompleteState extends State<ScheduleComplete> {
+class _MenteeScheduleCompleteState extends State<MenteeScheduleComplete> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -34,7 +34,7 @@ class _ScheduleCompleteState extends State<ScheduleComplete> {
               TitleBar(),
               StreamBuilder<QuerySnapshot>(
                 stream: firestore
-                    .collection('MentorData/$mentorUID/Schedule')
+                    .collection('MenteeInfo/$menteeUID/Schedule')
                     .orderBy('LectureTime')
                     .snapshots(),
                 builder: (context, snapshot) {
@@ -44,20 +44,12 @@ class _ScheduleCompleteState extends State<ScheduleComplete> {
                     final schedules = snapshot.data!.docs;
                     int index = 1;
                     for (var schedule in schedules) {
-                      String menteeName = '';
-                      for (var mentee in menteesList)
-                        if (mentee.uid == schedule.get('MenteeUID')) {
-                          menteeName = mentee.fullName;
-                          break;
-                        }
                       Schedule sch = Schedule(
-                        mentee: menteeName,
+                        mentor: mentorProfileData.fullName,
                         lesson: schedule.get('LessonNumber'),
                         duration: schedule.get('Duration'),
                         timing: schedule.get('LectureTime').toDate(),
-                        mentorScheduleID: schedule.id,
-                        menteeScheduleID: schedule.get('MenteeScheduleID'),
-                        menteeUID: schedule.get('MenteeUID'),
+                        menteeScheduleID: schedule.id,
                         postSessionSurvey: schedule.get('PostSessionSurvey'),
                         footNotes: schedule.get('FootNotes'),
                       );
@@ -134,7 +126,7 @@ class ScheduleCard extends StatelessWidget {
   ScheduleCard({required this.schedule, required this.index});
   @override
   Widget build(BuildContext context) {
-    var weekday = DateFormat('EEE d MMMM').format(schedule.timing);
+    var weekday = DateFormat('EEE, d MMMM').format(schedule.timing);
     var lesson = schedule.lesson;
     String startTime = DateFormat('hh:mm').format(schedule.timing);
     startTime = startTime.replaceAll("AM", "am").replaceAll("PM", "pm");
@@ -160,39 +152,33 @@ class ScheduleCard extends StatelessWidget {
                 child: Container(
                   decoration:
                       BoxDecoration(borderRadius: BorderRadius.circular(15)),
-                  height: size.height * 0.27,
+                  height: size.height * 0.18,
                   child: Container(
                     margin: EdgeInsets.symmetric(horizontal: 30),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Modify Lecture",
-                          style: TextStyle(
-                              color: kRed.withOpacity(0.6),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20),
-                        ),
                         Container(
-                          margin: EdgeInsets.only(bottom: 10),
+                          margin: EdgeInsets.only(top: 12),
                           padding:
                               EdgeInsets.symmetric(horizontal: 13, vertical: 7),
                           decoration: BoxDecoration(
-                            color: kLightBlue.withOpacity(0.2),
+                            color: kRed.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            "Deleted Lectures cannot be restored",
+                            "Please fill the survey with utmost sincerity",
                             style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 17,
-                              color: kLightBlue.withOpacity(0.9),
+                              color: kRed.withOpacity(0.7),
                             ),
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        EditDeleteWrapper(
+                        SizedBox(height: size.height * 0.02),
+                        SurveyWrapper(
                           schedule: schedule,
                         ),
                       ],
@@ -257,13 +243,13 @@ class ScheduleCard extends StatelessWidget {
                           maxWidth: size.width * 0.34,
                           minWidth: size.width * 0.3),
                       margin: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 15),
+                          horizontal: 10.0, vertical: 10),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            schedule.mentee,
+                            'Lesson $lesson',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
@@ -271,7 +257,7 @@ class ScheduleCard extends StatelessWidget {
                           ),
                           SizedBox(height: 3),
                           Text(
-                            "$weekday, lesson $lesson",
+                            "$weekday",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 10,
@@ -394,9 +380,10 @@ class TotContriLesTauWrapper extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           PlannedCard(
-              heading: "Planned Engagement", value: "${hours}hr ${minutes}min"),
+              heading: "Total Lesson Duration",
+              value: "${hours}hr ${minutes}min"),
           PlannedCard(
-              heading: "Planned Lessons", value: plannedLessons.toString()),
+              heading: "Total Lessons", value: plannedLessons.toString()),
         ],
       ),
     );
@@ -460,175 +447,54 @@ class BreakLine extends StatelessWidget {
   }
 }
 
-class EditDeleteWrapper extends StatelessWidget {
-  deleteSchedule(
-      String mentorSchID, String menteeUID, String menteeSchID) async {
-    await firestore
-        .collection('MentorData/$mentorUID/Schedule')
-        .doc(mentorSchID)
-        .get()
-        .then((var value) {
-      oldData = {
-        'Duration': value.get('Duration'),
-        'FootNotes': value.get('FootNotes'),
-        'LectureTime': value.get('LectureTime'),
-        'LessonNumber': value.get('LessonNumber'),
-        'MenteeName': value.get('MenteeName'),
-        'MenteeScheduleID': value.get('MenteeScheduleID'),
-        'MenteeUID': value.get('MenteeUID'),
-        'PostSessionSurvey': value.get('PostSessionSurvey'),
-        'MentorName': mentorName,
-      };
-    });
-    firestore
-        .collection('MenteeInfo/$menteeUID/Schedule')
-        .doc(menteeSchID)
-        .delete();
-    firestore
-        .collection('MentorData/$mentorUID/Schedule')
-        .doc(mentorSchID)
-        .delete();
-    firestore.collection('Logs').add({
-      'Event': "Session Deleted",
-      'OldData': oldData,
-      'NewData': 'Event Deleted',
-      'MentorName': mentorName,
-      'UID': mentorUID,
-      'DateModified': DateTime.now(),
-    });
-  }
-
+class SurveyWrapper extends StatelessWidget {
   Schedule schedule;
-  EditDeleteWrapper({required this.schedule});
+  SurveyWrapper({required this.schedule});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              InkWell(
-                onTap: () {
-                  // Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return EditLecture(
-                          menteeScheduleID: schedule.menteeScheduleID,
-                          mentorScheduleID: schedule.mentorScheduleID,
-                          menteeUID: schedule.menteeUID,
-                        );
-                      },
-                    ),
-                  );
-                },
-                child: Container(
-                  child: Center(
-                    child: Text(
-                      "EDIT",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18),
-                    ),
-                  ),
-                  height: size.height * 0.042,
-                  width: size.width * 0.3,
-                  decoration: BoxDecoration(
-                    color: kLightBlue,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(4),
-                    boxShadow: [
-                      BoxShadow(
-                        color: kLightBlue,
-                        blurRadius: 10,
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  deleteSchedule(schedule.mentorScheduleID, schedule.menteeUID,
-                      schedule.menteeScheduleID);
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  child: Center(
-                    child: Text(
-                      "DELETE",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18),
-                    ),
-                  ),
-                  height: size.height * 0.042,
-                  width: size.width * 0.3,
-                  decoration: BoxDecoration(
-                    color: kRed.withOpacity(0.7),
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(4),
-                    boxShadow: [
-                      BoxShadow(
-                        color: kRed.withOpacity(0.7),
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                ),
+      child: InkWell(
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return MenteePostSessionSurvey(
+                  menteeScheduleID: schedule.menteeScheduleID,
+                  mentorName: mentorProfileData.fullName,
+                );
+              },
+            ),
+          );
+        },
+        child: Container(
+          margin: EdgeInsets.only(bottom: 15),
+          child: Center(
+            child: Text(
+              "POST SESSION SURVEY",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
+            ),
+          ),
+          height: size.height * 0.042,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: kGreen.withOpacity(0.9),
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(4),
+            boxShadow: [
+              BoxShadow(
+                color: kGreen.withOpacity(0.9),
+                blurRadius: 10,
               ),
             ],
           ),
-          InkWell(
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return PostSessionSurvey(
-                      menteeScheduleID: schedule.menteeScheduleID,
-                      mentorScheduleID: schedule.mentorScheduleID,
-                      menteeUID: schedule.menteeUID,
-                    );
-                  },
-                ),
-              );
-            },
-            child: Container(
-              margin: EdgeInsets.only(top: 10),
-              child: Center(
-                child: Text(
-                  "POST SESSION SURVEY",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18),
-                ),
-              ),
-              height: size.height * 0.042,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: kGreen.withOpacity(0.9),
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(4),
-                boxShadow: [
-                  BoxShadow(
-                    color: kGreen.withOpacity(0.9),
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

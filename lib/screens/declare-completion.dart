@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../local-data/constants.dart';
-import '../logic/cached-data.dart';
-import '../logic/firestore.dart';
+import '../logic/mentor-cached-data.dart';
+import '../logic/mentor-firestore.dart';
 
 class DeclareCompletion extends StatefulWidget {
   ProfileHandler firestore;

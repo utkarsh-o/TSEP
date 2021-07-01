@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tsep/components/mentee-customNavigationBar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../components/CustomNavigationBar.dart';
+import '../components/mentor-customNavigationBar.dart';
 import '../local-data/constants.dart';
-import '../logic/firestore.dart';
+import '../logic/mentor-firestore.dart';
 import '../screens/FAQ-page.dart';
 import '../screens/guidelines-page.dart';
 
-class InfoPage extends StatelessWidget {
-  const InfoPage({Key? key}) : super(key: key);
+class MenteeInfoPage extends StatelessWidget {
+  const MenteeInfoPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,16 +35,13 @@ class InfoPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TitleBar(),
-              FAQGuidelineCards(),
-              BreakLine(),
-              ResourcesText(),
               getLessonList(),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        active: 3,
+      bottomNavigationBar: MenteeCustomBottomNavBar(
+        active: 2,
       ),
     );
   }
@@ -80,7 +78,7 @@ class TitleBar extends StatelessWidget {
         children: [
           Container(
             child: Text(
-              "Information",
+              "Lessons",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black.withOpacity(0.5),

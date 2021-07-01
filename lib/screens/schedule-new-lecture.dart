@@ -6,8 +6,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 import '../local-data/constants.dart';
-import '../logic/cached-data.dart';
-import '../logic/data-processing.dart';
+import '../logic/mentor-cached-data.dart';
+import '../logic/mentor-data-processing.dart';
 
 class ScheduleNew extends StatefulWidget {
   @override

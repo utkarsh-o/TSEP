@@ -4,23 +4,21 @@ import 'dart:ui';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:tsep/components/mentee-customNavigationBar.dart';
+import 'package:tsep/local-data/constants.dart';
+import 'package:tsep/local-data/line_titles.dart';
+import 'package:tsep/logic/authentication.dart';
+import 'package:tsep/logic/mentee-cached-data.dart';
+import 'package:tsep/logic/mentee-data-processing.dart';
+import 'package:tsep/logic/mentee-firestore.dart';
 
-import '../components/mentor-customNavigationBar.dart';
-import '../local-data/constants.dart';
-import '../local-data/line_titles.dart';
-import '../logic/authentication.dart';
-import '../logic/mentor-cached-data.dart';
-import '../logic/mentor-data-processing.dart';
-import '../logic/mentor-firestore.dart';
-import '../screens/declare-completion.dart';
-import '../screens/report-dropout.dart';
-
-class MentorProfile extends StatefulWidget {
-  static String route = "MentorProfile";
+class MenteeProfile extends StatefulWidget {
+  static String route = "MenteeProfile";
 
   @override
-  _MentorProfileState createState() => _MentorProfileState();
+  _MenteeProfileState createState() => _MenteeProfileState();
 }
 
 String firstName = '',
@@ -31,13 +29,16 @@ String firstName = '',
     uid = '',
     gender = '',
     lastInteraction = '',
-    nextInteraction = '';
+    nextInteraction = '',
+    mentorName = '',
+    mentorEmail = '';
 double lecturesPerWeek = 0, hoursPerWeek = 0;
-int idNumber = 0, mentees = 0;
+int idNumber = 0, mentees = 0, mentorIDNumber = -1, mentorPhoneNumber = -1;
 DateTime JoiningDate = DateTime.now();
-final firestore = ProfileHandler();
+bool mentorAssigned = false;
+final firestore = MenteeProfileHandler();
 
-class _MentorProfileState extends State<MentorProfile> {
+class _MenteeProfileState extends State<MenteeProfile> {
   String email = '', password = '';
 
   @override
@@ -46,36 +47,53 @@ class _MentorProfileState extends State<MentorProfile> {
     firestore.getData(parseData);
   }
 
-  parseMentorProfileData() {
+  parseMenteeProfileData() {
+    if (this.mounted)
+      setState(() {
+        batchName = menteeProfileData.batchName;
+        firstName = menteeProfileData.firstName;
+        idNumber = menteeProfileData.idNumber;
+        lastName = menteeProfileData.lastName;
+        organization = menteeProfileData.organization;
+        email = menteeProfileData.email;
+        JoiningDate = menteeProfileData.joiningDate;
+        gender = menteeProfileData.gender;
+      });
+  }
+
+  parseMenteeScheduleData() {
     setState(() {
-      batchName = mentorProfileData.batchName;
-      firstName = mentorProfileData.firstName;
-      idNumber = mentorProfileData.idNumber;
-      lastName = mentorProfileData.lastName;
-      organization = mentorProfileData.organization;
-      email = mentorProfileData.email;
-      JoiningDate = mentorProfileData.joiningDate;
-      gender = mentorProfileData.gender;
-      mentees = menteesList.length;
+      lastInteraction =
+          formatLastInteraction(menteeScheduleData.lastInteraction);
+      nextInteraction =
+          formatNextInteraction(menteeScheduleData.nextInteraction);
+      hoursPerWeek = menteeScheduleData.hoursPerWeek;
+      lecturesPerWeek = menteeScheduleData.lecturesPerWeek;
     });
   }
 
-  parseMentorScheduleData() {
-    setState(() {
-      lastInteraction =
-          formatLastInteraction(mentorScheduleData.lastInteraction);
-      nextInteraction =
-          formatNextInteraction(mentorScheduleData.nextInteraction);
-      hoursPerWeek = mentorScheduleData.hoursPerWeek;
-      lecturesPerWeek = mentorScheduleData.lecturesPerWeek;
-    });
+  parseMentorProfileData() {
+    if (mentorProfileData.firstName == '-')
+      setState(() {
+        mentorAssigned = false;
+      });
+    else {
+      setState(() {
+        mentorAssigned = true;
+        mentorName = mentorProfileData.fullName;
+        mentorIDNumber = mentorProfileData.idNumber;
+        mentorPhoneNumber = mentorProfileData.phoneNumber;
+        mentorEmail = mentorProfileData.email;
+      });
+    }
   }
 
   parseData() {
     if (this.mounted) {
       setState(() {
+        parseMenteeProfileData();
+        parseMenteeScheduleData();
         parseMentorProfileData();
-        parseMentorScheduleData();
       });
     }
   }
@@ -90,11 +108,12 @@ class _MentorProfileState extends State<MentorProfile> {
     return Scaffold(
       body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             TitleBar(callback: logoutCallback),
-            MentorProfileBanner(joiningDate: mentorProfileData.joiningDate),
+            MenteeProfileBanner(),
             OrgIDNumCard(),
+            MentorProfileBanner(),
             BreakLine(),
             ActivityPlot(),
             Text(
@@ -104,12 +123,121 @@ class _MentorProfileState extends State<MentorProfile> {
                 color: Colors.black.withOpacity(0.7),
               ),
             ),
-            BreakLine(),
-            DecComRepDropContainer()
           ],
         ),
       ),
-      bottomNavigationBar: MentorCustomBottomNavBar(active: 0),
+      bottomNavigationBar: MenteeCustomBottomNavBar(active: 0),
+    );
+  }
+}
+
+class MentorProfileBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return mentorAssigned
+        ? Container(
+            margin: EdgeInsets.only(top: 20),
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Mentor',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          height: size.height * 0.0025,
+                        ),
+                        Text(
+                          mentorProfileData.fullName,
+                          style: TextStyle(
+                            color: Colors.black.withOpacity(0.6),
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Phone',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          height: size.height * 0.005,
+                        ),
+                        Text(
+                          '${mentorProfileData.phoneNumber}',
+                          style: TextStyle(
+                            color: kGreen.withOpacity(0.9),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    DetailsWidget(
+                        heading: "Batch", value: menteeProfileData.batchName),
+                    DetailsWidget(
+                        heading: "ID",
+                        value: mentorProfileData.idNumber.toString()),
+                  ],
+                ),
+              ],
+            ),
+          )
+        : Container(
+            padding: EdgeInsets.fromLTRB(10, 15, 10, 0),
+            child: Text(
+              'Please wait patiently while a mentor is being assigned to you',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: kRed.withOpacity(0.6),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          );
+  }
+}
+
+class DetailsWidget extends StatelessWidget {
+  final String heading, value;
+  DetailsWidget({required this.heading, required this.value});
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          heading,
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(
+          height: size.height * 0.005,
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: kRed.withOpacity(0.8),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -126,7 +254,7 @@ class ActivityPlot extends StatelessWidget {
 
   List<LineChartBarData> linechartbardata() {
     final lessons = LineChartBarData(
-      spots: getMentorLessonChartData(JoiningDate),
+      spots: getMenteeLessonChartData(JoiningDate),
       curveSmoothness: 0.6,
       isCurved: true,
       colors: lessonBlueGradient,
@@ -142,7 +270,7 @@ class ActivityPlot extends StatelessWidget {
     );
     final hours = LineChartBarData(
       show: true,
-      spots: getMentorHourChartData(JoiningDate),
+      spots: getMenteeHourChartData(JoiningDate),
       isCurved: true,
       colors: hoursRedGradient,
       curveSmoothness: 0.6,
@@ -197,13 +325,13 @@ class TitleBar extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.symmetric(
-          horizontal: size.width * 0.1, vertical: size.height * 0.035),
+          horizontal: size.width * 0.1, vertical: size.height * 0.03),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
             child: Text(
-              "Mentor Profile",
+              "Mentee Profile",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black.withOpacity(0.5),
@@ -244,15 +372,11 @@ class TitleBar extends StatelessWidget {
   }
 }
 
-class MentorProfileBanner extends StatelessWidget {
-  final DateTime joiningDate;
-
-  MentorProfileBanner({required this.joiningDate});
-
+class MenteeProfileBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String formattedJoiningDate =
-        DateFormat(' d MMMM yyyy').format(joiningDate);
+        DateFormat(' d MMMM yyyy').format(menteeProfileData.joiningDate);
     String formattedEndDate =
         DateFormat(' d MMMM').format(JoiningDate.add(Duration(days: 70)));
     Size size = MediaQuery.of(context).size;
@@ -265,8 +389,8 @@ class MentorProfileBanner extends StatelessWidget {
             Container(
               width: gender == 'female' ? size.width * 0.3 : size.width * 0.25,
               child: gender == 'male'
-                  ? Image.asset("assets/vectors/Mentor(M).png")
-                  : Image.asset("assets/vectors/Mentor(F).png"),
+                  ? Image.asset("assets/vectors/Mentee(M)happy.png")
+                  : Image.asset("assets/vectors/Mentee(F)happy.png"),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [
@@ -293,30 +417,6 @@ class MentorProfileBanner extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     fontSize: 10,
                     color: Colors.black.withOpacity(0.6),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        "Mentees",
-                        style: TextStyle(
-                            color: Colors.black.withOpacity(0.6),
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        mentees.toString(),
-                        style: TextStyle(
-                            color: kBlue.withOpacity(0.6),
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ],
                   ),
                 ),
                 Padding(
@@ -420,7 +520,7 @@ class OrgIDNumCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+      margin: EdgeInsets.fromLTRB(10, 20, 10, 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -469,103 +569,16 @@ class BreakLine extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 0),
+      margin: EdgeInsets.symmetric(vertical: 15),
       height: 1,
       width: size.width,
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.05),
+        color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(3),
         boxShadow: [
           BoxShadow(
             color: kBlue.withOpacity(0.1),
             blurRadius: 10,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class DecComRepDropContainer extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          InkWell(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return DeclareCompletion(firestore: firestore);
-              }));
-            },
-            child: Container(
-              margin: EdgeInsets.symmetric(vertical: 15),
-              child: Center(
-                child: Text(
-                  "DECLARE\nCOMPLETION",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18),
-                ),
-              ),
-              height: size.height * 0.08,
-              width: size.width * 0.4,
-              decoration: BoxDecoration(
-                color: kLightBlue,
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: kLightBlue,
-                    blurRadius: 10,
-                  )
-                ],
-              ),
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return ReportDropout(
-                      firestore: firestore,
-                    );
-                  },
-                ),
-              );
-            },
-            child: Container(
-              margin: EdgeInsets.symmetric(vertical: 15),
-              child: Center(
-                child: Text(
-                  "REPORT\nDROPOUT",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18),
-                ),
-              ),
-              height: size.height * 0.08,
-              width: size.width * 0.4,
-              decoration: BoxDecoration(
-                color: kRed.withOpacity(0.7),
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: kRed.withOpacity(0.7),
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
-            ),
           ),
         ],
       ),

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +7,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../components/loading.dart';
 import '../local-data/constants.dart';
 import '../logic/authentication.dart';
-import '../screens/signup-page.dart';
+import 'mentee-profile.dart';
+import 'mentee-signup-page.dart';
 import 'mentor-profile.dart';
+import 'mentor-signup-page.dart';
 
 class LoginPage extends StatefulWidget {
   static String route = "LoginPage";
@@ -20,6 +23,7 @@ TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 GlobalKey<FormState> _emailLoginKey = GlobalKey<FormState>();
 GlobalKey<FormState> _passwordLoginKey = GlobalKey<FormState>();
+String activeUser = 'Mentor';
 
 emailValidator(String? val) {
   String value = val ?? 'test';
@@ -54,16 +58,51 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         loading = true;
       });
-      final newUser =
-          await auth.loginUser(emailController.text, passwordController.text);
-      if (newUser != null)
-        Navigator.pushReplacementNamed(context, MentorProfile.route);
+      bool validID = false;
+      if (activeUser == 'Mentor') {
+        await FirebaseFirestore.instance
+            .collection('MentorData')
+            .where('email', isEqualTo: emailController.text)
+            .get()
+            .then((value) => validID = value.docs.isNotEmpty);
+      } else if (activeUser == 'Mentee') {
+        await FirebaseFirestore.instance
+            .collection('MenteeInfo')
+            .where('email', isEqualTo: emailController.text)
+            .get()
+            .then((value) {
+          validID = value.docs.isNotEmpty;
+        });
+      }
+      if (validID) {
+        final newUser =
+            await auth.loginUser(emailController.text, passwordController.text);
+        if (newUser != null) {
+          if (activeUser == 'Mentor')
+            Navigator.pushReplacementNamed(context, MentorProfile.route);
+          else
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) {
+              return MenteeProfile();
+            }));
+        }
+      } else {
+        showSnackBar(context,
+            '$activeUser having the provided email address does not exist');
+        setState(() {
+          loading = false;
+        });
+      }
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message.toString());
       setState(() {
         loading = false;
       });
     }
+  }
+
+  void displayCallback() {
+    setState(() {});
   }
 
   @override
@@ -81,13 +120,18 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       mainLogo(),
                       SignupWrapper(),
-                      MntrMenteeWrapper(),
+                      MentorMenteeWrapper(
+                        loginCallback: displayCallback,
+                      ),
                       SizedBox(height: size.height * 0.025),
                       EmailInputForm(),
                       SizedBox(height: size.height * 0.0125),
                       PasswordInputForm(),
-                      frgtPassWrapper(),
-                      LoginWrapper(callback: loginCallback),
+                      forgotPassWrapper(),
+                      LoginWrapper(
+                        loginCallback: loginCallback,
+                        displayCallback: displayCallback,
+                      ),
                       FooterText(),
                     ],
                   ),
@@ -112,9 +156,8 @@ class FooterText extends StatelessWidget {
 }
 
 class LoginWrapper extends StatelessWidget {
-  final VoidCallback callback;
-
-  LoginWrapper({required this.callback});
+  final VoidCallback loginCallback, displayCallback;
+  LoginWrapper({required this.loginCallback, required this.displayCallback});
 
   @override
   Widget build(BuildContext context) {
@@ -138,10 +181,10 @@ class LoginWrapper extends StatelessWidget {
           if (!_passwordLoginKey.currentState!.validate()) {
             return;
           }
-          callback();
+          loginCallback();
         },
         child: Text(
-          'Login',
+          '$activeUser Login',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
@@ -149,7 +192,7 @@ class LoginWrapper extends StatelessWidget {
   }
 }
 
-class frgtPassWrapper extends StatelessWidget {
+class forgotPassWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -187,18 +230,19 @@ class frgtPassWrapper extends StatelessWidget {
   }
 }
 
-class MntrMenteeWrapper extends StatefulWidget {
+class MentorMenteeWrapper extends StatefulWidget {
+  VoidCallback loginCallback;
+  MentorMenteeWrapper({required this.loginCallback});
   @override
-  _MntrMenteeWrapperState createState() => _MntrMenteeWrapperState();
+  _MentorMenteeWrapperState createState() => _MentorMenteeWrapperState();
 }
 
-class _MntrMenteeWrapperState extends State<MntrMenteeWrapper> {
-  String active = 'mentor';
-
+class _MentorMenteeWrapperState extends State<MentorMenteeWrapper> {
   void onTap(String who) {
     setState(() {
-      active = who;
+      activeUser = who;
     });
+    widget.loginCallback();
   }
 
   @override
@@ -208,14 +252,14 @@ class _MntrMenteeWrapperState extends State<MntrMenteeWrapper> {
       children: [
         MentorMenteeButton(
           icon: "assets/icons/mentee.svg",
-          who: 'mentee',
-          active: active,
+          who: 'Mentee',
+          active: activeUser,
           ontap: onTap,
         ),
         MentorMenteeButton(
           icon: "assets/icons/mentor.svg",
-          who: 'mentor',
-          active: active,
+          who: 'Mentor',
+          active: activeUser,
           ontap: onTap,
         ),
       ],
@@ -286,7 +330,15 @@ class SignupWrapper extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, SignUp.route);
+                      activeUser == 'Mentee'
+                          ? Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                              return MenteeSignUp();
+                            }))
+                          : Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                              return MentorSignUp();
+                            }));
                     },
                     child: Text(
                       "Sign Up",

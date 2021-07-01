@@ -4,10 +4,10 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../components/CustomNavigationBar.dart';
+import '../components/mentor-customNavigationBar.dart';
 import '../local-data/constants.dart';
-import '../logic/cached-data.dart';
-import '../logic/data-processing.dart';
+import '../logic/mentor-cached-data.dart';
+import '../logic/mentor-data-processing.dart';
 import '../screens/mentee-details-page.dart';
 
 bool assigned = true;
@@ -31,7 +31,6 @@ class _MenteesPageState extends State<MenteesPage> {
       menteeCards.add(
         MenteeCard(
           name: mentee.fullName,
-          lesson: mentee.latestLecture,
           level: mentee.initialLevel,
           uid: mentee.uid,
           phone: mentee.phoneNumber,
@@ -91,7 +90,7 @@ class _MenteesPageState extends State<MenteesPage> {
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(active: 2),
+      bottomNavigationBar: MentorCustomBottomNavBar(active: 2),
     );
   }
 }
@@ -124,11 +123,10 @@ class TitleBar extends StatelessWidget {
 
 class MenteeCard extends StatelessWidget {
   final String name, level, uid;
-  final int lesson, phone;
+  final int phone;
   MenteeCard(
       {required this.name,
       required this.level,
-      required this.lesson,
       required this.uid,
       required this.phone});
 

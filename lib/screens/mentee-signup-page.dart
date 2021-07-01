@@ -7,13 +7,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../components/loading.dart';
 import '../local-data/constants.dart';
-import '../logic/data-processing.dart';
+import '../logic/mentor-data-processing.dart';
 
-class SignUp extends StatefulWidget {
-  static String route = "SignUp";
+class MenteeSignUp extends StatefulWidget {
+  static String route = "MenteeSignUp";
 
   @override
-  _SignUpState createState() => _SignUpState();
+  _MenteeSignUpState createState() => _MenteeSignUpState();
 }
 
 bool loading = false;
@@ -24,15 +24,13 @@ TextEditingController organizationController = TextEditingController();
 TextEditingController batchController = TextEditingController();
 TextEditingController ageController = TextEditingController();
 TextEditingController phoneNumberController = TextEditingController();
-TextEditingController qualificationController = TextEditingController();
-TextEditingController specializationController = TextEditingController();
 TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 String? uid = '';
 GlobalKey<FormState> _emailSignUpKey = GlobalKey<FormState>();
 GlobalKey<FormState> _passwordSingUpKey = GlobalKey<FormState>();
 
-class _SignUpState extends State<SignUp> {
+class _MenteeSignUpState extends State<MenteeSignUp> {
   void genderCallback(String inputGender) {
     setState(() {
       gender = inputGender;
@@ -51,8 +49,6 @@ class _SignUpState extends State<SignUp> {
     ageController.clear();
     phoneNumberController.clear();
     organizationController.clear();
-    specializationController.clear();
-    qualificationController.clear();
   }
 
   void singUpCallback() async {
@@ -77,7 +73,7 @@ class _SignUpState extends State<SignUp> {
         });
         int phoneNumber = parseIntFromString('${phoneNumberController.text}');
         int age = parseIntFromString('${ageController.text}');
-        await firestore.collection('/MentorData').doc(uid).set({
+        await firestore.collection('MenteeInfo').doc(uid).set({
           'BatchName': batchController.text,
           'FirstName': firstNameController.text,
           'IDNumber': -1,
@@ -88,11 +84,10 @@ class _SignUpState extends State<SignUp> {
           'Gender': gender,
           'Age': age,
           'PhoneNumber': phoneNumber,
-          'Qualification': qualificationController.text,
-          'Specialization': specializationController.text,
+          'InitialLevel': 'TBD',
         });
         firestore.collection('Logs').add({
-          'Event': 'New User SignUp',
+          'Event': 'New Mentee SignUp',
           'OldData': 'Does not exist',
           'NewData': {
             'BatchName': batchController.text,
@@ -105,11 +100,9 @@ class _SignUpState extends State<SignUp> {
             'Gender': gender,
             'Age': age,
             'PhoneNumber': phoneNumber,
-            'Qualification': qualificationController.text,
-            'Specialization': specializationController.text,
           },
           'UID': uid,
-          'MentorName':
+          'MenteeName':
               '${firstNameController.text} ${lastNameController.text}',
           'DateModified': DateTime.now(),
         });
@@ -184,8 +177,8 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
               onTap: () => widget.genderCallback("female"),
               child: Container(
                 child: Image.asset(
-                  'assets/vectors/Mentor(F).png',
-                  width: size.width * 0.3,
+                  'assets/vectors/Mentee(F)happy.png',
+                  height: size.width * 0.3,
                 ),
                 decoration: widget.gender == 'female'
                     ? BoxDecoration(
@@ -204,8 +197,8 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
               onTap: () => widget.genderCallback("male"),
               child: Container(
                 child: Image.asset(
-                  'assets/vectors/Mentor(M).png',
-                  width: size.width * 0.2,
+                  'assets/vectors/Mentee(M)happy.png',
+                  height: size.width * 0.3,
                 ),
                 decoration: widget.gender == 'male'
                     ? BoxDecoration(
@@ -358,46 +351,26 @@ class OrganizationBatchWrapper extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.only(top: 20),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              BlueTextFieldWithIcon(
-                heading: 'Organization',
-                hint: 'Individual',
-                controller: organizationController,
-                prefixIcon: Icon(
-                  Icons.card_travel,
-                  color: Colors.black.withOpacity(0.6),
-                ),
-              ),
-              BlueTextFieldWithIcon(
-                heading: 'Batch',
-                hint: 'APR2021',
-                controller: batchController,
-                prefixIcon: Icon(
-                  Icons.today,
-                  color: Colors.black.withOpacity(0.6),
-                ),
-              ),
-            ],
+          BlueTextFieldWithIcon(
+            heading: 'Organization / School',
+            hint: 'Individual',
+            controller: organizationController,
+            prefixIcon: Icon(
+              Icons.card_travel,
+              color: Colors.black.withOpacity(0.6),
+            ),
           ),
-          SizedBox(height: size.height * 0.01),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              blueTextFieldWithoutIcon(
-                heading: 'Qualification',
-                hint: 'B.Tech CSE',
-                controller: qualificationController,
-              ),
-              blueTextFieldWithoutIcon(
-                heading: 'Other Specializations',
-                hint: 'Financial Risk Management',
-                controller: specializationController,
-              ),
-            ],
+          BlueTextFieldWithIcon(
+            heading: 'Batch',
+            hint: 'APR2021',
+            controller: batchController,
+            prefixIcon: Icon(
+              Icons.today,
+              color: Colors.black.withOpacity(0.6),
+            ),
           ),
         ],
       ),
@@ -566,7 +539,7 @@ class TitleBar extends StatelessWidget {
         ),
         Container(
           child: Text(
-            "Sing Up",
+            "Mentee Sing Up",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black.withOpacity(0.5),

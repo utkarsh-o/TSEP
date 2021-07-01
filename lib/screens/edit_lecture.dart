@@ -5,8 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 import '../local-data/constants.dart';
-import '../logic/cached-data.dart';
-import '../logic/data-processing.dart';
+import '../logic/mentor-cached-data.dart';
+import '../logic/mentor-data-processing.dart';
 
 class EditLecture extends StatefulWidget {
   String mentorScheduleID, menteeScheduleID, menteeUID;
@@ -27,7 +27,7 @@ String footnotes = "",
     pickedMentee = '',
     menteeScheduleID = '',
     mentorScheduleID = '',
-    menteeUID = '';
+    _menteeUID = '';
 
 class _EditLectureState extends State<EditLecture> {
   final firestore = FirebaseFirestore.instance;
@@ -64,7 +64,7 @@ class _EditLectureState extends State<EditLecture> {
     getData();
     mentorScheduleID = widget.mentorScheduleID;
     menteeScheduleID = widget.menteeScheduleID;
-    menteeUID = widget.menteeUID;
+    _menteeUID = widget.menteeUID;
   }
 
   @override
@@ -142,7 +142,7 @@ class CancelConfirmWrapper extends StatelessWidget {
                   pickedTime.hour,
                   pickedTime.minute);
               await firestore
-                  .collection('/MenteeInfo/$menteeUID/Schedule')
+                  .collection('/MenteeInfo/$_menteeUID/Schedule')
                   .doc(menteeScheduleID)
                   .update({
                 "Duration": pickedDuration,
@@ -161,7 +161,7 @@ class CancelConfirmWrapper extends StatelessWidget {
                 "MenteeName": pickedMentee,
                 "FootNotes": footnotesController.text,
                 "MenteeScheduleID": menteeScheduleID,
-                "MenteeUID": menteeUID
+                "MenteeUID": _menteeUID
               });
               newData = {
                 'Duration': pickedDuration,
@@ -170,7 +170,7 @@ class CancelConfirmWrapper extends StatelessWidget {
                 'MenteeName': pickedMentee,
                 'FootNotes': footnotesController.text,
                 'MenteeScheduleID': menteeScheduleID,
-                'MenteeUID': menteeUID,
+                'MenteeUID': _menteeUID,
               };
               firestore.collection('Logs').add({
                 'Event': 'Edit Lecture Called',

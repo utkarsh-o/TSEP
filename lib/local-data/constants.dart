@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../logic/firestore.dart';
+import '../logic/mentor-firestore.dart';
 
 const Color kBlue = Color(0xff003670);
 const Color kLightBlue = Color(0xff1F78B4);
