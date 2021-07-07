@@ -29,7 +29,7 @@ String firstName = '',
     initialLevel = '',
     menteeName = '',
     menteeUID = '';
-int phoneNumber = -1, idNumber = -1;
+int phoneNumber = -1, idNumber = -1, whatsappNumber = -1;
 num engagement = 0;
 DateTime joiningDate = DateTime.now();
 
@@ -55,6 +55,7 @@ class _MenteeDetailsState extends State<MenteeDetails> {
           joiningDate = snapshot.get('JoiningDate').toDate();
           gender = snapshot.get('Gender');
           phoneNumber = snapshot.get('PhoneNumber');
+          whatsappNumber = snapshot.get('WhatsappNumber');
           initialLevel = snapshot.get('InitialLevel');
           menteeName = "$firstName $lastName";
         });
@@ -74,6 +75,7 @@ class _MenteeDetailsState extends State<MenteeDetails> {
           joiningDate = mentee.joiningDate;
           gender = mentee.gender;
           phoneNumber = mentee.phoneNumber;
+          whatsappNumber = mentee.whatsappNumber;
           initialLevel = mentee.initialLevel;
           menteeName = mentee.fullName;
         });
@@ -189,36 +191,31 @@ class BatchJoinProfWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          InkWell(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return TestScreen(
-                  menteeUID: menteeUID,
-                );
-              }));
-            },
-            child: BatchJoinProfAgeWidget(
-              heading: 'Batch',
-              value: batchName,
-            ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        InkWell(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return TestScreen(
+                menteeUID: menteeUID,
+              );
+            }));
+          },
+          child: BatchJoinProfIDWidget(
+            heading: 'Batch',
+            value: batchName,
           ),
-          BatchJoinProfAgeWidget(
-            heading: 'Joining Proficiency',
-            value: initialLevel,
-          ),
-          BatchJoinProfAgeWidget(
-            heading: 'ID No.',
-            value: idNumber.toString(),
-          ),
-        ],
-      ),
+        ),
+        BatchJoinProfIDWidget(
+          heading: 'Joining Proficiency',
+          value: initialLevel,
+        ),
+        BatchJoinProfIDWidget(
+          heading: 'ID Number',
+          value: idNumber.toString(),
+        ),
+      ],
     );
   }
 }
@@ -308,7 +305,7 @@ class LessonList extends StatelessWidget {
                     "Lesson $lesson",
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: 15,
+                      fontSize: 17,
                     ),
                   ),
                   SizedBox(
@@ -350,88 +347,119 @@ class _MenteeProfile extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Container(
-            height: size.height * 0.15,
-            width: size.height * 0.15,
-            child: gender == 'male'
-                ? Image.asset("assets/vectors/Mentee(M)normal"
-                    ".png")
-                : Image.asset("assets/vectors/Mentee(F)normal.png"),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 50,
-                )
-              ],
+      child: IntrinsicHeight(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Container(
+              child: gender == 'male'
+                  ? Image.asset(
+                      "assets/vectors/Mentee(M)normal"
+                      ".png",
+                      scale: 2,
+                    )
+                  : Image.asset(
+                      "assets/vectors/Mentee(F)normal.png",
+                      scale: 2,
+                    ),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 50,
+                  )
+                ],
+              ),
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                // width: double.infinity,
-                child: Text(
-                  "$firstName $lastName",
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Text(
-                "joined ${DateFormat('d MMMM yyyy').format(joiningDate)}",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 10,
-                  color: Colors.black.withOpacity(0.6),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  "+91 $phoneNumber",
-                  style: TextStyle(
-                      color: Color(0xff269200),
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+            IntrinsicWidth(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Container(
-                    child: EngLessonCards(
-                      heading: "Engagement",
-                      value:
-                          "${(engagement / 60).floor()}hr ${engagement % 60}min",
-                      valueColor: Color(0xffD92136).withOpacity(0.6),
-                    ),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "$firstName $lastName",
+                          style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black.withOpacity(0.8)),
+                        ),
+                        Text(
+                          "joined ${DateFormat('d MMMM yyyy').format(joiningDate)}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 11,
+                            color: Colors.black.withOpacity(0.6),
+                          ),
+                        ),
+                      ]),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.phone,
+                        color: kGreen,
+                        size: 16,
+                      ),
+                      SizedBox(width: size.width * 0.02),
+                      Text(
+                        "$phoneNumber",
+                        style: TextStyle(
+                            color: Color(0xff269200),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(width: size.width * 0.04),
+                      Icon(
+                        Icons.message,
+                        color: kGreen,
+                        size: 16,
+                      ),
+                      SizedBox(width: size.width * 0.02),
+                      Text(
+                        "$whatsappNumber",
+                        style: TextStyle(
+                            color: Color(0xff269200),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    width: size.width * 0.05,
-                  ),
-                  Container(
-                    child: EngLessonCards(
-                      heading: "Lessons",
-                      value: lessonsScheduled.toString(),
-                      valueColor: kLightBlue.withOpacity(0.9),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        child: EngLessonCards(
+                          heading: "Engagement",
+                          value:
+                              "${(engagement / 60).floor()}hr ${engagement % 60}min",
+                          valueColor: Color(0xffD92136).withOpacity(0.6),
+                        ),
+                      ),
+                      Container(
+                        child: EngLessonCards(
+                          heading: "Lessons",
+                          value: lessonsScheduled.toString(),
+                          valueColor: kLightBlue.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class BatchJoinProfAgeWidget extends StatelessWidget {
+class BatchJoinProfIDWidget extends StatelessWidget {
   final String heading, value;
-  BatchJoinProfAgeWidget({required this.heading, required this.value});
+  BatchJoinProfIDWidget({required this.heading, required this.value});
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -468,7 +496,6 @@ class EngLessonCards extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      margin: EdgeInsets.only(top: 10),
       child: Column(
         children: [
           Text(

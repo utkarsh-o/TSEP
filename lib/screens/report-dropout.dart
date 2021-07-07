@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:tsep/local-data/constants.dart';
-import 'package:tsep/logic/mentor-cached-data.dart';
-import 'package:tsep/logic/mentor-firestore.dart';
+import '../local-data/constants.dart';
+import '../logic/mentor-cached-data.dart';
+import '../logic/mentor-firestore.dart';
 
 class ReportDropout extends StatefulWidget {
   ProfileHandler firestore;
@@ -27,7 +27,9 @@ class _ReportDropoutState extends State<ReportDropout> {
     menteesList.forEach((Mentee mentee) {
       result.add(MenteeInformationCard(mentee: mentee));
     });
-    setState(() {});
+    if (this.mounted) {
+      setState(() {});
+    }
     return result;
   }
 
@@ -313,8 +315,7 @@ class ConfirmationWrapper extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pop(context);
                   firestore.DropMentee(mentee);
-                  showSnackBar(
-                      context, 'The declaration was filed successfully!');
+                  showSnackBar(context, 'The report was filed successfully!');
                 },
                 child: Container(
                   child: Center(

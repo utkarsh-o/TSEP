@@ -113,6 +113,7 @@ class ProfileHandler {
             lastName: lastName,
             organization: value['Organization'],
             phoneNumber: value['PhoneNumber'],
+            whatsappNumber: value['WhatsappNumber'],
             fullName: "$firstName $lastName",
             totalEngagementLectures: 0,
             totalEngagementTime: Duration(minutes: 0),
@@ -136,7 +137,8 @@ class ProfileHandler {
       final schedules = snapshot.docs;
       for (var schedule in schedules) {
         for (Mentee mentee in menteesList) {
-          if (mentee.uid == schedule.get('MenteeUID')) {
+          if (mentee.uid == schedule.get('MenteeUID') &&
+              schedule.get('PostSessionSurvey')) {
             mentee.totalEngagementLectures++;
             mentee.totalEngagementTime +=
                 Duration(minutes: schedule.get('Duration'));
@@ -166,10 +168,10 @@ class ProfileHandler {
       'NewData': data,
       'UID': mentorUID,
     });
-    // firestore
-    //     .collection('MentorData/$mentorUID/Mentees')
-    //     .doc(mentee.uid)
-    //     .delete();
+    firestore
+        .collection('MentorData/$mentorUID/Mentees')
+        .doc(mentee.uid)
+        .delete();
   }
 
   DeclareCompletion(Mentee mentee) {
@@ -259,7 +261,7 @@ class Mentee {
       initialLevel,
       gender,
       organization;
-  int phoneNumber, idNumber, totalEngagementLectures;
+  int phoneNumber, idNumber, totalEngagementLectures, whatsappNumber;
   DateTime joiningDate;
   Duration totalEngagementTime;
 
@@ -275,6 +277,7 @@ class Mentee {
     required this.organization,
     required this.idNumber,
     required this.phoneNumber,
+    required this.whatsappNumber,
     required this.totalEngagementLectures,
     required this.totalEngagementTime,
   });

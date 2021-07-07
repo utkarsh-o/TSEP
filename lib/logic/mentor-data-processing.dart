@@ -36,8 +36,10 @@ List getPlannedEngagement(List<Schedule> schedule) {
   Duration plannedEngagement = Duration();
   int plannedLessons = 0;
   for (var s in schedule) {
-    plannedEngagement += Duration(minutes: s.duration);
-    plannedLessons++;
+    if (s.postSessionSurvey) {
+      plannedEngagement += Duration(minutes: s.duration);
+      plannedLessons++;
+    }
   }
   return [plannedEngagement, plannedLessons];
 }
@@ -103,7 +105,8 @@ List getTotalContribution(List<Schedule> schedule) {
   DateTime today = DateTime.now();
   int totalLessons = 0;
   for (var s in schedule)
-    if (s.timing.add(Duration(minutes: s.duration)).isBefore(today)) {
+    if (s.timing.add(Duration(minutes: s.duration)).isBefore(today) &&
+        s.postSessionSurvey) {
       totalConrtibution += Duration(minutes: s.duration);
       totalLessons++;
     }

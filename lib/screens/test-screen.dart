@@ -27,6 +27,7 @@ Mentee menteeData = Mentee(
     idNumber: -1,
     phoneNumber: -1,
     totalEngagementTime: Duration(minutes: 0),
+    whatsappNumber: -1,
     totalEngagementLectures: 0);
 
 List<Response> responses = List<Response>.generate(

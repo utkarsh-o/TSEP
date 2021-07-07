@@ -223,7 +223,6 @@ class LessonCard extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () {
-        print(lesson.url);
         _openPDF(lesson.url, context);
       },
       child: Container(
@@ -271,8 +270,7 @@ class LessonCard extends StatelessWidget {
                 ),
               ),
               Container(
-                constraints: BoxConstraints(
-                    maxWidth: size.width * 0.45, minWidth: size.width * 0.40),
+                width: size.width * 0.38,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,7 +316,6 @@ class LessonCard extends StatelessWidget {
 }
 
 _openPDF(String url, BuildContext context) async {
-  print(url);
   if (await canLaunch(url))
     await launch(url);
   else {

@@ -2,12 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:tsep/logic/mentee-cached-data.dart';
-import 'package:tsep/logic/mentee-data-processing.dart';
-import 'package:tsep/logic/mentee-firestore.dart';
 
+import '../logic/mentee-cached-data.dart';
+import '../logic/mentee-data-processing.dart';
+import '../logic/mentee-firestore.dart';
 import '../local-data/constants.dart';
-import 'edit_lecture.dart';
 import 'mentee-post-session-survey.dart';
 
 final firestore = FirebaseFirestore.instance;
@@ -243,7 +242,7 @@ class ScheduleCard extends StatelessWidget {
                           maxWidth: size.width * 0.34,
                           minWidth: size.width * 0.3),
                       margin: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 10),
+                          horizontal: 10.0, vertical: 15),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,6 +302,9 @@ class ScheduleCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: Colors.black.withOpacity(0.8),
                           ),
+                        ),
+                        SizedBox(
+                          height: size.height * 0.01,
                         ),
                         Row(
                           children: [

@@ -24,6 +24,7 @@ TextEditingController organizationController = TextEditingController();
 TextEditingController batchController = TextEditingController();
 TextEditingController ageController = TextEditingController();
 TextEditingController phoneNumberController = TextEditingController();
+TextEditingController whatsappNumberController = TextEditingController();
 TextEditingController qualificationController = TextEditingController();
 TextEditingController specializationController = TextEditingController();
 TextEditingController emailController = TextEditingController();
@@ -50,6 +51,7 @@ class _MentorSignUpState extends State<MentorSignUp> {
     passwordController.clear();
     ageController.clear();
     phoneNumberController.clear();
+    whatsappNumberController.clear();
     organizationController.clear();
     specializationController.clear();
     qualificationController.clear();
@@ -76,6 +78,9 @@ class _MentorSignUpState extends State<MentorSignUp> {
           loading = false;
         });
         int phoneNumber = parseIntFromString('${phoneNumberController.text}');
+        int whatsappNumber = whatsappNumberController.text == ''
+            ? phoneNumber
+            : parseIntFromString('${whatsappNumberController.text}');
         int age = parseIntFromString('${ageController.text}');
         await firestore.collection('/MentorData').doc(uid).set({
           'BatchName': batchController.text,
@@ -90,6 +95,7 @@ class _MentorSignUpState extends State<MentorSignUp> {
           'PhoneNumber': phoneNumber,
           'Qualification': qualificationController.text,
           'Specialization': specializationController.text,
+          'WhatsappNumber': whatsappNumber,
         });
         firestore.collection('Logs').add({
           'Event': 'New Mentor SignUp',
@@ -107,6 +113,7 @@ class _MentorSignUpState extends State<MentorSignUp> {
             'PhoneNumber': phoneNumber,
             'Qualification': qualificationController.text,
             'Specialization': specializationController.text,
+            'WhatsappNumber': whatsappNumber,
           },
           'UID': uid,
           'MentorName':
@@ -244,12 +251,14 @@ class NameAgePhoneWrapper extends StatelessWidget {
                 controller: firstNameController,
                 hint: "Chirag",
                 prefixIcon: true,
+                width: size.width * 0.45,
               ),
               RedBorderTextField(
                 heading: "Last Name",
                 controller: lastNameController,
                 hint: "Gupta",
                 prefixIcon: false,
+                width: size.width * 0.45,
               ),
             ],
           ),
@@ -260,14 +269,23 @@ class NameAgePhoneWrapper extends StatelessWidget {
               RedBorderTextField(
                 heading: "Age",
                 controller: ageController,
-                hint: "26",
+                hint: "36",
                 prefixIcon: false,
+                width: size.width * 0.15,
               ),
               RedBorderTextField(
                 heading: "Phone Number",
                 controller: phoneNumberController,
                 hint: "9876543210",
                 prefixIcon: false,
+                width: size.width * 0.35,
+              ),
+              RedBorderTextField(
+                heading: "Whatsapp Number",
+                controller: whatsappNumberController,
+                hint: "9876543210",
+                prefixIcon: false,
+                width: size.width * 0.35,
               ),
             ],
           ),
@@ -281,12 +299,14 @@ class RedBorderTextField extends StatelessWidget {
   String heading, hint;
   TextEditingController controller;
   bool prefixIcon;
+  double width;
 
   RedBorderTextField(
       {required this.heading,
       required this.controller,
       required this.hint,
-      required this.prefixIcon});
+      required this.prefixIcon,
+      required this.width});
 
   @override
   Widget build(BuildContext context) {
@@ -303,7 +323,7 @@ class RedBorderTextField extends StatelessWidget {
           alignment: Alignment.center,
           padding: !prefixIcon ? EdgeInsets.only(left: 15) : null,
           margin: EdgeInsets.only(top: 7),
-          width: size.width * 0.45,
+          width: width,
           height: size.height * 0.05,
           decoration: BoxDecoration(
             color: Colors.white,

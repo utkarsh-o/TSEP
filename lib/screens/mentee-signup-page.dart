@@ -24,6 +24,7 @@ TextEditingController organizationController = TextEditingController();
 TextEditingController batchController = TextEditingController();
 TextEditingController ageController = TextEditingController();
 TextEditingController phoneNumberController = TextEditingController();
+TextEditingController whatsappNumberController = TextEditingController();
 TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 String? uid = '';
@@ -48,6 +49,7 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
     passwordController.clear();
     ageController.clear();
     phoneNumberController.clear();
+    whatsappNumberController.clear();
     organizationController.clear();
   }
 
@@ -72,6 +74,9 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
           loading = false;
         });
         int phoneNumber = parseIntFromString('${phoneNumberController.text}');
+        int whatsappNumber = whatsappNumberController.text == ''
+            ? phoneNumber
+            : parseIntFromString('${whatsappNumberController.text}');
         int age = parseIntFromString('${ageController.text}');
         await firestore.collection('MenteeInfo').doc(uid).set({
           'BatchName': batchController.text,
@@ -84,7 +89,9 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
           'Gender': gender,
           'Age': age,
           'PhoneNumber': phoneNumber,
+          'WhatsappNumber': whatsappNumber,
           'InitialLevel': 'TBD',
+          'MentorUID': '',
         });
         firestore.collection('Logs').add({
           'Event': 'New Mentee SignUp',
@@ -100,6 +107,9 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
             'Gender': gender,
             'Age': age,
             'PhoneNumber': phoneNumber,
+            'WhatsappNumber': whatsappNumber,
+            'InitialLevel': 'TBD',
+            'MentorUID': '',
           },
           'UID': uid,
           'MenteeName':
@@ -235,14 +245,16 @@ class NameAgePhoneWrapper extends StatelessWidget {
               RedBorderTextField(
                 heading: "First Name",
                 controller: firstNameController,
-                hint: "Chirag",
+                hint: "Tanmay",
                 prefixIcon: true,
+                width: size.width * 0.45,
               ),
               RedBorderTextField(
                 heading: "Last Name",
                 controller: lastNameController,
-                hint: "Gupta",
+                hint: "Agrawal",
                 prefixIcon: false,
+                width: size.width * 0.45,
               ),
             ],
           ),
@@ -253,14 +265,23 @@ class NameAgePhoneWrapper extends StatelessWidget {
               RedBorderTextField(
                 heading: "Age",
                 controller: ageController,
-                hint: "26",
+                hint: "16",
                 prefixIcon: false,
+                width: size.width * 0.15,
               ),
               RedBorderTextField(
                 heading: "Phone Number",
                 controller: phoneNumberController,
                 hint: "9876543210",
                 prefixIcon: false,
+                width: size.width * 0.35,
+              ),
+              RedBorderTextField(
+                heading: "Whatsapp Number",
+                controller: whatsappNumberController,
+                hint: "9876543210",
+                prefixIcon: false,
+                width: size.width * 0.35,
               ),
             ],
           ),
@@ -274,12 +295,14 @@ class RedBorderTextField extends StatelessWidget {
   String heading, hint;
   TextEditingController controller;
   bool prefixIcon;
+  double width;
 
   RedBorderTextField(
       {required this.heading,
       required this.controller,
       required this.hint,
-      required this.prefixIcon});
+      required this.prefixIcon,
+      required this.width});
 
   @override
   Widget build(BuildContext context) {
@@ -296,7 +319,7 @@ class RedBorderTextField extends StatelessWidget {
           alignment: Alignment.center,
           padding: !prefixIcon ? EdgeInsets.only(left: 15) : null,
           margin: EdgeInsets.only(top: 7),
-          width: size.width * 0.45,
+          width: width,
           height: size.height * 0.05,
           decoration: BoxDecoration(
             color: Colors.white,

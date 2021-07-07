@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -18,22 +19,23 @@ void main() async {
   MobileAds.instance.initialize();
   await Firebase.initializeApp();
   final auth = FirebaseAuth.instance;
-  var user = auth.currentUser;
+  User? user = auth.currentUser;
+  bool isMentor = false;
   if (user != null) {
-    runApp(TSEP(
-      user: true,
-    ));
-  } else {
-    runApp(TSEP(
-      user: false,
-    ));
+    await FirebaseFirestore.instance
+        .collection('MentorData')
+        .doc(user.uid)
+        .get()
+        .then((value) => isMentor = value.exists);
   }
+
+  runApp(TSEP(user: user, isMentor: isMentor));
 }
 
 class TSEP extends StatelessWidget {
-  final bool user;
-
-  TSEP({required this.user});
+  final User? user;
+  final bool isMentor;
+  TSEP({required this.user, required this.isMentor});
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +54,11 @@ class TSEP extends StatelessWidget {
         MenteeProfile.route: (context) => MenteeProfile(),
       },
       theme: ThemeData(fontFamily: 'Montserrat'),
-      initialRoute: user ? MenteeProfile.route : LoginPage.route,
+      initialRoute: user != null
+          ? isMentor
+              ? MentorProfile.route
+              : MenteeProfile.route
+          : LoginPage.route,
     );
   }
 }

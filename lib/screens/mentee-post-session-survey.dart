@@ -177,10 +177,8 @@ class DurationWrapper extends StatefulWidget {
 }
 
 class _DurationWrapperState extends State<DurationWrapper> {
-  callback(Duration dur) {
-    setState(() {
-      pickedDuration = dur.inMinutes.toInt();
-    });
+  callback() {
+    setState(() {});
   }
 
   @override
@@ -192,13 +190,14 @@ class _DurationWrapperState extends State<DurationWrapper> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              "Duration",
+              "Alter Duration",
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.grey,
                   fontSize: 16),
             ),
             Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
                 color: Color(0xff34A853).withOpacity(0.3),
                 shape: BoxShape.rectangle,
@@ -207,11 +206,39 @@ class _DurationWrapperState extends State<DurationWrapper> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  DurationNum(
-                      duration: Duration(minutes: 30), callback: callback),
-                  DurationNum(
-                      duration: Duration(minutes: 45), callback: callback),
-                  DurationNum(duration: Duration(hours: 1), callback: callback),
+                  InkWell(
+                    onTap: () {
+                      pickedDuration -= 5;
+                      callback();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xff34A853).withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Icon(
+                        Icons.remove,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  DurationNum(callback: callback),
+                  InkWell(
+                    onTap: () {
+                      pickedDuration += 5;
+                      callback();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xff34A853).withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -225,7 +252,7 @@ class _DurationWrapperState extends State<DurationWrapper> {
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: kGreen.withOpacity(0.9),
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: FontWeight.bold),
           ),
         )
@@ -235,38 +262,22 @@ class _DurationWrapperState extends State<DurationWrapper> {
 }
 
 class DurationNum extends StatelessWidget {
-  final Duration duration;
   final Function callback;
-  DurationNum({required this.callback, required this.duration});
+  DurationNum({required this.callback});
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => callback(duration),
+    return Container(
+      margin: EdgeInsets.all(7),
       child: Container(
-        margin: EdgeInsets.all(7),
-        // padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        // height: MediaQuery.of(context).size.height * 0.03,
-        // width: MediaQuery.of(context).size.width * 0.1,
-        decoration: duration.inMinutes == pickedDuration
-            ? BoxDecoration(
-                color: Color(0xff34A853).withOpacity(0.7),
-                borderRadius: BorderRadius.circular(4),
-              )
-            : null,
-        child: Container(
-          padding: EdgeInsets.all(5),
-          child: Text(
-            "${duration.inMinutes} mins",
-            // textAlign: TextAlign.center,
-            style: TextStyle(
-              color: duration.inMinutes == pickedDuration
-                  ? Colors.white
-                  : Colors.black.withOpacity(0.8),
-              fontWeight: duration.inMinutes == pickedDuration
-                  ? FontWeight.w700
-                  : FontWeight.w600,
-              fontSize: 14,
-            ),
+        padding: EdgeInsets.all(5),
+        child: Text(
+          (pickedDuration / 60).floor() >= 1
+              ? "${(pickedDuration / 60).floor()} hr ${pickedDuration % 60} mins"
+              : "${pickedDuration % 60} mins",
+          style: TextStyle(
+            color: Colors.black.withOpacity(0.6),
+            fontWeight: FontWeight.w800,
+            fontSize: 14,
           ),
         ),
       ),

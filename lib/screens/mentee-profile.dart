@@ -33,7 +33,11 @@ String firstName = '',
     mentorName = '',
     mentorEmail = '';
 double lecturesPerWeek = 0, hoursPerWeek = 0;
-int idNumber = 0, mentees = 0, mentorIDNumber = -1, mentorPhoneNumber = -1;
+int idNumber = 0,
+    mentees = 0,
+    mentorIDNumber = -1,
+    mentorPhoneNumber = -1,
+    mentorWhatsappNumber = -1;
 DateTime JoiningDate = DateTime.now();
 bool mentorAssigned = false;
 final firestore = MenteeProfileHandler();
@@ -83,6 +87,7 @@ class _MenteeProfileState extends State<MenteeProfile> {
         mentorName = mentorProfileData.fullName;
         mentorIDNumber = mentorProfileData.idNumber;
         mentorPhoneNumber = mentorProfileData.phoneNumber;
+        mentorWhatsappNumber = mentorProfileData.whatsappNumber;
         mentorEmail = mentorProfileData.email;
       });
     }
@@ -113,6 +118,7 @@ class _MenteeProfileState extends State<MenteeProfile> {
             TitleBar(callback: logoutCallback),
             MenteeProfileBanner(),
             OrgIDNumCard(),
+            BreakLine(),
             MentorProfileBanner(),
             BreakLine(),
             ActivityPlot(),
@@ -137,20 +143,16 @@ class MentorProfileBanner extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return mentorAssigned
         ? Container(
-            margin: EdgeInsets.only(top: 20),
+            // margin: EdgeInsets.only(top: 20),
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(),
-                SizedBox(
-                  height: 10,
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           'Mentor',
@@ -165,21 +167,31 @@ class MentorProfileBanner extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.black.withOpacity(0.6),
                             fontWeight: FontWeight.w800,
-                            fontSize: 16,
+                            fontSize: 17,
                           ),
                         ),
                       ],
                     ),
+                    DetailsWidget(
+                        heading: "Batch", value: menteeProfileData.batchName),
+                    DetailsWidget(
+                        heading: "ID Number",
+                        value: mentorProfileData.idNumber.toString()),
+                  ],
+                ),
+                SizedBox(
+                  height: size.height * 0.015,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'Phone',
+                          'Phone Number',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: size.height * 0.005,
                         ),
                         Text(
                           '${mentorProfileData.phoneNumber}',
@@ -190,13 +202,25 @@ class MentorProfileBanner extends StatelessWidget {
                         ),
                       ],
                     ),
-                    DetailsWidget(
-                        heading: "Batch", value: menteeProfileData.batchName),
-                    DetailsWidget(
-                        heading: "ID",
-                        value: mentorProfileData.idNumber.toString()),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Whatsapp Phone',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '${mentorProfileData.whatsappNumber}',
+                          style: TextStyle(
+                            color: kGreen.withOpacity(0.9),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
-                ),
+                )
               ],
             ),
           )
@@ -221,7 +245,7 @@ class DetailsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           heading,
@@ -289,7 +313,7 @@ class ActivityPlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        margin: EdgeInsets.only(left: 10, right: 20, top: 20),
+        margin: EdgeInsets.only(right: 20, top: 10),
         height: MediaQuery.of(context).size.height * 0.20,
         child: LineChart(
           LineChartData(

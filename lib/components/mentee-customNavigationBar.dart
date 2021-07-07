@@ -43,7 +43,7 @@ class _MenteeCustomBottomNavBarState extends State<MenteeCustomBottomNavBar> {
         print('Ad failed to load with error -> $error');
       }),
     );
-    _ad.load();
+    // _ad.load();
   }
 
   @override
@@ -101,16 +101,14 @@ class _MenteeCustomBottomNavBarState extends State<MenteeCustomBottomNavBar> {
             )
           ],
         ),
-        isLoaded
-            ? Container(
-                child: AdWidget(
-                  ad: _ad,
-                ),
-                width: _ad.size.width.toDouble(),
-                height: 50,
-                alignment: Alignment.center,
-              )
-            : CircularProgressIndicator(),
+        // Container(
+        //   child: AdWidget(
+        //     ad: _ad,
+        //   ),
+        //   width: _ad.size.width.toDouble(),
+        //   height: 50,
+        //   alignment: Alignment.center,
+        // ),
       ],
     );
   }

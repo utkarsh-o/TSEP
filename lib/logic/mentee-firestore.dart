@@ -34,28 +34,27 @@ class MenteeProfileHandler {
       var firstName = snapshot.get('FirstName').toString();
       var lastName = snapshot.get('LastName').toString();
       menteeProfileData = MenteeProfileData(
-        batchName: snapshot.get('BatchName').toString(),
-        firstName: firstName,
-        idNumber: snapshot.get('IDNumber'),
-        lastName: lastName,
-        organization: snapshot.get('Organization').toString(),
-        email: snapshot.get('email'),
-        joiningDate: snapshot.get('JoiningDate').toDate(),
-        gender: snapshot.get('Gender'),
-        age: snapshot.get('Age'),
-        phoneNumber: snapshot.get('PhoneNumber'),
-        initialLevel: snapshot.get('InitialLevel'),
-      );
+          batchName: snapshot.get('BatchName').toString(),
+          firstName: firstName,
+          idNumber: snapshot.get('IDNumber'),
+          lastName: lastName,
+          organization: snapshot.get('Organization').toString(),
+          email: snapshot.get('email'),
+          joiningDate: snapshot.get('JoiningDate').toDate(),
+          gender: snapshot.get('Gender'),
+          age: snapshot.get('Age'),
+          phoneNumber: snapshot.get('PhoneNumber'),
+          initialLevel: snapshot.get('InitialLevel'),
+          whatsappNumber: snapshot.get('WhatsappNumber'));
       joiningDate = snapshot.get('JoiningDate').toDate();
-      mentorUID = snapshot.get('MentorUID');
-      if (mentorUID != '')
-        getMentorProfileData(callback);
-      else
-        callback();
+      mentorUID = snapshot.get('MentorUID').toString();
+      getMentorProfileData(callback);
+      callback();
     }
   }
 
   getMentorProfileData(VoidCallback callback) async {
+    if (mentorUID == '') return;
     await for (var snapshot
         in firestore.collection('MentorData').doc(mentorUID).snapshots()) {
       var firstName = snapshot.get('FirstName').toString();
@@ -67,6 +66,7 @@ class MenteeProfileHandler {
         email: snapshot.get('email'),
         gender: snapshot.get('Gender'),
         phoneNumber: snapshot.get('PhoneNumber'),
+        whatsappNumber: snapshot.get('WhatsappNumber'),
         fullName: "$firstName $lastName",
       );
       callback();
@@ -111,7 +111,7 @@ class MenteeProfileData {
       email,
       gender,
       initialLevel;
-  final int idNumber, phoneNumber, age;
+  final int idNumber, phoneNumber, age, whatsappNumber;
   final DateTime joiningDate;
 
   MenteeProfileData(
@@ -124,19 +124,21 @@ class MenteeProfileData {
       required this.lastName,
       required this.organization,
       required this.phoneNumber,
+      required this.whatsappNumber,
       required this.age,
       required this.initialLevel});
 }
 
 class MentorProfileData {
   final String firstName, lastName, email, gender, fullName;
-  final int phoneNumber, idNumber;
+  final int phoneNumber, idNumber, whatsappNumber;
   MentorProfileData(
       {required this.firstName,
       required this.email,
       required this.gender,
       required this.lastName,
       required this.phoneNumber,
+      required this.whatsappNumber,
       required this.idNumber,
       required this.fullName});
 }

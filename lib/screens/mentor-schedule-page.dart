@@ -120,7 +120,7 @@ class _MentorSchedulePageState extends State<MentorSchedulePage> {
                     scheduleList.clear();
                     final schedules = snapshot.data!.docs;
                     for (var schedule in schedules) {
-                      String menteeName = '';
+                      String menteeName = 'Dropped Mentee';
                       for (var mentee in menteesList)
                         if (mentee.uid == schedule.get('MenteeUID')) {
                           menteeName = mentee.fullName;
@@ -369,10 +369,16 @@ class ScheduleCard extends StatelessWidget {
                         children: [
                           Text(
                             schedule.mentee,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
+                            style: schedule.mentee != 'Dropped Mentee'
+                                ? TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  )
+                                : TextStyle(
+                                    color: kRed.withOpacity(0.8),
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 14,
+                                  ),
                           ),
                           SizedBox(height: 3),
                           Text(
@@ -422,6 +428,9 @@ class ScheduleCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: Colors.black.withOpacity(0.8),
                           ),
+                        ),
+                        SizedBox(
+                          height: size.height * 0.01,
                         ),
                         Row(
                           children: [
@@ -670,7 +679,7 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
                 onTap: () {

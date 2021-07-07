@@ -44,7 +44,7 @@ class _MentorScheduleCompleteState extends State<MentorScheduleComplete> {
                     final schedules = snapshot.data!.docs;
                     int index = 1;
                     for (var schedule in schedules) {
-                      String menteeName = '';
+                      String menteeName = 'Dropped Mentee';
                       for (var mentee in menteesList)
                         if (mentee.uid == schedule.get('MenteeUID')) {
                           menteeName = mentee.fullName;
@@ -170,7 +170,7 @@ class ScheduleCard extends StatelessWidget {
                         Text(
                           "Modify Lecture",
                           style: TextStyle(
-                              color: kRed.withOpacity(0.6),
+                              color: kBlue.withOpacity(0.8),
                               fontWeight: FontWeight.bold,
                               fontSize: 20),
                         ),
@@ -179,7 +179,7 @@ class ScheduleCard extends StatelessWidget {
                           padding:
                               EdgeInsets.symmetric(horizontal: 13, vertical: 7),
                           decoration: BoxDecoration(
-                            color: kLightBlue.withOpacity(0.2),
+                            color: kRed.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -187,12 +187,12 @@ class ScheduleCard extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 17,
-                              color: kLightBlue.withOpacity(0.9),
+                              color: kRed.withOpacity(0.7),
                             ),
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        EditDeleteWrapper(
+                        EditDeleteSurveyWrapper(
                           schedule: schedule,
                         ),
                       ],
@@ -264,10 +264,16 @@ class ScheduleCard extends StatelessWidget {
                         children: [
                           Text(
                             schedule.mentee,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
+                            style: schedule.mentee != 'Dropped Mentee'
+                                ? TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  )
+                                : TextStyle(
+                                    color: kRed.withOpacity(0.8),
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 14,
+                                  ),
                           ),
                           SizedBox(height: 3),
                           Text(
@@ -317,6 +323,9 @@ class ScheduleCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: Colors.black.withOpacity(0.8),
                           ),
+                        ),
+                        SizedBox(
+                          height: size.height * 0.01,
                         ),
                         Row(
                           children: [
@@ -460,7 +469,7 @@ class BreakLine extends StatelessWidget {
   }
 }
 
-class EditDeleteWrapper extends StatelessWidget {
+class EditDeleteSurveyWrapper extends StatelessWidget {
   deleteSchedule(
       String mentorSchID, String menteeUID, String menteeSchID) async {
     await firestore
@@ -499,7 +508,7 @@ class EditDeleteWrapper extends StatelessWidget {
   }
 
   Schedule schedule;
-  EditDeleteWrapper({required this.schedule});
+  EditDeleteSurveyWrapper({required this.schedule});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;

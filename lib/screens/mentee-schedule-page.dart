@@ -403,6 +403,9 @@ class ScheduleCard extends StatelessWidget {
                             color: Colors.black.withOpacity(0.8),
                           ),
                         ),
+                        SizedBox(
+                          height: size.height * 0.01,
+                        ),
                         Row(
                           children: [
                             Icon(

@@ -29,7 +29,9 @@ class _DeclareCompletionState extends State<DeclareCompletion> {
         firestore: widget.firestore,
       ));
     });
-    setState(() {});
+    if (this.mounted) {
+      setState(() {});
+    }
     return result;
   }
 
@@ -89,75 +91,78 @@ class MenteeInformationCard extends StatelessWidget {
                     : 'assets/vectors/Mentee(F)happy.png',
               ),
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  mentee.fullName,
-                  style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 22,
-                      color: kLightBlue.withOpacity(0.9)),
-                ),
-                Container(
-                  // margin: EdgeInsets.only(top: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      MenteeTotalInformationCards(
-                        text: '${mentee.totalEngagementLectures} lessons',
-                      ),
-                      MenteeTotalInformationCards(
-                        text:
-                            "${(mentee.totalEngagementTime.inMinutes / 60).floor()} hr ${mentee.totalEngagementTime.inMinutes % 60} min",
-                      ),
-                    ],
+            IntrinsicWidth(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    mentee.fullName,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 22,
+                        color: kLightBlue.withOpacity(0.9)),
                   ),
-                ),
-                InkWell(
-                  onTap: () async {
-                    if (!completed) {
-                      showSnackBar(context,
-                          'Minimum requirements not met for the selected mentee');
-                    } else {
-                      firestore.DeclareCompletion(mentee);
-                      showSnackBar(
-                          context, 'The declaration was filed successfully!');
-                    }
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(top: 10),
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      child: Text(
-                        "DECLARE COMPLETION",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: !completed ? kLightBlue : Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16),
-                      ),
+                  Container(
+                    // margin: EdgeInsets.only(top: 10),
+                    child: Column(
+                      children: [
+                        MenteeTotalInformationCards(
+                          heading: '${mentee.totalEngagementLectures} lessons',
+                          percentage: mentee.totalEngagementLectures / 30 * 100,
+                        ),
+                        MenteeTotalInformationCards(
+                          heading:
+                              "${(mentee.totalEngagementTime.inMinutes / 60).floor()} hr ${mentee.totalEngagementTime.inMinutes % 60} min",
+                          percentage:
+                              mentee.totalEngagementTime.inMinutes / 900 * 100,
+                        ),
+                      ],
                     ),
-                    decoration: completed
-                        ? BoxDecoration(
-                            color: kLightBlue.withOpacity(0.7),
-                            borderRadius: BorderRadius.circular(5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: kLightBlue.withOpacity(0.9),
-                                blurRadius: 15,
-                              )
-                            ],
-                          )
-                        : BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                                color: kLightBlue.withOpacity(0.7), width: 5),
-                          ),
                   ),
-                ),
-              ],
+                  InkWell(
+                    onTap: () async {
+                      if (!completed) {
+                        showSnackBar(context,
+                            'Minimum requirements not met for the selected mentee');
+                      } else {
+                        firestore.DeclareCompletion(mentee);
+                        showSnackBar(
+                            context, 'The declaration was filed successfully!');
+                      }
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(top: 10),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        child: Text(
+                          "DECLARE COMPLETION",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: !completed ? kLightBlue : Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16),
+                        ),
+                      ),
+                      decoration: completed
+                          ? BoxDecoration(
+                              color: kLightBlue.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(5),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: kLightBlue.withOpacity(0.9),
+                                  blurRadius: 15,
+                                )
+                              ],
+                            )
+                          : BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(
+                                  color: kLightBlue.withOpacity(0.7), width: 5),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
             )
           ],
         ),
@@ -167,28 +172,53 @@ class MenteeInformationCard extends StatelessWidget {
 }
 
 class MenteeTotalInformationCards extends StatelessWidget {
-  String text;
-  MenteeTotalInformationCards({required this.text});
+  String heading;
+  double percentage;
+  MenteeTotalInformationCards(
+      {required this.heading, required this.percentage});
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(7),
-      decoration: BoxDecoration(
-        color: kRed.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: Text(
-          text,
-          // textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: 15,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Container(
+          margin: EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            color: kRed.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Text(
+              heading,
+              // textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              ),
+            ),
           ),
         ),
-      ),
+        Container(
+          decoration: BoxDecoration(
+            color: kRed.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Text(
+              '${percentage.toStringAsFixed(1)} %',
+              // textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -213,6 +243,20 @@ class CompletionCriterionWrapper extends StatelessWidget {
                 fontSize: 20,
                 color: kGreen.withOpacity(0.9)),
           ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+          Container(
+            padding: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(3),
+                color: kGreen.withOpacity(0.7)),
+            child: Text(
+              '75% Target:',
+              style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12,
+                  color: Colors.white),
+            ),
+          ),
           SizedBox(height: 5),
           Text(
             "1. More than 11 hours devoted and more than 15 lessons taken",
@@ -223,14 +267,28 @@ class CompletionCriterionWrapper extends StatelessWidget {
             "2. More than 22 lessons taken devoted and more than 7 hours devoted",
             style: TextStyle(color: kGreen, fontWeight: FontWeight.bold),
           ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.015),
+          Container(
+            padding: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(3),
+                color: kGreen.withOpacity(0.7)),
+            child: Text(
+              '100% Target:',
+              style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12,
+                  color: Colors.white),
+            ),
+          ),
           SizedBox(height: 5),
           Text(
-            "3. 30 lessons taken",
+            "1. 30 or more lessons taken",
             style: TextStyle(color: kGreen, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 5),
           Text(
-            "4. 15 hours devoted",
+            "2. 15 or more hours devoted",
             style: TextStyle(color: kGreen, fontWeight: FontWeight.bold),
           ),
           TotalInformationWrapper(),
@@ -328,7 +386,7 @@ class TotalInformationCards extends StatelessWidget {
     return Container(
       margin: EdgeInsets.all(7),
       decoration: BoxDecoration(
-        color: Color(0xff34A853).withOpacity(0.7),
+        color: kGreen.withOpacity(0.7),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Container(

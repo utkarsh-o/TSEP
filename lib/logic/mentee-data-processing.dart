@@ -32,8 +32,10 @@ List getPlannedEngagement(List<Schedule> schedule) {
   Duration plannedEngagement = Duration();
   int plannedLessons = 0;
   for (var s in schedule) {
-    plannedEngagement += Duration(minutes: s.duration);
-    plannedLessons++;
+    if (s.postSessionSurvey) {
+      plannedEngagement += Duration(minutes: s.duration);
+      plannedLessons++;
+    }
   }
   return [plannedEngagement, plannedLessons];
 }

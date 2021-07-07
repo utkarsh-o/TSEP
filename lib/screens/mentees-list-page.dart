@@ -34,6 +34,7 @@ class _MenteesPageState extends State<MenteesPage> {
           level: mentee.initialLevel,
           uid: mentee.uid,
           phone: mentee.phoneNumber,
+          whatsappNumber: mentee.whatsappNumber,
         ),
       );
     }
@@ -123,12 +124,13 @@ class TitleBar extends StatelessWidget {
 
 class MenteeCard extends StatelessWidget {
   final String name, level, uid;
-  final int phone;
+  final int phone, whatsappNumber;
   MenteeCard(
       {required this.name,
       required this.level,
       required this.uid,
-      required this.phone});
+      required this.phone,
+      required this.whatsappNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +217,7 @@ class MenteeCard extends StatelessWidget {
                       name,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
                     ),
                     SizedBox(height: size.height * 0.003),
@@ -227,12 +229,36 @@ class MenteeCard extends StatelessWidget {
                         color: Colors.black.withOpacity(0.7),
                       ),
                     ),
+                    SizedBox(height: size.height * 0.01),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IntrinsicHeight(
+                          child: Icon(
+                            Icons.message_rounded,
+                            color: kGreen,
+                            size: 14,
+                          ),
+                        ),
+                        SizedBox(width: size.width * 0.015),
+                        Text(
+                          whatsappNumber.toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: kGreen,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidthInt * 0.01),
+              padding: EdgeInsets.symmetric(
+                  horizontal: screenWidthInt * 0.01, vertical: 6),
               child: Text(
                 phone.toString(),
                 style: TextStyle(

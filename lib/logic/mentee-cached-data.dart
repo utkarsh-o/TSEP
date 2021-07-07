@@ -11,6 +11,7 @@ MenteeProfileData menteeProfileData = MenteeProfileData(
     lastName: '-',
     organization: '-',
     phoneNumber: -1,
+    whatsappNumber: -1,
     age: -1,
     initialLevel: '-');
 MenteeScheduleData menteeScheduleData = MenteeScheduleData(
@@ -24,6 +25,7 @@ MentorProfileData mentorProfileData = MentorProfileData(
     gender: '-',
     lastName: '-',
     phoneNumber: -1,
+    whatsappNumber: -1,
     idNumber: -1,
     fullName: '-');
 List<Schedule> menteeSchedule = [];
