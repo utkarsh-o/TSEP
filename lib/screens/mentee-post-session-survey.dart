@@ -8,9 +8,8 @@ import '../logic/mentee-data-processing.dart';
 import '../local-data/constants.dart';
 
 class MenteePostSessionSurvey extends StatefulWidget {
-  String menteeScheduleID, mentorName;
-  MenteePostSessionSurvey(
-      {required this.menteeScheduleID, required this.mentorName});
+  String menteeScheduleID;
+  MenteePostSessionSurvey({required this.menteeScheduleID});
   static String route = "PostSessionSurvey";
 
   @override
@@ -23,7 +22,7 @@ TimeOfDay pickedTime = TimeOfDay.now();
 DateTime pickedDate = DateTime.now();
 var remarkController = TextEditingController();
 int pickedDuration = 0, pickedLesson = -1;
-String _menteeScheduleID = '';
+String _menteeScheduleID = '', mentorName = '';
 
 class _MenteePostSessionSurveyState extends State<MenteePostSessionSurvey> {
   final firestore = FirebaseFirestore.instance;
@@ -40,6 +39,7 @@ class _MenteePostSessionSurveyState extends State<MenteePostSessionSurvey> {
         pickedDate = time;
         pickedDuration = value.get('Duration');
         pickedLesson = value.get('LessonNumber');
+        mentorName = value.get('MentorName');
       });
       oldData = {'Duration': pickedDuration};
     });
@@ -60,7 +60,7 @@ class _MenteePostSessionSurveyState extends State<MenteePostSessionSurvey> {
           child: Column(
             children: [
               TitleBar(),
-              MenteeLessonWrapper(mentorName: widget.mentorName),
+              MenteeLessonWrapper(),
               SizedBox(height: 20),
               TimeDatePickerWrapper(),
               BreakLine(),
@@ -436,8 +436,6 @@ class TimeDatePickerWrapper extends StatelessWidget {
 }
 
 class MenteeLessonWrapper extends StatelessWidget {
-  final String mentorName;
-  MenteeLessonWrapper({required this.mentorName});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;

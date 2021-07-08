@@ -4,8 +4,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:tsep/screens/mentee-profile.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
+import '../screens/mentee-schedule-page.dart';
+import '../screens/mentee-profile.dart';
 import '../screens/FAQ-page.dart';
 import '../screens/guidelines-page.dart';
 import '../screens/login-page.dart';
@@ -28,7 +30,16 @@ void main() async {
         .get()
         .then((value) => isMentor = value.exists);
   }
-
+  AwesomeNotifications().initialize(null, [
+    NotificationChannel(
+      channelKey: 'key1',
+      channelName: 'Session Reminders',
+      channelDescription: 'Reminders for Sessions',
+      playSound: true,
+      enableVibration: true,
+      importance: NotificationImportance.High,
+    )
+  ]);
   runApp(TSEP(user: user, isMentor: isMentor));
 }
 
@@ -52,6 +63,7 @@ class TSEP extends StatelessWidget {
         FAQPage.route: (context) => FAQPage(),
         GuidelinesPage.route: (context) => GuidelinesPage(),
         MenteeProfile.route: (context) => MenteeProfile(),
+        MenteeSchedulePage.route: (context) => MenteeSchedulePage(),
       },
       theme: ThemeData(fontFamily: 'Montserrat'),
       initialRoute: user != null

@@ -19,7 +19,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="tsep" >
         <activity
-            android:name="com.example.tsep.MainActivity"
+            android:name="com.kotak.tsep.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"

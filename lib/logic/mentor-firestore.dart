@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:intl/intl.dart';
 
 import 'authentication.dart';
 import 'mentor-cached-data.dart';
@@ -63,6 +66,7 @@ class ProfileHandler {
         .snapshots()) {
       mentorSchedule.clear();
       final schedules = snapshot.docs;
+      int notificationID = 1;
       for (var schedule in schedules) {
         Schedule sch = Schedule(
           mentee: schedule.get('MenteeName'),
@@ -76,6 +80,10 @@ class ProfileHandler {
           footNotes: schedule.get('FootNotes'),
         );
         mentorSchedule.add(sch);
+        if (sch.timing.isAfter(DateTime.now())) {
+          Notify(sch.timing, sch.lesson.toString(), sch.mentee, notificationID);
+          notificationID++;
+        }
       }
       mentorScheduleData = MentorScheduleData(
         nextInteraction: getNextInteraction(mentorSchedule),
@@ -85,6 +93,20 @@ class ProfileHandler {
       );
       callback();
     }
+  }
+
+  void Notify(DateTime schedule, String lesson, String mentee,
+      int notificationID) async {
+    await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+            notificationLayout: NotificationLayout.BigText,
+            id: notificationID,
+            channelKey: 'key1',
+            title: 'Schedule Reminder',
+            body:
+                'You have a lesson scheduled with $mentee, at ${DateFormat('hh:mm a').format(schedule)} for lesson $lesson. Please be on time!'),
+        schedule: NotificationCalendar.fromDate(
+            date: schedule, allowWhileIdle: true));
   }
 
   getMenteeData(VoidCallback callback) async {

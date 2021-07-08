@@ -465,7 +465,6 @@ class SurveyWrapper extends StatelessWidget {
               builder: (context) {
                 return MenteePostSessionSurvey(
                   menteeScheduleID: schedule.menteeScheduleID,
-                  mentorName: mentorProfileData.fullName,
                 );
               },
             ),

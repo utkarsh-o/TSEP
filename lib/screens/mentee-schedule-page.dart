@@ -4,10 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
-import 'package:tsep/components/mentee-customNavigationBar.dart';
-import 'package:tsep/logic/mentee-cached-data.dart';
-import 'package:tsep/logic/mentee-data-processing.dart';
-import 'package:tsep/logic/mentee-firestore.dart';
+import '../components/mentee-customNavigationBar.dart';
+import '../logic/mentee-cached-data.dart';
+import '../logic/mentee-data-processing.dart';
+import '../logic/mentee-firestore.dart';
 
 import '../local-data/constants.dart';
 import 'mentee-post-session-survey.dart';
@@ -18,6 +18,7 @@ bool loading = false;
 Map<String, dynamic> oldData = {}, newData = {};
 
 class MenteeSchedulePage extends StatefulWidget {
+  static String route = 'MenteeSchedulePage';
   @override
   _MenteeSchedulePageState createState() => _MenteeSchedulePageState();
 }
@@ -622,7 +623,6 @@ class SurveyWrapper extends StatelessWidget {
               builder: (context) {
                 return MenteePostSessionSurvey(
                   menteeScheduleID: schedule.menteeScheduleID,
-                  mentorName: mentorProfileData.fullName,
                 );
               },
             ),

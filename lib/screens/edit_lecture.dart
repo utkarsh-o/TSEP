@@ -602,7 +602,8 @@ class _MenteeLessonWrapperState extends State<MenteeLessonWrapper> {
                     color: Colors.black.withOpacity(0.6),
                     fontFamily: 'Montserrat'),
                 isExpanded: true,
-                value: displayLesson,
+                value:
+                    pickedLesson != -1 ? 'lesson $pickedLesson' : displayLesson,
                 items: lessons.map((int value) {
                   return DropdownMenuItem<String>(
                     child: Text("lesson $value"),

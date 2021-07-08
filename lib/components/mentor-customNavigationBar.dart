@@ -39,14 +39,16 @@ class _MentorCustomBottomNavBarState extends State<MentorCustomBottomNavBar> {
       listener: BannerAdListener(onAdLoaded: (_) {
         setState(
           () {
+            showSnackBar(context, 'ad loaded successfully');
             isLoaded = true;
           },
         );
       }, onAdFailedToLoad: (_, error) {
-        print('Ad failed to load with error -> $error');
+        // showSnackBar(context, 'ad error -> $error');
+        // print('Ad failed to load with error -> $error');
       }),
     );
-    // _ad.load();
+    _ad.load();
   }
 
   @override
@@ -136,14 +138,14 @@ class _MentorCustomBottomNavBarState extends State<MentorCustomBottomNavBar> {
                 onPressed: setactv),
           ],
         ),
-        // Container(
-        //         //   child: AdWidget(
-        //         //     ad: _ad,
-        //         //   ),
-        //         //   width: _ad.size.width.toDouble(),
-        //         //   height: 50,
-        //         //   alignment: Alignment.center,
-        //         // ),
+        Container(
+          child: AdWidget(
+            ad: _ad,
+          ),
+          width: _ad.size.width.toDouble(),
+          height: 50,
+          alignment: Alignment.center,
+        ),
         // isLoaded
         //     ? Container(
         //         child: AdWidget(
@@ -203,4 +205,24 @@ class NavbarIconSmall extends StatelessWidget {
       ),
     );
   }
+}
+
+void showSnackBar(BuildContext context, String text) {
+  final scaffold = ScaffoldMessenger.of(context);
+  scaffold.showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      elevation: 3,
+      backgroundColor: kRed.withOpacity(0.7),
+      content: Text(
+        text,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: scaffold.hideCurrentSnackBar,
+        textColor: Colors.black54,
+      ),
+    ),
+  );
 }

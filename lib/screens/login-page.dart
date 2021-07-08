@@ -353,7 +353,7 @@ class SignupWrapper extends StatelessWidget {
             ],
           ),
           SvgPicture.asset(
-            "assets/tsep-logo.svg",
+            "assets/tsep-logo1.svg",
             height: MediaQuery.of(context).size.width * 0.21,
           ),
         ],

@@ -1,4 +1,4 @@
-package com.example.tsep
+package com.kotak.tsep
 
 import io.flutter.embedding.android.FlutterActivity
 
