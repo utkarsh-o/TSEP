@@ -106,7 +106,7 @@ class ProfileHandler {
             body:
                 'You have a lesson scheduled with $mentee, at ${DateFormat('hh:mm a').format(schedule)} for lesson $lesson. Please be on time!'),
         schedule: NotificationCalendar.fromDate(
-            date: schedule, allowWhileIdle: true));
+            date: schedule.subtract(Duration(minutes:30),), allowWhileIdle: true),);
   }
 
   getMenteeData(VoidCallback callback) async {

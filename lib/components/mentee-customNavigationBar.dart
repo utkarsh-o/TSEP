@@ -40,6 +40,7 @@ class _MenteeCustomBottomNavBarState extends State<MenteeCustomBottomNavBar> {
           },
         );
       }, onAdFailedToLoad: (_, error) {
+        showSnackBar(context, 'ad error -> $error');
         print('Ad failed to load with error -> $error');
       }),
     );
@@ -158,4 +159,24 @@ class NavbarIconSmall extends StatelessWidget {
       ),
     );
   }
+}
+
+void showSnackBar(BuildContext context, String text) {
+  final scaffold = ScaffoldMessenger.of(context);
+  scaffold.showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      elevation: 3,
+      backgroundColor: kRed.withOpacity(0.7),
+      content: Text(
+        text,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: scaffold.hideCurrentSnackBar,
+        textColor: Colors.black54,
+      ),
+    ),
+  );
 }

@@ -39,12 +39,11 @@ class _MentorCustomBottomNavBarState extends State<MentorCustomBottomNavBar> {
       listener: BannerAdListener(onAdLoaded: (_) {
         setState(
           () {
-            showSnackBar(context, 'ad loaded successfully');
             isLoaded = true;
           },
         );
       }, onAdFailedToLoad: (_, error) {
-        // showSnackBar(context, 'ad error -> $error');
+        showSnackBar(context, 'ad error -> $error');
         // print('Ad failed to load with error -> $error');
       }),
     );

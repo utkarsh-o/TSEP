@@ -54,6 +54,25 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
   }
 
   void singUpCallback() async {
+    if (firstNameController.text == '') {
+      showSnackBar(context, 'Please enter a First Name');
+      return;
+    } else if (lastNameController.text == '') {
+      showSnackBar(context, 'Please enter a Last Name');
+      return;
+    } else if (ageController.text == '') {
+      showSnackBar(context, 'Please enter your age');
+      return;
+    } else if (phoneNumberController.text == '') {
+      showSnackBar(context, 'Please enter your phone number');
+      return;
+    } else if (organizationController.text == '') {
+      showSnackBar(context, 'Please enter an Organization');
+      return;
+    } else if (batchController.text == '') {
+      showSnackBar(context, 'Please enter your Batch');
+      return;
+    }
     if (!_emailSignUpKey.currentState!.validate()) {
       return;
     }
@@ -183,45 +202,57 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            InkWell(
-              onTap: () => widget.genderCallback("female"),
-              child: Container(
-                child: Image.asset(
-                  'assets/vectors/Mentee(F)happy.png',
-                  height: size.width * 0.3,
+            Theme(
+              data: ThemeData(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+              ),
+              child: InkWell(
+                onTap: () => widget.genderCallback("female"),
+                child: Container(
+                  child: Image.asset(
+                    'assets/vectors/Mentee(F)happy.png',
+                    height: size.width * 0.3,
+                  ),
+                  decoration: widget.gender == 'female'
+                      ? BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: kRed.withOpacity(0.8),
+                              blurRadius: 45,
+                            )
+                          ],
+                        )
+                      : null,
                 ),
-                decoration: widget.gender == 'female'
-                    ? BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: kRed.withOpacity(0.8),
-                            blurRadius: 45,
-                          )
-                        ],
-                      )
-                    : null,
               ),
             ),
-            InkWell(
-              onTap: () => widget.genderCallback("male"),
-              child: Container(
-                child: Image.asset(
-                  'assets/vectors/Mentee(M)happy.png',
-                  height: size.width * 0.3,
+            Theme(
+              data: ThemeData(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+              ),
+              child: InkWell(
+                onTap: () => widget.genderCallback("male"),
+                child: Container(
+                  child: Image.asset(
+                    'assets/vectors/Mentee(M)happy.png',
+                    height: size.width * 0.3,
+                  ),
+                  decoration: widget.gender == 'male'
+                      ? BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: kBlue.withOpacity(0.8),
+                              blurRadius: 50,
+                              spreadRadius: 10,
+                            )
+                          ],
+                        )
+                      : null,
                 ),
-                decoration: widget.gender == 'male'
-                    ? BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: kBlue.withOpacity(0.8),
-                            blurRadius: 50,
-                            spreadRadius: 10,
-                          )
-                        ],
-                      )
-                    : null,
               ),
             ),
           ],
@@ -556,10 +587,7 @@ class TitleBar extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(
-          width: screenWidth * 0.05,
-          height: screenHeight * 0.12,
-        ),
+        SizedBox(width: screenWidth * 0.05, height: screenHeight * 0.12),
         Container(
           child: Text(
             "Mentee Sing Up",

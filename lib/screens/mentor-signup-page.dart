@@ -58,6 +58,28 @@ class _MentorSignUpState extends State<MentorSignUp> {
   }
 
   void singUpCallback() async {
+    if (firstNameController.text == '') {
+      showSnackBar(context, 'Please enter a First Name');
+      return;
+    } else if (lastNameController.text == '') {
+      showSnackBar(context, 'Please enter a Last Name');
+      return;
+    } else if (ageController.text == '') {
+      showSnackBar(context, 'Please enter your age');
+      return;
+    } else if (phoneNumberController.text == '') {
+      showSnackBar(context, 'Please enter your phone number');
+      return;
+    } else if (organizationController.text == '') {
+      showSnackBar(context, 'Please enter an Organization');
+      return;
+    } else if (batchController.text == '') {
+      showSnackBar(context, 'Please enter your Batch');
+      return;
+    } else if (qualificationController.text == '') {
+      showSnackBar(context, 'Please enter your Qualification');
+      return;
+    }
     if (!_emailSignUpKey.currentState!.validate()) {
       return;
     }
@@ -148,7 +170,7 @@ class _MentorSignUpState extends State<MentorSignUp> {
                     OrganizationBatchWrapper(),
                     EmailInputForm(),
                     PasswordInputForm(),
-                    LoginWrapper(callback: singUpCallback)
+                    SignUpWrapper(callback: singUpCallback)
                   ],
                 ),
               ),
@@ -187,45 +209,57 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            InkWell(
-              onTap: () => widget.genderCallback("female"),
-              child: Container(
-                child: Image.asset(
-                  'assets/vectors/Mentor(F).png',
-                  width: size.width * 0.3,
+            Theme(
+              data: ThemeData(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+              ),
+              child: InkWell(
+                onTap: () => widget.genderCallback("female"),
+                child: Container(
+                  child: Image.asset(
+                    'assets/vectors/Mentor(F).png',
+                    width: size.width * 0.3,
+                  ),
+                  decoration: widget.gender == 'female'
+                      ? BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: kRed.withOpacity(0.8),
+                              blurRadius: 45,
+                            )
+                          ],
+                        )
+                      : null,
                 ),
-                decoration: widget.gender == 'female'
-                    ? BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: kRed.withOpacity(0.8),
-                            blurRadius: 45,
-                          )
-                        ],
-                      )
-                    : null,
               ),
             ),
-            InkWell(
-              onTap: () => widget.genderCallback("male"),
-              child: Container(
-                child: Image.asset(
-                  'assets/vectors/Mentor(M).png',
-                  width: size.width * 0.2,
+            Theme(
+              data: ThemeData(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+              ),
+              child: InkWell(
+                onTap: () => widget.genderCallback("male"),
+                child: Container(
+                  child: Image.asset(
+                    'assets/vectors/Mentor(M).png',
+                    width: size.width * 0.2,
+                  ),
+                  decoration: widget.gender == 'male'
+                      ? BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: kBlue.withOpacity(0.8),
+                              blurRadius: 50,
+                              spreadRadius: 10,
+                            )
+                          ],
+                        )
+                      : null,
                 ),
-                decoration: widget.gender == 'male'
-                    ? BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: kBlue.withOpacity(0.8),
-                            blurRadius: 50,
-                            spreadRadius: 10,
-                          )
-                        ],
-                      )
-                    : null,
               ),
             ),
           ],
@@ -706,10 +740,10 @@ class PasswordInputForm extends StatelessWidget {
   }
 }
 
-class LoginWrapper extends StatelessWidget {
+class SignUpWrapper extends StatelessWidget {
   final VoidCallback callback;
 
-  LoginWrapper({required this.callback});
+  SignUpWrapper({required this.callback});
 
   @override
   Widget build(BuildContext context) {
