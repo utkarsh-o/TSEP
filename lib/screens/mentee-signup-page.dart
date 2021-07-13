@@ -434,7 +434,7 @@ class OrganizationBatchWrapper extends StatelessWidget {
           ),
           BlueTextFieldWithIcon(
             heading: 'Batch',
-            hint: 'APR2021',
+            hint: 'MARCH2021',
             controller: batchController,
             prefixIcon: Icon(
               Icons.today,
@@ -490,6 +490,11 @@ class BlueTextFieldWithIcon extends StatelessWidget {
           child: TextFormField(
             textAlignVertical: TextAlignVertical.center,
             controller: controller,
+            textCapitalization: controller == batchController
+                ? TextCapitalization.characters
+                : TextCapitalization.none,
+            keyboardType:
+                controller == batchController ? TextInputType.text : null,
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: size.width * 0.037,

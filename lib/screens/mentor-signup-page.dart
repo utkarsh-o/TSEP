@@ -602,6 +602,16 @@ class BlueTextFieldWithIcon extends StatelessWidget {
           child: TextFormField(
             textAlignVertical: TextAlignVertical.center,
             controller: controller,
+            // inputFormatters: controller == batchController
+            //     ? <TextInputFormatter>[
+            //         FilteringTextInputFormatter.allow(RegExp("[A-Z]"))
+            //       ]
+            //     : null,
+            textCapitalization: controller == batchController
+                ? TextCapitalization.characters
+                : TextCapitalization.none,
+            keyboardType:
+                controller == batchController ? TextInputType.text : null,
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: size.width * 0.037,
