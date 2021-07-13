@@ -29,6 +29,7 @@ TextEditingController qualificationController = TextEditingController();
 TextEditingController specializationController = TextEditingController();
 TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
+TextEditingController addressController = TextEditingController();
 String? uid = '';
 GlobalKey<FormState> _emailSignUpKey = GlobalKey<FormState>();
 GlobalKey<FormState> _passwordSingUpKey = GlobalKey<FormState>();
@@ -56,6 +57,7 @@ class _MentorSignUpState extends State<MentorSignUp> {
     organizationController.clear();
     specializationController.clear();
     qualificationController.clear();
+    addressController.clear();
   }
 
   void singUpCallback() async {
@@ -83,6 +85,8 @@ class _MentorSignUpState extends State<MentorSignUp> {
     } else if (qualificationController.text == '') {
       showSnackBar(context, 'Please enter your Qualification');
       return;
+    } else if (addressController.text == '') {
+      showSnackBar(context, 'Please enter your Address');
     }
     if (!_emailSignUpKey.currentState!.validate()) {
       return;
@@ -124,6 +128,7 @@ class _MentorSignUpState extends State<MentorSignUp> {
           'Qualification': qualificationController.text,
           'Specialization': specializationController.text,
           'WhatsappNumber': whatsappNumber,
+          'Address': addressController.text,
         });
         firestore.collection('Logs').add({
           'Event': 'New Mentor SignUp',
@@ -142,6 +147,7 @@ class _MentorSignUpState extends State<MentorSignUp> {
             'Qualification': qualificationController.text,
             'Specialization': specializationController.text,
             'WhatsappNumber': whatsappNumber,
+            'Address': addressController.text,
           },
           'UID': uid,
           'MentorName':
@@ -174,6 +180,7 @@ class _MentorSignUpState extends State<MentorSignUp> {
                         genderCallback: genderCallback, gender: gender),
                     NameAgePhoneWrapper(),
                     OrganizationBatchWrapper(),
+                    AddressWrapper(),
                     EmailInputForm(),
                     PasswordInputForm(),
                     SignUpWrapper(callback: singUpCallback)
@@ -182,6 +189,71 @@ class _MentorSignUpState extends State<MentorSignUp> {
               ),
             ),
           );
+  }
+}
+
+class AddressWrapper extends StatelessWidget {
+  String addressHint =
+      'Flat No. 201, Shree Raj Plaza,\n3/176, Vishnupuri\nKanpur,208002';
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      margin: EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Address',
+            style: TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 14),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 7),
+            width: size.width * 0.9,
+            height: size.height * 0.1,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(
+                color: kBlue.withOpacity(0.7),
+                width: 3,
+              ),
+              borderRadius: BorderRadius.circular(5),
+              boxShadow: [
+                BoxShadow(
+                  color: kBlue.withOpacity(0.7),
+                  blurRadius: 6,
+                ),
+              ],
+            ),
+            child: TextFormField(
+              keyboardType: TextInputType.multiline,
+              maxLines: 4,
+              textAlignVertical: TextAlignVertical.center,
+              controller: addressController,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: size.width * 0.037,
+                color: Colors.black.withOpacity(0.7),
+              ),
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: EdgeInsets.all(10),
+                // prefixIcon: prefixIcon,
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                hintText: addressHint,
+                hintStyle: TextStyle(
+                  color: Colors.grey[400],
+                  fontWeight: FontWeight.w600,
+                  fontSize: size.width * 0.037,
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
 
