@@ -17,7 +17,7 @@ class MenteeSignUp extends StatefulWidget {
 }
 
 bool loading = false;
-String gender = 'male';
+String gender = 'none';
 TextEditingController firstNameController = TextEditingController();
 TextEditingController lastNameController = TextEditingController();
 TextEditingController organizationController = TextEditingController();
@@ -41,6 +41,7 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
   @override
   void initState() {
     super.initState();
+    gender = 'none';
     firstNameController.clear();
     lastNameController.clear();
     organizationController.clear();
@@ -54,7 +55,10 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
   }
 
   void singUpCallback() async {
-    if (firstNameController.text == '') {
+    if (gender == 'none') {
+      showSnackBar(context, 'Please choose your gender');
+      return;
+    } else if (firstNameController.text == '') {
       showSnackBar(context, 'Please enter a First Name');
       return;
     } else if (lastNameController.text == '') {
@@ -97,8 +101,10 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
             ? phoneNumber
             : parseIntFromString('${whatsappNumberController.text}');
         int age = parseIntFromString('${ageController.text}');
+        String formattedBatch =
+            batchController.text.toUpperCase().replaceAll(' ', '');
         await firestore.collection('MenteeInfo').doc(uid).set({
-          'BatchName': batchController.text,
+          'BatchName': formattedBatch,
           'FirstName': firstNameController.text,
           'IDNumber': -1,
           'JoiningDate': Timestamp.fromDate(DateTime.now()),
@@ -157,7 +163,7 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     TitleBar(),
-                    AvatarWrapper(
+                    GenderWrapper(
                         genderCallback: genderCallback, gender: gender),
                     NameAgePhoneWrapper(),
                     OrganizationBatchWrapper(),
@@ -172,17 +178,17 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
   }
 }
 
-class AvatarWrapper extends StatefulWidget {
+class GenderWrapper extends StatefulWidget {
   final String gender;
   final Function genderCallback;
 
-  AvatarWrapper({required this.gender, required this.genderCallback});
+  GenderWrapper({required this.gender, required this.genderCallback});
 
   @override
-  _AvatarWrapperState createState() => _AvatarWrapperState();
+  _GenderWrapperState createState() => _GenderWrapperState();
 }
 
-class _AvatarWrapperState extends State<AvatarWrapper> {
+class _GenderWrapperState extends State<GenderWrapper> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -192,7 +198,7 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
           alignment: Alignment.centerLeft,
           margin: EdgeInsets.only(left: 30, bottom: 10),
           child: Text(
-            "Avatar",
+            "Gender",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black.withOpacity(0.6),
@@ -276,14 +282,14 @@ class NameAgePhoneWrapper extends StatelessWidget {
               RedBorderTextField(
                 heading: "First Name",
                 controller: firstNameController,
-                hint: "Tanmay",
+                hint: gender == 'male' ? "Tanmay" : 'Riya',
                 prefixIcon: true,
                 width: size.width * 0.45,
               ),
               RedBorderTextField(
                 heading: "Last Name",
                 controller: lastNameController,
-                hint: "Agrawal",
+                hint: gender == 'male' ? "Agrawal" : 'Kapoor',
                 prefixIcon: false,
                 width: size.width * 0.45,
               ),

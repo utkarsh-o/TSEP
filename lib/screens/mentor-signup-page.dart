@@ -17,7 +17,7 @@ class MentorSignUp extends StatefulWidget {
 }
 
 bool loading = false;
-String gender = 'male';
+String gender = 'none';
 TextEditingController firstNameController = TextEditingController();
 TextEditingController lastNameController = TextEditingController();
 TextEditingController organizationController = TextEditingController();
@@ -43,6 +43,7 @@ class _MentorSignUpState extends State<MentorSignUp> {
   @override
   void initState() {
     super.initState();
+    gender = 'none';
     firstNameController.clear();
     lastNameController.clear();
     organizationController.clear();
@@ -58,7 +59,10 @@ class _MentorSignUpState extends State<MentorSignUp> {
   }
 
   void singUpCallback() async {
-    if (firstNameController.text == '') {
+    if (gender == 'none') {
+      showSnackBar(context, 'Please choose your gender');
+      return;
+    } else if (firstNameController.text == '') {
       showSnackBar(context, 'Please enter a First Name');
       return;
     } else if (lastNameController.text == '') {
@@ -104,8 +108,10 @@ class _MentorSignUpState extends State<MentorSignUp> {
             ? phoneNumber
             : parseIntFromString('${whatsappNumberController.text}');
         int age = parseIntFromString('${ageController.text}');
+        String formattedBatch =
+            batchController.text.toUpperCase().replaceAll(' ', '');
         await firestore.collection('/MentorData').doc(uid).set({
-          'BatchName': batchController.text,
+          'BatchName': formattedBatch,
           'FirstName': firstNameController.text,
           'IDNumber': -1,
           'JoiningDate': Timestamp.fromDate(DateTime.now()),
@@ -164,7 +170,7 @@ class _MentorSignUpState extends State<MentorSignUp> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     TitleBar(),
-                    AvatarWrapper(
+                    GenderWrapper(
                         genderCallback: genderCallback, gender: gender),
                     NameAgePhoneWrapper(),
                     OrganizationBatchWrapper(),
@@ -179,17 +185,17 @@ class _MentorSignUpState extends State<MentorSignUp> {
   }
 }
 
-class AvatarWrapper extends StatefulWidget {
+class GenderWrapper extends StatefulWidget {
   final String gender;
   final Function genderCallback;
 
-  AvatarWrapper({required this.gender, required this.genderCallback});
+  GenderWrapper({required this.gender, required this.genderCallback});
 
   @override
-  _AvatarWrapperState createState() => _AvatarWrapperState();
+  _GenderWrapperState createState() => _GenderWrapperState();
 }
 
-class _AvatarWrapperState extends State<AvatarWrapper> {
+class _GenderWrapperState extends State<GenderWrapper> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -199,70 +205,73 @@ class _AvatarWrapperState extends State<AvatarWrapper> {
           alignment: Alignment.centerLeft,
           margin: EdgeInsets.only(left: 30, bottom: 10),
           child: Text(
-            "Avatar",
+            "Gender",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black.withOpacity(0.6),
                 fontSize: 16),
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Theme(
-              data: ThemeData(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-              ),
-              child: InkWell(
-                onTap: () => widget.genderCallback("female"),
-                child: Container(
-                  child: Image.asset(
-                    'assets/vectors/Mentor(F).png',
-                    width: size.width * 0.3,
+        IntrinsicHeight(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Theme(
+                data: ThemeData(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                ),
+                child: InkWell(
+                  onTap: () => widget.genderCallback("female"),
+                  child: Container(
+                    child: Image.asset(
+                      'assets/vectors/Mentor(F).png',
+                      width: size.width * 0.3,
+                    ),
+                    decoration: widget.gender == 'female'
+                        ? BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: kRed.withOpacity(0.8),
+                                blurRadius: 45,
+                              )
+                            ],
+                          )
+                        : null,
                   ),
-                  decoration: widget.gender == 'female'
-                      ? BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: kRed.withOpacity(0.8),
-                              blurRadius: 45,
-                            )
-                          ],
-                        )
-                      : null,
                 ),
               ),
-            ),
-            Theme(
-              data: ThemeData(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-              ),
-              child: InkWell(
-                onTap: () => widget.genderCallback("male"),
-                child: Container(
-                  child: Image.asset(
-                    'assets/vectors/Mentor(M).png',
-                    width: size.width * 0.2,
+              Theme(
+                data: ThemeData(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                ),
+                child: InkWell(
+                  onTap: () => widget.genderCallback("male"),
+                  child: Container(
+                    child: Image.asset(
+                      'assets/vectors/Mentor(M).png',
+                      width: size.width * 0.2,
+                    ),
+                    decoration: widget.gender == 'male'
+                        ? BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: kBlue.withOpacity(0.8),
+                                blurRadius: 50,
+                                spreadRadius: 10,
+                              )
+                            ],
+                          )
+                        : null,
                   ),
-                  decoration: widget.gender == 'male'
-                      ? BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: kBlue.withOpacity(0.8),
-                              blurRadius: 50,
-                              spreadRadius: 10,
-                            )
-                          ],
-                        )
-                      : null,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -283,14 +292,14 @@ class NameAgePhoneWrapper extends StatelessWidget {
               RedBorderTextField(
                 heading: "First Name",
                 controller: firstNameController,
-                hint: "Chirag",
+                hint: gender == 'male' ? "Chirag" : 'Sneha',
                 prefixIcon: true,
                 width: size.width * 0.45,
               ),
               RedBorderTextField(
                 heading: "Last Name",
                 controller: lastNameController,
-                hint: "Gupta",
+                hint: gender == 'male' ? "Gupta" : 'Khanna',
                 prefixIcon: false,
                 width: size.width * 0.45,
               ),
@@ -428,7 +437,7 @@ class OrganizationBatchWrapper extends StatelessWidget {
               ),
               BlueTextFieldWithIcon(
                 heading: 'Batch',
-                hint: 'APR2021',
+                hint: 'MARCH2021',
                 controller: batchController,
                 prefixIcon: Icon(
                   Icons.today,
