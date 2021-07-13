@@ -16,6 +16,21 @@ class MentorSignUp extends StatefulWidget {
   _MentorSignUpState createState() => _MentorSignUpState();
 }
 
+getAutofillType(String heading) {
+  switch (heading) {
+    case 'First Name':
+      return <String>[AutofillHints.givenName];
+    case 'Last Name':
+      return <String>[AutofillHints.familyName];
+    case 'Phone Number':
+      return <String>[AutofillHints.telephoneNumberNational];
+    case 'Whatsapp Number':
+      return <String>[AutofillHints.telephoneNumberNational];
+    default:
+      return <String>[];
+  }
+}
+
 bool loading = false;
 String gender = 'none';
 TextEditingController firstNameController = TextEditingController();
@@ -181,8 +196,8 @@ class _MentorSignUpState extends State<MentorSignUp> {
                     NameAgePhoneWrapper(),
                     OrganizationBatchWrapper(),
                     AddressWrapper(),
-                    EmailInputForm(),
-                    PasswordInputForm(),
+                    EmailPasswordForm(),
+                    // PasswordInputForm(),
                     SignUpWrapper(callback: singUpCallback)
                   ],
                 ),
@@ -231,6 +246,7 @@ class AddressWrapper extends StatelessWidget {
               maxLines: 4,
               textAlignVertical: TextAlignVertical.center,
               controller: addressController,
+              autofillHints: [AutofillHints.fullStreetAddress],
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: size.width * 0.037,
@@ -358,24 +374,26 @@ class NameAgePhoneWrapper extends StatelessWidget {
       margin: EdgeInsets.only(top: 40),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              RedBorderTextField(
-                heading: "First Name",
-                controller: firstNameController,
-                hint: gender == 'male' ? "Chirag" : 'Sneha',
-                prefixIcon: true,
-                width: size.width * 0.45,
-              ),
-              RedBorderTextField(
-                heading: "Last Name",
-                controller: lastNameController,
-                hint: gender == 'male' ? "Gupta" : 'Khanna',
-                prefixIcon: false,
-                width: size.width * 0.45,
-              ),
-            ],
+          AutofillGroup(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                RedBorderTextField(
+                  heading: "First Name",
+                  controller: firstNameController,
+                  hint: gender == 'male' ? "Chirag" : 'Sneha',
+                  prefixIcon: true,
+                  width: size.width * 0.45,
+                ),
+                RedBorderTextField(
+                  heading: "Last Name",
+                  controller: lastNameController,
+                  hint: gender == 'male' ? "Gupta" : 'Khanna',
+                  prefixIcon: false,
+                  width: size.width * 0.45,
+                ),
+              ],
+            ),
           ),
           SizedBox(height: size.height * 0.01),
           Row(
@@ -412,7 +430,7 @@ class NameAgePhoneWrapper extends StatelessWidget {
 
 class RedBorderTextField extends StatelessWidget {
   String heading, hint;
-  TextEditingController controller;
+  final TextEditingController controller;
   bool prefixIcon;
   double width;
 
@@ -422,7 +440,6 @@ class RedBorderTextField extends StatelessWidget {
       required this.hint,
       required this.prefixIcon,
       required this.width});
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -457,6 +474,8 @@ class RedBorderTextField extends StatelessWidget {
           child: TextFormField(
             textAlignVertical: TextAlignVertical.center,
             controller: controller,
+            // autofillHints: getAutofillType(heading),
+            autofillHints: getAutofillType(heading),
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: size.width * 0.037,
@@ -714,112 +733,122 @@ class TitleBar extends StatelessWidget {
   }
 }
 
-class EmailInputForm extends StatelessWidget {
+class EmailPasswordForm extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Container(
-      margin: EdgeInsets.only(top: 25),
-      width: size.width * 0.7,
-      child: Form(
-        key: _emailSignUpKey,
-        child: TextFormField(
-          controller: emailController,
-          validator: (String? val) {
-            String value = val ?? 'test';
-            if (value.isEmpty || value == 'test') {
-              return 'Please input email';
-            } else if (RegExp(
-                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                .hasMatch(value)) {
-              return null;
-            } else {
-              return 'Invalid email-address';
-            }
-          },
-          keyboardType: TextInputType.emailAddress,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: kBlue.withOpacity(0.7),
-            // border: OutlineInputBorder(),
-            hintText: 'Email',
-            hintStyle: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
+    return AutofillGroup(
+      child: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: 25),
+            width: size.width * 0.7,
+            child: Form(
+              key: _emailSignUpKey,
+              child: TextFormField(
+                controller: emailController,
+                autofillHints: [AutofillHints.email],
+                validator: (String? val) {
+                  String value = val ?? 'test';
+                  if (value.isEmpty || value == 'test') {
+                    return 'Please input email';
+                  } else if (RegExp(
+                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                      .hasMatch(value)) {
+                    return null;
+                  } else {
+                    return 'Invalid email-address';
+                  }
+                },
+                keyboardType: TextInputType.emailAddress,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: kBlue.withOpacity(0.7),
+                  // border: OutlineInputBorder(),
+                  hintText: 'Email',
+                  hintStyle: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8.0),
+                    ),
+                    borderSide: BorderSide(color: kBlue, width: 0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8.0),
+                    ),
+                    borderSide: BorderSide(color: kBlue, width: 0),
+                  ),
+                ),
               ),
-              borderSide: BorderSide(color: kBlue, width: 0),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-              borderSide: BorderSide(color: kBlue, width: 0),
             ),
           ),
-        ),
+          Container(
+            margin: EdgeInsets.only(top: 10),
+            width: size.width * 0.7,
+            child: Form(
+              key: _passwordSingUpKey,
+              child: TextFormField(
+                controller: passwordController,
+                autofillHints: [AutofillHints.password],
+                onEditingComplete: () => TextInput.finishAutofillContext(),
+                validator: (String? val) {
+                  String value = val ?? 'test';
+                  if (value.isEmpty || value == 'test') {
+                    return 'Please input password';
+                  }
+                  if (value.length < 6) {
+                    return 'Minimum 6 characters needed';
+                  } else
+                    return null;
+                },
+                obscureText: true,
+                style: TextStyle(
+                  color: Color(0xffAFAFAD),
+                  fontWeight: FontWeight.w600,
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey.withOpacity(0.27),
+                  hintText: 'Password',
+                  hintStyle: TextStyle(
+                    color: Color(0xffAFAFAD),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8.0),
+                    ),
+                    borderSide: BorderSide(color: kBlue, width: 0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8.0),
+                    ),
+                    borderSide: BorderSide(color: Color(0xffAFAFAD), width: 0),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class PasswordInputForm extends StatelessWidget {
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Container(
-      margin: EdgeInsets.only(top: 10),
-      width: size.width * 0.7,
-      child: Form(
-        key: _passwordSingUpKey,
-        child: TextFormField(
-          controller: passwordController,
-          validator: (String? val) {
-            String value = val ?? 'test';
-            if (value.isEmpty || value == 'test') {
-              return 'Please input password';
-            }
-            if (value.length < 6) {
-              return 'Minimum 6 characters needed';
-            } else
-              return null;
-          },
-          obscureText: true,
-          style: TextStyle(
-            color: Color(0xffAFAFAD),
-            fontWeight: FontWeight.w600,
-          ),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey.withOpacity(0.27),
-            hintText: 'Password',
-            hintStyle: TextStyle(
-              color: Color(0xffAFAFAD),
-              fontWeight: FontWeight.w600,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-              borderSide: BorderSide(color: kBlue, width: 0),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-              borderSide: BorderSide(color: Color(0xffAFAFAD), width: 0),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+// class PasswordInputForm extends StatelessWidget {
+//   Widget build(BuildContext context) {
+//     Size size = MediaQuery.of(context).size;
+//     return
+//   }
+// }
 
 class SignUpWrapper extends StatelessWidget {
   final VoidCallback callback;

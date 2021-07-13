@@ -167,8 +167,7 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
                         genderCallback: genderCallback, gender: gender),
                     NameAgePhoneWrapper(),
                     OrganizationBatchWrapper(),
-                    EmailInputForm(),
-                    PasswordInputForm(),
+                    EmailPasswordForm(),
                     LoginWrapper(callback: singUpCallback)
                   ],
                 ),
@@ -276,24 +275,28 @@ class NameAgePhoneWrapper extends StatelessWidget {
       margin: EdgeInsets.only(top: 40),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              RedBorderTextField(
-                heading: "First Name",
-                controller: firstNameController,
-                hint: gender == 'male' ? "Tanmay" : 'Riya',
-                prefixIcon: true,
-                width: size.width * 0.45,
-              ),
-              RedBorderTextField(
-                heading: "Last Name",
-                controller: lastNameController,
-                hint: gender == 'male' ? "Agrawal" : 'Kapoor',
-                prefixIcon: false,
-                width: size.width * 0.45,
-              ),
-            ],
+          AutofillGroup(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                RedBorderTextField(
+                  heading: "First Name",
+                  controller: firstNameController,
+                  autofillHints: [AutofillHints.givenName],
+                  hint: gender == 'male' ? "Tanmay" : 'Riya',
+                  prefixIcon: true,
+                  width: size.width * 0.45,
+                ),
+                RedBorderTextField(
+                  heading: "Last Name",
+                  controller: lastNameController,
+                  autofillHints: [AutofillHints.familyName],
+                  hint: gender == 'male' ? "Agrawal" : 'Kapoor',
+                  prefixIcon: false,
+                  width: size.width * 0.45,
+                ),
+              ],
+            ),
           ),
           SizedBox(height: size.height * 0.01),
           Row(
@@ -302,6 +305,7 @@ class NameAgePhoneWrapper extends StatelessWidget {
               RedBorderTextField(
                 heading: "Age",
                 controller: ageController,
+                autofillHints: [],
                 hint: "16",
                 prefixIcon: false,
                 width: size.width * 0.15,
@@ -309,6 +313,7 @@ class NameAgePhoneWrapper extends StatelessWidget {
               RedBorderTextField(
                 heading: "Phone Number",
                 controller: phoneNumberController,
+                autofillHints: [AutofillHints.telephoneNumberNational],
                 hint: "9876543210",
                 prefixIcon: false,
                 width: size.width * 0.35,
@@ -316,6 +321,7 @@ class NameAgePhoneWrapper extends StatelessWidget {
               RedBorderTextField(
                 heading: "Whatsapp Number",
                 controller: whatsappNumberController,
+                autofillHints: [AutofillHints.telephoneNumberNational],
                 hint: "9876543210",
                 prefixIcon: false,
                 width: size.width * 0.35,
@@ -331,6 +337,7 @@ class NameAgePhoneWrapper extends StatelessWidget {
 class RedBorderTextField extends StatelessWidget {
   String heading, hint;
   TextEditingController controller;
+  List<String> autofillHints;
   bool prefixIcon;
   double width;
 
@@ -338,6 +345,7 @@ class RedBorderTextField extends StatelessWidget {
       {required this.heading,
       required this.controller,
       required this.hint,
+      required this.autofillHints,
       required this.prefixIcon,
       required this.width});
 
@@ -375,6 +383,7 @@ class RedBorderTextField extends StatelessWidget {
           child: TextFormField(
             textAlignVertical: TextAlignVertical.center,
             controller: controller,
+            autofillHints: autofillHints,
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: size.width * 0.037,
@@ -609,108 +618,111 @@ class TitleBar extends StatelessWidget {
   }
 }
 
-class EmailInputForm extends StatelessWidget {
+class EmailPasswordForm extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Container(
-      margin: EdgeInsets.only(top: 25),
-      width: size.width * 0.7,
-      child: Form(
-        key: _emailSignUpKey,
-        child: TextFormField(
-          controller: emailController,
-          validator: (String? val) {
-            String value = val ?? 'test';
-            if (value.isEmpty || value == 'test') {
-              return 'Please input email';
-            } else if (RegExp(
-                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                .hasMatch(value)) {
-              return null;
-            } else {
-              return 'Invalid email-address';
-            }
-          },
-          keyboardType: TextInputType.emailAddress,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: kBlue.withOpacity(0.7),
-            // border: OutlineInputBorder(),
-            hintText: 'Email',
-            hintStyle: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
+    return AutofillGroup(
+      child: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: 25),
+            width: size.width * 0.7,
+            child: Form(
+              key: _emailSignUpKey,
+              child: TextFormField(
+                controller: emailController,
+                autofillHints: [AutofillHints.email],
+                validator: (String? val) {
+                  String value = val ?? 'test';
+                  if (value.isEmpty || value == 'test') {
+                    return 'Please input email';
+                  } else if (RegExp(
+                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                      .hasMatch(value)) {
+                    return null;
+                  } else {
+                    return 'Invalid email-address';
+                  }
+                },
+                keyboardType: TextInputType.emailAddress,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: kBlue.withOpacity(0.7),
+                  // border: OutlineInputBorder(),
+                  hintText: 'Email',
+                  hintStyle: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8.0),
+                    ),
+                    borderSide: BorderSide(color: kBlue, width: 0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8.0),
+                    ),
+                    borderSide: BorderSide(color: kBlue, width: 0),
+                  ),
+                ),
               ),
-              borderSide: BorderSide(color: kBlue, width: 0),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-              borderSide: BorderSide(color: kBlue, width: 0),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class PasswordInputForm extends StatelessWidget {
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Container(
-      margin: EdgeInsets.only(top: 10),
-      width: size.width * 0.7,
-      child: Form(
-        key: _passwordSingUpKey,
-        child: TextFormField(
-          controller: passwordController,
-          validator: (String? val) {
-            String value = val ?? 'test';
-            if (value.isEmpty || value == 'test') {
-              return 'Please input password';
-            }
-            if (value.length < 6) {
-              return 'Minimum 6 characters needed';
-            } else
-              return null;
-          },
-          obscureText: true,
-          style: TextStyle(
-            color: Color(0xffAFAFAD),
-            fontWeight: FontWeight.w600,
-          ),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey.withOpacity(0.27),
-            hintText: 'Password',
-            hintStyle: TextStyle(
-              color: Color(0xffAFAFAD),
-              fontWeight: FontWeight.w600,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-              borderSide: BorderSide(color: kBlue, width: 0),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-              borderSide: BorderSide(color: Color(0xffAFAFAD), width: 0),
             ),
           ),
-        ),
+          Container(
+            margin: EdgeInsets.only(top: 10),
+            width: size.width * 0.7,
+            child: Form(
+              key: _passwordSingUpKey,
+              child: TextFormField(
+                controller: passwordController,
+                autofillHints: [AutofillHints.password],
+                onEditingComplete: () => TextInput.finishAutofillContext(),
+                validator: (String? val) {
+                  String value = val ?? 'test';
+                  if (value.isEmpty || value == 'test') {
+                    return 'Please input password';
+                  }
+                  if (value.length < 6) {
+                    return 'Minimum 6 characters needed';
+                  } else
+                    return null;
+                },
+                obscureText: true,
+                style: TextStyle(
+                  color: Color(0xffAFAFAD),
+                  fontWeight: FontWeight.w600,
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey.withOpacity(0.27),
+                  hintText: 'Password',
+                  hintStyle: TextStyle(
+                    color: Color(0xffAFAFAD),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8.0),
+                    ),
+                    borderSide: BorderSide(color: kBlue, width: 0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8.0),
+                    ),
+                    borderSide: BorderSide(color: Color(0xffAFAFAD), width: 0),
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
