@@ -27,7 +27,7 @@ String firstName = '',
     email = '',
     lastName = '',
     batchName = '',
-    organization = '',
+    category = '',
     uid = '',
     gender = '',
     lastInteraction = '',
@@ -52,7 +52,7 @@ class _MentorProfileState extends State<MentorProfile> {
       firstName = mentorProfileData.firstName;
       idNumber = mentorProfileData.idNumber;
       lastName = mentorProfileData.lastName;
-      organization = mentorProfileData.organization;
+      category = mentorProfileData.category;
       email = mentorProfileData.email;
       JoiningDate = mentorProfileData.joiningDate;
       gender = mentorProfileData.gender;
@@ -424,7 +424,7 @@ class OrgIDNumCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          InsideCard(heading: "Organization", value: "$organization"),
+          InsideCard(heading: "Organization", value: "$category"),
           InsideCard(
               heading: "ID Number /Batch ", value: "$idNumber / $batchName"),
         ],

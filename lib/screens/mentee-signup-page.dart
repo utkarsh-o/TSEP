@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 import '../components/loading.dart';
 import '../local-data/constants.dart';
@@ -20,8 +21,8 @@ bool loading = false;
 String gender = 'none';
 TextEditingController firstNameController = TextEditingController();
 TextEditingController lastNameController = TextEditingController();
-TextEditingController organizationController = TextEditingController();
-TextEditingController batchController = TextEditingController();
+TextEditingController qualificationController = TextEditingController();
+TextEditingController subDivisionController = TextEditingController();
 TextEditingController ageController = TextEditingController();
 TextEditingController phoneNumberController = TextEditingController();
 TextEditingController whatsappNumberController = TextEditingController();
@@ -30,6 +31,23 @@ TextEditingController passwordController = TextEditingController();
 String? uid = '';
 GlobalKey<FormState> _emailSignUpKey = GlobalKey<FormState>();
 GlobalKey<FormState> _passwordSingUpKey = GlobalKey<FormState>();
+
+List<String> interventionList = [
+  'UNNATI',
+  'EXCEL',
+  'GURU',
+  'LEAD',
+  'PARVARISH',
+  'HEALTH',
+  'SCD',
+  'HR & ADMIN',
+  'ACCOUNTS',
+  'DLS',
+  'INDIVIDUAL'
+];
+String? selectedIntervention = interventionList.first;
+List<String> subDivisionList = ['BFSI', 'CRS', 'HOSPITALITY'];
+String? selectedSubDivision = subDivisionList.first;
 
 class _MenteeSignUpState extends State<MenteeSignUp> {
   void genderCallback(String inputGender) {
@@ -44,17 +62,16 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
     gender = 'none';
     firstNameController.clear();
     lastNameController.clear();
-    organizationController.clear();
-    batchController.clear();
+    qualificationController.clear();
     emailController.clear();
     passwordController.clear();
     ageController.clear();
     phoneNumberController.clear();
     whatsappNumberController.clear();
-    organizationController.clear();
+    qualificationController.clear();
   }
 
-  void singUpCallback() async {
+  void signUpCallback() async {
     if (gender == 'none') {
       showSnackBar(context, 'Please choose your gender');
       return;
@@ -70,11 +87,8 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
     } else if (phoneNumberController.text == '') {
       showSnackBar(context, 'Please enter your phone number');
       return;
-    } else if (organizationController.text == '') {
-      showSnackBar(context, 'Please enter an Organization');
-      return;
-    } else if (batchController.text == '') {
-      showSnackBar(context, 'Please enter your Batch');
+    } else if (qualificationController.text == '') {
+      showSnackBar(context, 'Please enter an Qualification');
       return;
     }
     if (!_emailSignUpKey.currentState!.validate()) {
@@ -100,34 +114,41 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
         int whatsappNumber = whatsappNumberController.text == ''
             ? phoneNumber
             : parseIntFromString('${whatsappNumberController.text}');
+        String batch = selectedIntervention == interventionList.first
+            ? '${DateFormat(' MMMyy').format(DateTime.now()).toUpperCase()} $selectedIntervention$selectedSubDivision'
+            : '${DateFormat(' MMMyy').format(DateTime.now()).toUpperCase()} $selectedIntervention';
         int age = parseIntFromString('${ageController.text}');
-        String formattedBatch =
-            batchController.text.toUpperCase().replaceAll(' ', '');
+        String? subdivision = selectedIntervention == interventionList.first
+            ? selectedSubDivision
+            : 'NA';
         await firestore.collection('MenteeInfo').doc(uid).set({
-          'BatchName': formattedBatch,
+          'BatchName': batch,
           'FirstName': firstNameController.text,
           'IDNumber': -1,
           'JoiningDate': Timestamp.fromDate(DateTime.now()),
           'LastName': lastNameController.text,
-          'Organization': organizationController.text,
+          'Qualification': qualificationController.text,
           'email': emailController.text,
           'Gender': gender,
           'Age': age,
           'PhoneNumber': phoneNumber,
           'WhatsappNumber': whatsappNumber,
           'InitialLevel': 'TBD',
+          'PreTestScore': -1,
           'MentorUID': '',
+          'Intervention': selectedIntervention,
+          'SubDivision': subdivision,
         });
         firestore.collection('Logs').add({
           'Event': 'New Mentee SignUp',
           'OldData': 'Does not exist',
           'NewData': {
-            'BatchName': batchController.text,
+            'BatchName': batch,
             'FirstName': firstNameController.text,
             'IDNumber': -1,
             'JoiningDate': Timestamp.fromDate(DateTime.now()),
             'LastName': lastNameController.text,
-            'Organization': organizationController.text,
+            'Qualification': qualificationController.text,
             'email': emailController.text,
             'Gender': gender,
             'Age': age,
@@ -135,6 +156,8 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
             'WhatsappNumber': whatsappNumber,
             'InitialLevel': 'TBD',
             'MentorUID': '',
+            'Intervention': selectedIntervention,
+            'SubDivision': subdivision,
           },
           'UID': uid,
           'MenteeName':
@@ -166,9 +189,9 @@ class _MenteeSignUpState extends State<MenteeSignUp> {
                     GenderWrapper(
                         genderCallback: genderCallback, gender: gender),
                     NameAgePhoneWrapper(),
-                    OrganizationBatchWrapper(),
+                    InterventionBatchWrapper(),
                     EmailPasswordForm(),
-                    LoginWrapper(callback: singUpCallback)
+                    LoginWrapper(callback: signUpCallback)
                   ],
                 ),
               ),
@@ -414,35 +437,139 @@ class RedBorderTextField extends StatelessWidget {
   }
 }
 
-class OrganizationBatchWrapper extends StatelessWidget {
+class InterventionBatchWrapper extends StatefulWidget {
+  @override
+  _InterventionBatchWrapperState createState() =>
+      _InterventionBatchWrapperState();
+}
+
+class _InterventionBatchWrapperState extends State<InterventionBatchWrapper> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.only(top: 20),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          BlueTextFieldWithIcon(
-            heading: 'Organization / School',
-            hint: 'Individual',
-            controller: organizationController,
-            prefixIcon: Icon(
-              Icons.card_travel,
-              color: Colors.black.withOpacity(0.6),
-            ),
+          Column(
+            mainAxisAlignment: selectedIntervention == interventionList.first
+                ? MainAxisAlignment.spaceEvenly
+                : MainAxisAlignment.center,
+            children: [
+              blueDropDownMenu(
+                heading: 'Intervention',
+                value: selectedIntervention,
+                items: interventionList.map((String value) {
+                  return DropdownMenuItem<String>(
+                    child: Text(value),
+                    value: value,
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  setState(() {
+                    selectedIntervention = value;
+                  });
+                },
+              ),
+              Visibility(
+                visible: selectedIntervention == interventionList.first,
+                child: Column(
+                  children: [
+                    SizedBox(height: size.height * 0.01),
+                    blueDropDownMenu(
+                      heading: 'Sub-Division',
+                      value: selectedSubDivision,
+                      items: subDivisionList.map((String value) {
+                        return DropdownMenuItem<String>(
+                          child: Text(value),
+                          value: value,
+                        );
+                      }).toList(),
+                      onChanged: (String? value) {
+                        setState(() {
+                          selectedSubDivision = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          BlueTextFieldWithIcon(
-            heading: 'Batch',
-            hint: 'MARCH2021',
-            controller: batchController,
-            prefixIcon: Icon(
-              Icons.today,
-              color: Colors.black.withOpacity(0.6),
-            ),
-          ),
+          BlueTextFieldWithoutIcon(
+              heading: 'Qualification',
+              controller: qualificationController,
+              hint: '10th Pass')
         ],
       ),
+    );
+  }
+}
+
+class blueDropDownMenu extends StatelessWidget {
+  String heading;
+  String? value;
+  final items;
+  final onChanged;
+  blueDropDownMenu(
+      {required this.heading,
+      required this.onChanged,
+      required this.items,
+      required this.value});
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          heading,
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 14),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          margin: EdgeInsets.only(top: 7),
+          width: size.width * 0.45,
+          height: size.height * 0.05,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: kBlue.withOpacity(0.7),
+              width: 3,
+            ),
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: [
+              BoxShadow(
+                color: kBlue.withOpacity(0.7),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: DropdownButton(
+            style: TextStyle(
+              fontFamily: 'Montserrat',
+              fontWeight: FontWeight.bold,
+              fontSize: size.width * 0.037,
+              color: Colors.black.withOpacity(0.7),
+            ),
+            // style: TextStyle(
+            //     fontSize: 14,
+            //     fontWeight: FontWeight.bold,
+            //     color: Colors.grey,
+            //     fontFamily: 'Montserrat'),
+            isExpanded: true,
+            value: value,
+            items: items,
+            onChanged: onChanged,
+            underline: Container(
+              height: 0,
+            ),
+          ),
+        )
+      ],
     );
   }
 }
@@ -490,11 +617,6 @@ class BlueTextFieldWithIcon extends StatelessWidget {
           child: TextFormField(
             textAlignVertical: TextAlignVertical.center,
             controller: controller,
-            textCapitalization: controller == batchController
-                ? TextCapitalization.characters
-                : TextCapitalization.none,
-            keyboardType:
-                controller == batchController ? TextInputType.text : null,
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: size.width * 0.037,
@@ -520,11 +642,11 @@ class BlueTextFieldWithIcon extends StatelessWidget {
   }
 }
 
-class blueTextFieldWithoutIcon extends StatelessWidget {
+class BlueTextFieldWithoutIcon extends StatelessWidget {
   String heading, hint;
   TextEditingController controller;
 
-  blueTextFieldWithoutIcon({
+  BlueTextFieldWithoutIcon({
     required this.heading,
     required this.controller,
     required this.hint,
@@ -598,9 +720,7 @@ class TitleBar extends StatelessWidget {
         Container(
           margin: EdgeInsets.only(left: 20),
           child: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
             icon: SvgPicture.asset(
               "assets/icons/back-tb.svg",
               height: screenWidth * 0.07,
@@ -610,7 +730,7 @@ class TitleBar extends StatelessWidget {
         SizedBox(width: screenWidth * 0.05, height: screenHeight * 0.12),
         Container(
           child: Text(
-            "Mentee Sing Up",
+            "Mentee Sign Up",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black.withOpacity(0.5),

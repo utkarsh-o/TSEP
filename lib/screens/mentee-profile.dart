@@ -4,15 +4,14 @@ import 'dart:ui';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
-import 'package:tsep/components/mentee-customNavigationBar.dart';
-import 'package:tsep/local-data/constants.dart';
-import 'package:tsep/local-data/line_titles.dart';
-import 'package:tsep/logic/authentication.dart';
-import 'package:tsep/logic/mentee-cached-data.dart';
-import 'package:tsep/logic/mentee-data-processing.dart';
-import 'package:tsep/logic/mentee-firestore.dart';
+import '../components/mentee-customNavigationBar.dart';
+import '../local-data/constants.dart';
+import '../local-data/line_titles.dart';
+import '../logic/authentication.dart';
+import '../logic/mentee-cached-data.dart';
+import '../logic/mentee-data-processing.dart';
+import '../logic/mentee-firestore.dart';
 
 class MenteeProfile extends StatefulWidget {
   static String route = "MenteeProfile";

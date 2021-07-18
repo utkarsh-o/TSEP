@@ -2,6 +2,7 @@ import 'mentee-firestore.dart';
 
 String menteeName = '', menteeEmail = '', menteeUID = '', mentorUID = '';
 MenteeProfileData menteeProfileData = MenteeProfileData(
+    preTestScore: -1,
     batchName: '-',
     firstName: '-',
     email: '-',

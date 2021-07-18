@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 import '../components/loading.dart';
 import '../local-data/constants.dart';
@@ -31,12 +32,18 @@ getAutofillType(String heading) {
   }
 }
 
+List<String> categoryList = [
+  'Corporate',
+  'Insti/Org/College',
+  'NGO',
+  'Individual'
+];
+String? selectedCategory = categoryList.first;
 bool loading = false;
 String gender = 'none';
 TextEditingController firstNameController = TextEditingController();
 TextEditingController lastNameController = TextEditingController();
-TextEditingController organizationController = TextEditingController();
-TextEditingController batchController = TextEditingController();
+TextEditingController categoryNameController = TextEditingController();
 TextEditingController ageController = TextEditingController();
 TextEditingController phoneNumberController = TextEditingController();
 TextEditingController whatsappNumberController = TextEditingController();
@@ -47,7 +54,7 @@ TextEditingController passwordController = TextEditingController();
 TextEditingController addressController = TextEditingController();
 String? uid = '';
 GlobalKey<FormState> _emailSignUpKey = GlobalKey<FormState>();
-GlobalKey<FormState> _passwordSingUpKey = GlobalKey<FormState>();
+GlobalKey<FormState> _passwordSignUpKey = GlobalKey<FormState>();
 
 class _MentorSignUpState extends State<MentorSignUp> {
   void genderCallback(String inputGender) {
@@ -62,20 +69,19 @@ class _MentorSignUpState extends State<MentorSignUp> {
     gender = 'none';
     firstNameController.clear();
     lastNameController.clear();
-    organizationController.clear();
-    batchController.clear();
+    categoryNameController.clear();
     emailController.clear();
     passwordController.clear();
     ageController.clear();
     phoneNumberController.clear();
     whatsappNumberController.clear();
-    organizationController.clear();
+    categoryNameController.clear();
     specializationController.clear();
     qualificationController.clear();
     addressController.clear();
   }
 
-  void singUpCallback() async {
+  void signUpCallback() async {
     if (gender == 'none') {
       showSnackBar(context, 'Please choose your gender');
       return;
@@ -91,22 +97,20 @@ class _MentorSignUpState extends State<MentorSignUp> {
     } else if (phoneNumberController.text == '') {
       showSnackBar(context, 'Please enter your phone number');
       return;
-    } else if (organizationController.text == '') {
-      showSnackBar(context, 'Please enter an Organization');
-      return;
-    } else if (batchController.text == '') {
-      showSnackBar(context, 'Please enter your Batch');
-      return;
     } else if (qualificationController.text == '') {
       showSnackBar(context, 'Please enter your Qualification');
       return;
     } else if (addressController.text == '') {
       showSnackBar(context, 'Please enter your Address');
+    } else if (categoryNameController.text == '' &&
+        categoryNameController.text != categoryList.last) {
+      showSnackBar(context, 'Please enter the category\'s name');
+      return;
     }
     if (!_emailSignUpKey.currentState!.validate()) {
       return;
     }
-    if (!_passwordSingUpKey.currentState!.validate()) {
+    if (!_passwordSignUpKey.currentState!.validate()) {
       return;
     }
     final auth = FirebaseAuth.instance;
@@ -127,15 +131,19 @@ class _MentorSignUpState extends State<MentorSignUp> {
             ? phoneNumber
             : parseIntFromString('${whatsappNumberController.text}');
         int age = parseIntFromString('${ageController.text}');
-        String formattedBatch =
-            batchController.text.toUpperCase().replaceAll(' ', '');
+        String categoryName = selectedCategory != categoryList.last
+            ? categoryNameController.text
+            : 'Individual';
+        String batch =
+            '${DateFormat('MMMyy').format(DateTime.now()).toUpperCase()}';
         await firestore.collection('/MentorData').doc(uid).set({
-          'BatchName': formattedBatch,
+          'BatchName': batch,
           'FirstName': firstNameController.text,
           'IDNumber': -1,
           'JoiningDate': Timestamp.fromDate(DateTime.now()),
           'LastName': lastNameController.text,
-          'Organization': organizationController.text,
+          'Category': selectedCategory,
+          'CategoryName': categoryName,
           'email': emailController.text,
           'Gender': gender,
           'Age': age,
@@ -149,12 +157,13 @@ class _MentorSignUpState extends State<MentorSignUp> {
           'Event': 'New Mentor SignUp',
           'OldData': 'Does not exist',
           'NewData': {
-            'BatchName': batchController.text,
+            'BatchName': batch,
             'FirstName': firstNameController.text,
             'IDNumber': -1,
             'JoiningDate': Timestamp.fromDate(DateTime.now()),
             'LastName': lastNameController.text,
-            'Organization': organizationController.text,
+            'Category': selectedCategory,
+            'CategoryName': categoryName,
             'email': emailController.text,
             'Gender': gender,
             'Age': age,
@@ -198,7 +207,7 @@ class _MentorSignUpState extends State<MentorSignUp> {
                     AddressWrapper(),
                     EmailPasswordForm(),
                     // PasswordInputForm(),
-                    SignUpWrapper(callback: singUpCallback)
+                    SignUpWrapper(callback: signUpCallback)
                   ],
                 ),
               ),
@@ -506,7 +515,13 @@ class RedBorderTextField extends StatelessWidget {
   }
 }
 
-class OrganizationBatchWrapper extends StatelessWidget {
+class OrganizationBatchWrapper extends StatefulWidget {
+  @override
+  _OrganizationBatchWrapperState createState() =>
+      _OrganizationBatchWrapperState();
+}
+
+class _OrganizationBatchWrapperState extends State<OrganizationBatchWrapper> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -514,30 +529,6 @@ class OrganizationBatchWrapper extends StatelessWidget {
       margin: EdgeInsets.only(top: 20),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              BlueTextFieldWithIcon(
-                heading: 'Organization',
-                hint: 'Individual',
-                controller: organizationController,
-                prefixIcon: Icon(
-                  Icons.card_travel,
-                  color: Colors.black.withOpacity(0.6),
-                ),
-              ),
-              BlueTextFieldWithIcon(
-                heading: 'Batch',
-                hint: 'MARCH2021',
-                controller: batchController,
-                prefixIcon: Icon(
-                  Icons.today,
-                  color: Colors.black.withOpacity(0.6),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: size.height * 0.01),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -553,8 +544,103 @@ class OrganizationBatchWrapper extends StatelessWidget {
               ),
             ],
           ),
+          SizedBox(height: size.height * 0.01),
+          Row(
+            mainAxisAlignment: selectedCategory != categoryList.last
+                ? MainAxisAlignment.spaceEvenly
+                : MainAxisAlignment.center,
+            children: [
+              BlueDropDownMenu(
+                heading: 'Category',
+                onChanged: (String? value) {
+                  setState(() {
+                    selectedCategory = value;
+                  });
+                },
+                items: categoryList.map((String value) {
+                  return DropdownMenuItem<String>(
+                    child: Text(value),
+                    value: value,
+                  );
+                }).toList(),
+                value: selectedCategory,
+              ),
+              Visibility(
+                visible: selectedCategory != categoryList.last,
+                child: BlueTextFieldWithIcon(
+                  heading: '$selectedCategory Name',
+                  hint: 'Kotak Education Foundation',
+                  controller: categoryNameController,
+                  prefixIcon: Icon(
+                    Icons.card_travel,
+                    color: Colors.black.withOpacity(0.6),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
+    );
+  }
+}
+
+class BlueDropDownMenu extends StatelessWidget {
+  String heading;
+  String? value;
+  final items;
+  final onChanged;
+  BlueDropDownMenu(
+      {required this.heading,
+      required this.onChanged,
+      required this.items,
+      required this.value});
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          heading,
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 14),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          margin: EdgeInsets.only(top: 7),
+          width: size.width * 0.45,
+          height: size.height * 0.05,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: kBlue.withOpacity(0.7),
+              width: 3,
+            ),
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: [
+              BoxShadow(
+                color: kBlue.withOpacity(0.7),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: DropdownButton(
+            style: TextStyle(
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.bold,
+                fontSize: size.width * 0.037,
+                color: Colors.black.withOpacity(0.7)),
+            isExpanded: true,
+            value: value,
+            items: items,
+            onChanged: onChanged,
+            underline: Container(
+              height: 0,
+            ),
+          ),
+        )
+      ],
     );
   }
 }
@@ -602,16 +688,6 @@ class BlueTextFieldWithIcon extends StatelessWidget {
           child: TextFormField(
             textAlignVertical: TextAlignVertical.center,
             controller: controller,
-            // inputFormatters: controller == batchController
-            //     ? <TextInputFormatter>[
-            //         FilteringTextInputFormatter.allow(RegExp("[A-Z]"))
-            //       ]
-            //     : null,
-            textCapitalization: controller == batchController
-                ? TextCapitalization.characters
-                : TextCapitalization.none,
-            keyboardType:
-                controller == batchController ? TextInputType.text : null,
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: size.width * 0.037,
@@ -730,7 +806,7 @@ class TitleBar extends StatelessWidget {
         ),
         Container(
           child: Text(
-            "Mentor Sing Up",
+            "Mentor Sign Up",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black.withOpacity(0.5),
@@ -803,7 +879,7 @@ class EmailPasswordForm extends StatelessWidget {
             margin: EdgeInsets.only(top: 10),
             width: size.width * 0.7,
             child: Form(
-              key: _passwordSingUpKey,
+              key: _passwordSignUpKey,
               child: TextFormField(
                 controller: passwordController,
                 autofillHints: [AutofillHints.password],

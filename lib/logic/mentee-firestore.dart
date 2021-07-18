@@ -36,11 +36,12 @@ class MenteeProfileHandler {
       var firstName = snapshot.get('FirstName').toString();
       var lastName = snapshot.get('LastName').toString();
       menteeProfileData = MenteeProfileData(
+          preTestScore: snapshot.get('PreTestScore'),
           batchName: snapshot.get('BatchName').toString(),
           firstName: firstName,
           idNumber: snapshot.get('IDNumber'),
           lastName: lastName,
-          organization: snapshot.get('Organization').toString(),
+          organization: snapshot.get('Intervention').toString(),
           email: snapshot.get('email'),
           joiningDate: snapshot.get('JoiningDate').toDate(),
           gender: snapshot.get('Gender'),
@@ -120,7 +121,8 @@ class MenteeProfileHandler {
             body:
                 'You have a lesson scheduled with $mentor, at ${DateFormat('hh:mm a').format(schedule)} for lesson $lesson. Please be on time!'),
         schedule: NotificationCalendar.fromDate(
-            date: schedule.subtract(Duration(minutes:30)), allowWhileIdle: true));
+            date: schedule.subtract(Duration(minutes: 30)),
+            allowWhileIdle: true));
   }
 }
 
@@ -132,11 +134,12 @@ class MenteeProfileData {
       email,
       gender,
       initialLevel;
-  final int idNumber, phoneNumber, age, whatsappNumber;
+  final int idNumber, phoneNumber, age, whatsappNumber, preTestScore;
   final DateTime joiningDate;
 
   MenteeProfileData(
       {required this.batchName,
+      required this.preTestScore,
       required this.firstName,
       required this.email,
       required this.gender,

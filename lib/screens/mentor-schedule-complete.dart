@@ -368,7 +368,7 @@ class ScheduleCard extends StatelessWidget {
                             color: kBlue.withOpacity(0.9),
                             fontWeight: FontWeight.bold),
                       ),
-                      Text(
+                      SelectableText(
                         schedule.footNotes,
                         style: TextStyle(
                             fontWeight: FontWeight.w600, fontSize: 12),

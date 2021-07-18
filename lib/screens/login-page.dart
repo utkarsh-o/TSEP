@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tsep/screens/admin-home-page.dart';
 
 import '../components/loading.dart';
 import '../local-data/constants.dart';
@@ -73,6 +74,12 @@ class _LoginPageState extends State<LoginPage> {
             .then((value) {
           validID = value.docs.isNotEmpty;
         });
+      } else if (activeUser == 'Admin') {
+        await FirebaseFirestore.instance
+            .collection('AdminData')
+            .where('email', isEqualTo: emailController.text)
+            .get()
+            .then((value) => validID = value.docs.isNotEmpty);
       }
       if (validID) {
         final newUser =
@@ -80,11 +87,23 @@ class _LoginPageState extends State<LoginPage> {
         if (newUser != null) {
           if (activeUser == 'Mentor')
             Navigator.pushReplacementNamed(context, MentorProfile.route);
-          else
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) {
-              return MenteeProfile();
-            }));
+          else if (activeUser == 'Mentee')
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return MenteeProfile();
+                },
+              ),
+            );
+          else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AdminHomePage(),
+              ),
+            );
+          }
         }
       } else {
         showSnackBar(context,
@@ -118,16 +137,14 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      mainLogo(),
+                      MainLogo(),
                       SignupWrapper(),
-                      MentorMenteeWrapper(
+                      AdminMentorMenteeWrapper(
                         loginCallback: displayCallback,
                       ),
                       SizedBox(height: size.height * 0.025),
-                      EmailInputForm(),
-                      SizedBox(height: size.height * 0.0125),
-                      PasswordInputForm(),
-                      forgotPassWrapper(),
+                      EmailPasswordInputForm(),
+                      ForgotPasswordWrapper(),
                       LoginWrapper(
                         loginCallback: loginCallback,
                         displayCallback: displayCallback,
@@ -192,7 +209,7 @@ class LoginWrapper extends StatelessWidget {
   }
 }
 
-class forgotPassWrapper extends StatelessWidget {
+class ForgotPasswordWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -230,14 +247,15 @@ class forgotPassWrapper extends StatelessWidget {
   }
 }
 
-class MentorMenteeWrapper extends StatefulWidget {
+class AdminMentorMenteeWrapper extends StatefulWidget {
   VoidCallback loginCallback;
-  MentorMenteeWrapper({required this.loginCallback});
+  AdminMentorMenteeWrapper({required this.loginCallback});
   @override
-  _MentorMenteeWrapperState createState() => _MentorMenteeWrapperState();
+  _AdminMentorMenteeWrapperState createState() =>
+      _AdminMentorMenteeWrapperState();
 }
 
-class _MentorMenteeWrapperState extends State<MentorMenteeWrapper> {
+class _AdminMentorMenteeWrapperState extends State<AdminMentorMenteeWrapper> {
   void onTap(String who) {
     setState(() {
       activeUser = who;
@@ -250,6 +268,12 @@ class _MentorMenteeWrapperState extends State<MentorMenteeWrapper> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
+        MentorMenteeButton(
+          icon: "assets/icons/admin.svg",
+          who: 'Admin',
+          active: activeUser,
+          ontap: onTap,
+        ),
         MentorMenteeButton(
           icon: "assets/icons/mentee.svg",
           who: 'Mentee',
@@ -362,90 +386,96 @@ class SignupWrapper extends StatelessWidget {
   }
 }
 
-class mainLogo extends StatelessWidget {
+class MainLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.06),
-      child: SvgPicture.asset(
-        "assets/Kotak_Mahindra_Bank_logo.svg",
-        height: MediaQuery.of(context).size.height * 0.25,
-      ),
-    );
-  }
-}
-
-class EmailInputForm extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _emailLoginKey,
-      child: TextFormField(
-        controller: emailController,
-        validator: (String? val) => emailValidator(val),
-        keyboardType: TextInputType.emailAddress,
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: kBlue.withOpacity(0.7),
-          // border: OutlineInputBorder(),
-          hintText: 'Email',
-          hintStyle: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12.0)),
-            borderSide: BorderSide(color: Color(0x00003670), width: 0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12.0)),
-            borderSide: BorderSide(color: Color(0x00003670), width: 0),
-          ),
+    return InkWell(
+      onTap: () => Navigator.pushNamed(context, AdminHomePage.route),
+      child: Container(
+        margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.06),
+        child: SvgPicture.asset(
+          "assets/Kotak_Mahindra_Bank_logo.svg",
+          height: MediaQuery.of(context).size.height * 0.25,
         ),
       ),
     );
   }
 }
 
-class PasswordInputForm extends StatelessWidget {
+class EmailPasswordInputForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _passwordLoginKey,
-      child: TextFormField(
-        controller: passwordController,
-        validator: (String? val) => passwordValidator(val),
-        obscureText: true,
-        style: TextStyle(
-          color: Color(0xffAFAFAD),
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Color(0xffF5F5F5),
-          // border: OutlineInputBorder(),
-          hintText: 'Password',
-          hintStyle: TextStyle(
-            color: Color(0xffAFAFAD),
-            fontWeight: FontWeight.w600,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(12.0),
+    Size size = MediaQuery.of(context).size;
+    return AutofillGroup(
+      child: Column(
+        children: [
+          Form(
+            key: _emailLoginKey,
+            child: TextFormField(
+              controller: emailController,
+              validator: (String? val) => emailValidator(val),
+              keyboardType: TextInputType.emailAddress,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: kBlue.withOpacity(0.7),
+                // border: OutlineInputBorder(),
+                hintText: 'Email',
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                  borderSide: BorderSide(color: Color(0x00003670), width: 0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                  borderSide: BorderSide(color: Color(0x00003670), width: 0),
+                ),
+              ),
             ),
-            borderSide: BorderSide(color: Color(0x00003670), width: 0),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(12.0),
+          SizedBox(height: size.height * 0.0125),
+          Form(
+            key: _passwordLoginKey,
+            child: TextFormField(
+              controller: passwordController,
+              autofillHints: [AutofillHints.password],
+              validator: (String? val) => passwordValidator(val),
+              obscureText: true,
+              style: TextStyle(
+                color: Color(0xffAFAFAD),
+                fontWeight: FontWeight.w600,
+              ),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color(0xffF5F5F5),
+                // border: OutlineInputBorder(),
+                hintText: 'Password',
+                hintStyle: TextStyle(
+                  color: Color(0xffAFAFAD),
+                  fontWeight: FontWeight.w600,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12.0),
+                  ),
+                  borderSide: BorderSide(color: Color(0x00003670), width: 0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12.0),
+                  ),
+                  borderSide: BorderSide(color: Color(0x00003670), width: 0),
+                ),
+              ),
             ),
-            borderSide: BorderSide(color: Color(0x00003670), width: 0),
-          ),
-        ),
+          )
+        ],
       ),
     );
   }

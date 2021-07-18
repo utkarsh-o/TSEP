@@ -149,7 +149,8 @@ List getWeeklyStatistics(List<Schedule> schedule) {
   DateTime today = DateTime.now();
   int lectureCount = 0;
   for (var s in schedule)
-    if (s.timing.add(Duration(minutes: s.duration)).isBefore(today)) {
+    if (s.timing.add(Duration(minutes: s.duration)).isBefore(today) &&
+        s.postSessionSurvey) {
       lectureDuration += Duration(minutes: s.duration);
       lectureCount++;
     }

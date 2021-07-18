@@ -39,18 +39,19 @@ class ProfileHandler {
         in firestore.collection('MentorData').doc(uid).snapshots()) {
       var firstName = snapshot.get('FirstName').toString();
       var lastName = snapshot.get('LastName').toString();
-      mentorProfileData = MentorProfileData(
+      mentorProfileData = Mentor(
         batchName: snapshot.get('BatchName').toString(),
         firstName: firstName,
         idNumber: snapshot.get('IDNumber'),
         lastName: lastName,
-        organization: snapshot.get('Organization').toString(),
+        categoryName: snapshot.get('CategoryName').toString(),
         email: snapshot.get('email'),
         joiningDate: snapshot.get('JoiningDate').toDate(),
         gender: snapshot.get('Gender'),
         age: snapshot.get('Age'),
         phoneNumber: snapshot.get('PhoneNumber'),
-        qualification: snapshot.get('Qualification'),
+        category: snapshot.get('Category'),
+        qualification: snapshot.get('CategoryName'),
         specialization: snapshot.get('Specialization'),
       );
       joiningDate = snapshot.get('JoiningDate').toDate();
@@ -98,15 +99,19 @@ class ProfileHandler {
   void Notify(DateTime schedule, String lesson, String mentee,
       int notificationID) async {
     await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-            notificationLayout: NotificationLayout.BigText,
-            id: notificationID,
-            channelKey: 'key1',
-            title: 'Schedule Reminder',
-            body:
-                'You have a lesson scheduled with $mentee, at ${DateFormat('hh:mm a').format(schedule)} for lesson $lesson. Please be on time!'),
-        schedule: NotificationCalendar.fromDate(
-            date: schedule.subtract(Duration(minutes:30),), allowWhileIdle: true),);
+      content: NotificationContent(
+          notificationLayout: NotificationLayout.BigText,
+          id: notificationID,
+          channelKey: 'key1',
+          title: 'Schedule Reminder',
+          body:
+              'You have a lesson scheduled with $mentee, at ${DateFormat('hh:mm a').format(schedule)} for lesson $lesson. Please be on time!'),
+      schedule: NotificationCalendar.fromDate(
+          date: schedule.subtract(
+            Duration(minutes: 30),
+          ),
+          allowWhileIdle: true),
+    );
   }
 
   getMenteeData(VoidCallback callback) async {
@@ -125,6 +130,7 @@ class ProfileHandler {
           String firstName = mentee.get('FirstName');
           String lastName = mentee.get('LastName');
           Mentee mnt = Mentee(
+            preTestScore: value['PreTestScore'],
             uid: mentee.id,
             batchName: value['BatchName'],
             firstName: firstName,
@@ -133,7 +139,7 @@ class ProfileHandler {
             initialLevel: value['InitialLevel'],
             joiningDate: value['JoiningDate'].toDate(),
             lastName: lastName,
-            organization: value['Organization'],
+            intervention: value['Intervention'],
             phoneNumber: value['PhoneNumber'],
             whatsappNumber: value['WhatsappNumber'],
             fullName: "$firstName $lastName",
@@ -198,13 +204,23 @@ class ProfileHandler {
 
   DeclareCompletion(Mentee mentee) {
     Map<String, dynamic> data = {
-      'DateModified': Timestamp.fromDate(DateTime.now()),
+      'DateDeclared': Timestamp.fromDate(DateTime.now()),
       'EngagementTime': mentee.totalEngagementTime.inMinutes,
       'LessonCount': mentee.totalEngagementLectures,
       'MenteeName': mentee.fullName,
       'MenteeUID': mentee.uid,
       'MentorName': mentorName,
-      'MentorUID': mentorUID
+      'MentorUID': mentorUID,
+      'MentorGender': mentorProfileData.gender,
+      'MenteeGender': mentee.gender,
+      'MentorBatch': mentorProfileData.batchName,
+      'MenteeBatch': mentee.batchName,
+      'MenteeInitialLevel': mentee.initialLevel,
+      'PreTestScore': mentee.preTestScore,
+      'MenteeID': mentee.idNumber,
+      'MentorID': mentorProfileData.idNumber,
+      'MenteeJoiningDate': Timestamp.fromDate(mentee.joiningDate),
+      'MentorCategory': mentorProfileData.category,
     };
     firestore.collection('Completion').add(data);
     firestore.collection('Logs').add({
@@ -218,19 +234,20 @@ class ProfileHandler {
   }
 }
 
-class MentorProfileData {
+class Mentor {
   final String batchName,
       firstName,
       lastName,
-      organization,
+      qualification,
       email,
       gender,
-      qualification,
+      category,
+      categoryName,
       specialization;
   final int idNumber, phoneNumber, age;
   final DateTime joiningDate;
 
-  MentorProfileData(
+  Mentor(
       {required this.batchName,
       required this.firstName,
       required this.email,
@@ -238,10 +255,11 @@ class MentorProfileData {
       required this.joiningDate,
       required this.idNumber,
       required this.lastName,
-      required this.organization,
+      required this.qualification,
       required this.phoneNumber,
       required this.age,
-      required this.qualification,
+      required this.category,
+      required this.categoryName,
       required this.specialization});
 }
 
@@ -282,13 +300,18 @@ class Mentee {
       fullName,
       initialLevel,
       gender,
-      organization;
-  int phoneNumber, idNumber, totalEngagementLectures, whatsappNumber;
+      intervention;
+  int phoneNumber,
+      idNumber,
+      totalEngagementLectures,
+      whatsappNumber,
+      preTestScore;
   DateTime joiningDate;
   Duration totalEngagementTime;
 
   Mentee({
     required this.firstName,
+    required this.preTestScore,
     required this.batchName,
     required this.uid,
     required this.joiningDate,
@@ -296,7 +319,7 @@ class Mentee {
     required this.fullName,
     required this.initialLevel,
     required this.gender,
-    required this.organization,
+    required this.intervention,
     required this.idNumber,
     required this.phoneNumber,
     required this.whatsappNumber,
@@ -314,6 +337,47 @@ class Response {
 
 class Lesson {
   String title, duration, url;
+  List<String>? videoLinks;
+  int number;
 
-  Lesson({required this.title, required this.duration, required this.url});
+  Lesson(
+      {required this.title,
+      required this.number,
+      required this.duration,
+      required this.url,
+      this.videoLinks});
+}
+
+class Completion {
+  String mentorName,
+      menteeName,
+      mentorUID,
+      menteeUID,
+      mentorGender,
+      menteeBatch,
+      mentorBatch,
+      menteeGender,
+      menteeInitialLevel,
+      mentorCategory;
+  DateTime dateDeclared, menteeJoiningDate;
+  Duration engagementTime;
+  int lessonCount, preTestScore, mentorID, menteeID;
+  Completion(
+      {required this.mentorName,
+      required this.mentorUID,
+      required this.mentorCategory,
+      required this.menteeInitialLevel,
+      required this.mentorID,
+      required this.menteeID,
+      required this.menteeJoiningDate,
+      required this.menteeName,
+      required this.dateDeclared,
+      required this.engagementTime,
+      required this.lessonCount,
+      required this.mentorGender,
+      required this.menteeBatch,
+      required this.mentorBatch,
+      required this.menteeGender,
+      required this.preTestScore,
+      required this.menteeUID});
 }

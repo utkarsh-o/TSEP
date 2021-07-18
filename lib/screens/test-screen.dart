@@ -8,6 +8,7 @@ import '../logic/mentor-cached-data.dart';
 import '../logic/mentor-firestore.dart';
 
 class TestScreen extends StatefulWidget {
+  static const String route = 'TestScreen';
   final String menteeUID;
   TestScreen({required this.menteeUID});
   @override
@@ -15,6 +16,7 @@ class TestScreen extends StatefulWidget {
 }
 
 Mentee menteeData = Mentee(
+    preTestScore: -1,
     uid: '',
     firstName: '',
     batchName: '',
@@ -23,7 +25,7 @@ Mentee menteeData = Mentee(
     fullName: '',
     initialLevel: '',
     gender: '',
-    organization: '',
+    intervention: '',
     idNumber: -1,
     phoneNumber: -1,
     totalEngagementTime: Duration(minutes: 0),
@@ -51,6 +53,7 @@ clearForm() {
 
 class _TestScreenState extends State<TestScreen> {
   submitForm() {
+    int totalScore = scores.reduce((a, b) => a + b);
     responses[questionIndex] = Response(
         score: scores[questionIndex],
         answer: responseFieldController.text,
@@ -68,7 +71,7 @@ class _TestScreenState extends State<TestScreen> {
     firestore
         .collection('MenteeInfo')
         .doc(menteeUID)
-        .update({'InitialLevel': currentLevel});
+        .update({'InitialLevel': currentLevel, 'PreTestScore': totalScore});
   }
 
   @override
@@ -688,6 +691,10 @@ class TitleBar extends StatelessWidget {
             ),
           ),
         ),
+        SizedBox(
+          width: size.width * 0.02,
+          height: size.height * 0.12,
+        ),
         Container(
           child: Text(
             "Test-Form",
@@ -696,17 +703,6 @@ class TitleBar extends StatelessWidget {
               color: Colors.black.withOpacity(0.5),
               fontSize: 16,
             ),
-          ),
-        ),
-        SizedBox(
-          width: size.width * 0.42,
-          height: size.height * 0.12,
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: SvgPicture.asset(
-            "assets/icons/edit-tb.svg",
-            height: size.height * 0.07,
           ),
         ),
       ],

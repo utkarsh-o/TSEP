@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../components/mentee-customNavigationBar.dart';
 import '../logic/mentee-cached-data.dart';
 import '../logic/mentee-data-processing.dart';
@@ -243,69 +244,70 @@ class ScheduleCard extends StatelessWidget {
       surveyAvailable = true;
     }
     Size size = MediaQuery.of(context).size;
-    return InkWell(
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return Dialog(
-                child: Container(
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(15)),
-                  height: size.height * 0.18,
-                  child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 30),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(top: 12),
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 13, vertical: 7),
-                          decoration: BoxDecoration(
-                            color: kRed.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            "Please fill the survey with utmost sincerity",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 17,
-                              color: kRed.withOpacity(0.7),
-                            ),
-                            textAlign: TextAlign.center,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 10,
+            ),
+          ],
+        ),
+        width: size.width * 0.9,
+        // constraints: BoxConstraints(minHeight: size.height * 0.09),
+        child: Column(
+          children: [
+            InkWell(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return Dialog(
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15)),
+                        height: size.height * 0.18,
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 30),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(top: 12),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 13, vertical: 7),
+                                decoration: BoxDecoration(
+                                  color: kRed.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  "Please fill the survey with utmost sincerity",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 17,
+                                    color: kRed.withOpacity(0.7),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              SizedBox(height: size.height * 0.02),
+                              SurveyWrapper(
+                                schedule: schedule,
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(height: size.height * 0.02),
-                        SurveyWrapper(
-                          schedule: schedule,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            });
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 10,
-              ),
-            ],
-          ),
-          width: size.width * 0.9,
-          // constraints: BoxConstraints(minHeight: size.height * 0.09),
-          child: Column(
-            children: [
-              Row(
+                      ),
+                    );
+                  },
+                );
+              },
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Container(
@@ -428,40 +430,90 @@ class ScheduleCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Visibility(
-                visible: schedule.footNotes != '',
-                child: Container(
-                  width: double.infinity,
-                  margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7),
-                    color: kBlue.withOpacity(0.15),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'FootNotes:',
-                        style: TextStyle(
-                            fontSize: 15,
-                            color: kBlue.withOpacity(0.9),
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        schedule.footNotes,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 12),
-                      ),
-                    ],
-                  ),
+            ),
+            Visibility(
+              visible: schedule.footNotes != '',
+              child: Container(
+                width: double.infinity,
+                margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(7),
+                  color: kBlue.withOpacity(0.15),
                 ),
-              )
-            ],
-          ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'FootNotes:',
+                      style: TextStyle(
+                          fontSize: 15,
+                          color: kBlue.withOpacity(0.9),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SelectableText(
+                      schedule.footNotes,
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Visibility(
+              visible: getLessonByNumber(schedule.lesson).videoLinks != null,
+              child: Container(
+                width: double.infinity,
+                margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(7),
+                  color: kRed.withOpacity(0.15),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Watch / Listen:',
+                      style: TextStyle(
+                          fontSize: 15,
+                          color: kRed.withOpacity(0.9),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    getLinks(getLessonByNumber(schedule.lesson).videoLinks),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  Widget getLinks(List<String>? videoLinks) {
+    if (videoLinks == null) return Text('');
+    int x = 1;
+    List<Widget> result = [];
+    for (var link in videoLinks) {
+      result.add(InkWell(
+        onTap: () => launch(link),
+        child: Container(
+          margin: EdgeInsets.fromLTRB(3, 10, 3, 0),
+          padding: EdgeInsets.all(3),
+          decoration: BoxDecoration(
+              color: kRed.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(3)),
+          child: Text(
+            'LINK $x',
+            style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 12, color: kRed),
+          ),
+        ),
+      ));
+      x++;
+    }
+    return Row(mainAxisAlignment: MainAxisAlignment.start, children: result);
   }
 }
 
