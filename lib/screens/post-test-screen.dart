@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../local-data/constants.dart';
-import '../logic/mentor-cached-data.dart';
 import '../logic/mentor-firestore.dart';
 
 class PostTestScreen extends StatefulWidget {
@@ -40,7 +39,7 @@ int questionIndex = 0, activeScore = 0, currentScored = 0, currentMax = 0;
 TextEditingController responseFieldController = TextEditingController();
 List<int> scores = List<int>.generate(10, (index) => 0);
 List<bool> checked = List<bool>.generate(10, (index) => false);
-String currentLevel = '-', menteeUID = '';
+String currentLevel = '-';
 
 clearForm() {
   questionIndex = 0;
@@ -68,18 +67,21 @@ class _PostTestScreenState extends State<PostTestScreen> {
         oldResponses
             .add(Response(question: question, answer: answer, score: score));
       }
-      print('getData');
+      setState(() {});
     });
   }
 
-  submitForm() {
+  submitForm() async {
     int totalScore = scores.reduce((a, b) => a + b);
     newResponses[questionIndex] = Response(
         score: scores[questionIndex],
         answer: responseFieldController.text,
         question: questions[questionIndex]);
     final firestore = FirebaseFirestore.instance;
-    firestore.collection('MenteeInfo/$menteeUID/TestData').doc('PostTest').set({
+    firestore
+        .collection('MenteeInfo/${menteeData.uid}/TestData')
+        .doc('PostTest')
+        .set({
       'Responses': newResponses
           .map((e) =>
               {'Question': e.question, 'Answer': e.answer, 'Score': e.score})
@@ -87,8 +89,25 @@ class _PostTestScreenState extends State<PostTestScreen> {
     });
     firestore
         .collection('MenteeInfo')
-        .doc(menteeUID)
+        .doc(menteeData.uid)
         .update({'FinalLevel': currentLevel, 'PostTestScore': totalScore});
+    List<String> docID = [];
+    await firestore
+        .collection('Completion')
+        .where('MenteeUID', isEqualTo: menteeData.uid)
+        .get()
+        .then((value) {
+      if (value.docs.isNotEmpty) {
+        value.docs.forEach((document) => docID.add(document.id));
+      }
+    });
+    docID.forEach((docID) async {
+      await firestore
+          .collection('Completion')
+          .doc(docID)
+          .update({'PostTest': true});
+      print('updated $docID');
+    });
   }
 
   @override
@@ -98,13 +117,22 @@ class _PostTestScreenState extends State<PostTestScreen> {
     getPreTestResponses();
   }
 
-  getMentee() {
-    for (Mentee mentee in menteesList) {
-      if (mentee.uid == widget.menteeUID) {
-        menteeData = mentee;
-        menteeUID = widget.menteeUID;
-      }
-    }
+  getMentee() async {
+    final firestore = FirebaseFirestore.instance;
+    await firestore
+        .collection('MenteeInfo')
+        .doc(widget.menteeUID)
+        .get()
+        .then((data) {
+      var firstName = data['FirstName'];
+      var lastName = data['LastName'];
+      menteeData.fullName = '$firstName $lastName';
+      menteeData.batchName = data['BatchName'];
+      menteeData.idNumber = data['IDNumber'];
+      menteeData.phoneNumber = data['PhoneNumber'];
+      menteeData.uid = data.id;
+    });
+    setState(() {});
   }
 
   getLevel() {
@@ -344,12 +372,15 @@ class _ScoreCardState extends State<ScoreCard> {
                                             blurRadius: 10)
                                       ],
                                     ),
-                                    child: Text(
-                                      'Close',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
+                                    child: InkWell(
+                                      onTap: () => Navigator.pop(context),
+                                      child: Text(
+                                        'Close',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ),
                                 ],

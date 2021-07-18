@@ -102,33 +102,34 @@ class _AdminHomePageState extends State<AdminHomePage> {
                         (element) async {
                           final menteeUID = element.get('MenteeUID');
                           final mentorUID = element.get('MentorUID');
-                          completionList.add(
-                            CompletionCard(
-                              completion: Completion(
-                                menteeInitialLevel:
-                                    element.get('MenteeInitialLevel'),
-                                menteeID: element.get('MenteeID'),
-                                menteeJoiningDate:
-                                    element.get('MenteeJoiningDate').toDate(),
-                                mentorCategory: element.get('MentorCategory'),
-                                mentorID: element.get('MentorID'),
-                                preTestScore: element.get('PreTestScore'),
-                                menteeGender: element.get('MenteeGender'),
-                                mentorGender: element.get('MentorGender'),
-                                menteeName: element.get('MenteeName'),
-                                menteeUID: menteeUID,
-                                mentorName: element.get('MentorName'),
-                                mentorUID: mentorUID,
-                                engagementTime: Duration(
-                                    minutes: element.get('EngagementTime')),
-                                lessonCount: element.get('LessonCount'),
-                                menteeBatch: element.get('MenteeBatch'),
-                                mentorBatch: element.get('MentorBatch'),
-                                dateDeclared:
-                                    element.get('DateDeclared').toDate(),
+                          if (!element.get('PostTest'))
+                            completionList.add(
+                              CompletionCard(
+                                completion: Completion(
+                                  menteeInitialLevel:
+                                      element.get('MenteeInitialLevel'),
+                                  menteeID: element.get('MenteeID'),
+                                  menteeJoiningDate:
+                                      element.get('MenteeJoiningDate').toDate(),
+                                  mentorCategory: element.get('MentorCategory'),
+                                  mentorID: element.get('MentorID'),
+                                  preTestScore: element.get('PreTestScore'),
+                                  menteeGender: element.get('MenteeGender'),
+                                  mentorGender: element.get('MentorGender'),
+                                  menteeName: element.get('MenteeName'),
+                                  menteeUID: menteeUID,
+                                  mentorName: element.get('MentorName'),
+                                  mentorUID: mentorUID,
+                                  engagementTime: Duration(
+                                      minutes: element.get('EngagementTime')),
+                                  lessonCount: element.get('LessonCount'),
+                                  menteeBatch: element.get('MenteeBatch'),
+                                  mentorBatch: element.get('MentorBatch'),
+                                  dateDeclared:
+                                      element.get('DateDeclared').toDate(),
+                                ),
                               ),
-                            ),
-                          );
+                            );
                         },
                       );
                     }

@@ -29,12 +29,16 @@ void main() async {
         .collection('MentorData')
         .doc(user.uid)
         .get()
-        .then((value) => userType = 'Mentor');
+        .then((value) {
+      if (value.exists) userType = 'Mentor';
+    });
     await FirebaseFirestore.instance
         .collection('AdminData')
         .doc(user.uid)
         .get()
-        .then((value) => userType = 'Admin');
+        .then((value) {
+      if (value.exists) userType = 'Admin';
+    });
   }
   AwesomeNotifications().initialize(null, [
     NotificationChannel(

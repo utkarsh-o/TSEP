@@ -88,21 +88,9 @@ class _LoginPageState extends State<LoginPage> {
           if (activeUser == 'Mentor')
             Navigator.pushReplacementNamed(context, MentorProfile.route);
           else if (activeUser == 'Mentee')
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return MenteeProfile();
-                },
-              ),
-            );
+            Navigator.pushReplacementNamed(context, MenteeProfile.route);
           else {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AdminHomePage(),
-              ),
-            );
+            Navigator.pushReplacementNamed(context, AdminHomePage.route);
           }
         }
       } else {
