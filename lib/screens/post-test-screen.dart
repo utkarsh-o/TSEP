@@ -7,15 +7,16 @@ import '../local-data/constants.dart';
 import '../logic/mentor-cached-data.dart';
 import '../logic/mentor-firestore.dart';
 
-class TestScreen extends StatefulWidget {
+class PostTestScreen extends StatefulWidget {
   static const String route = 'TestScreen';
   final String menteeUID;
-  TestScreen({required this.menteeUID});
+  PostTestScreen({required this.menteeUID});
   @override
-  _TestScreenState createState() => _TestScreenState();
+  _PostTestScreenState createState() => _PostTestScreenState();
 }
 
 Mentee menteeData = Mentee(
+    subDivision: '',
     preTestScore: -1,
     uid: '',
     firstName: '',
@@ -32,8 +33,9 @@ Mentee menteeData = Mentee(
     whatsappNumber: -1,
     totalEngagementLectures: 0);
 
-List<Response> responses = List<Response>.generate(
+List<Response> newResponses = List<Response>.generate(
     10, (index) => Response(score: 0, answer: '', question: questions[index]));
+List<Response> oldResponses = [];
 int questionIndex = 0, activeScore = 0, currentScored = 0, currentMax = 0;
 TextEditingController responseFieldController = TextEditingController();
 List<int> scores = List<int>.generate(10, (index) => 0);
@@ -51,19 +53,34 @@ clearForm() {
   currentLevel = '-';
 }
 
-class _TestScreenState extends State<TestScreen> {
+class _PostTestScreenState extends State<PostTestScreen> {
+  getPreTestResponses() async {
+    final firestore = FirebaseFirestore.instance;
+    await firestore
+        .collection('MenteeInfo/${widget.menteeUID}/TestData')
+        .doc('PreTest')
+        .get()
+        .then((value) {
+      for (int i = 0; i < 10; i++) {
+        String question = value.data()!['Responses'][i]['Question'];
+        String answer = value.data()!['Responses'][i]['Answer'];
+        int score = value.data()!['Responses'][i]['Score'];
+        oldResponses
+            .add(Response(question: question, answer: answer, score: score));
+      }
+      print('getData');
+    });
+  }
+
   submitForm() {
     int totalScore = scores.reduce((a, b) => a + b);
-    responses[questionIndex] = Response(
+    newResponses[questionIndex] = Response(
         score: scores[questionIndex],
         answer: responseFieldController.text,
         question: questions[questionIndex]);
     final firestore = FirebaseFirestore.instance;
-    firestore
-        .collection('MenteeInfo/$menteeUID/PreTestData')
-        .doc('responses')
-        .set({
-      'Responses': responses
+    firestore.collection('MenteeInfo/$menteeUID/TestData').doc('PostTest').set({
+      'Responses': newResponses
           .map((e) =>
               {'Question': e.question, 'Answer': e.answer, 'Score': e.score})
           .toList(),
@@ -71,13 +88,14 @@ class _TestScreenState extends State<TestScreen> {
     firestore
         .collection('MenteeInfo')
         .doc(menteeUID)
-        .update({'InitialLevel': currentLevel, 'PreTestScore': totalScore});
+        .update({'FinalLevel': currentLevel, 'PostTestScore': totalScore});
   }
 
   @override
   void initState() {
     super.initState();
     getMentee();
+    getPreTestResponses();
   }
 
   getMentee() {
@@ -99,7 +117,7 @@ class _TestScreenState extends State<TestScreen> {
   }
 
   void nextButtonCallback() {
-    responses[questionIndex] = Response(
+    newResponses[questionIndex] = Response(
         score: scores[questionIndex],
         answer: responseFieldController.text,
         question: questions[questionIndex]);
@@ -107,7 +125,7 @@ class _TestScreenState extends State<TestScreen> {
       updateTotalScores();
       questionIndex += questionIndex + 1 > 9 ? 0 : 1;
       if (checked[questionIndex]) {
-        responseFieldController.text = responses[questionIndex].answer;
+        responseFieldController.text = newResponses[questionIndex].answer;
         activeScore = scores[questionIndex];
       } else {
         activeScore = 0;
@@ -118,12 +136,12 @@ class _TestScreenState extends State<TestScreen> {
   }
 
   void previousButtonCallback() {
-    responses[questionIndex].answer = responseFieldController.text;
+    newResponses[questionIndex].answer = responseFieldController.text;
     setState(() {
       questionIndex--;
       if (questionIndex < 0) questionIndex = 0;
       activeScore = scores[questionIndex];
-      responseFieldController.text = responses[questionIndex].answer;
+      responseFieldController.text = newResponses[questionIndex].answer;
     });
   }
 
@@ -291,67 +309,97 @@ class _ScoreCardState extends State<ScoreCard> {
                 context: context,
                 builder: (context) {
                   return Dialog(
-                    child: SingleChildScrollView(
-                      child: Container(
-                        // margin: EdgeInsets.all(30),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Column(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.symmetric(vertical: 25),
-                              child: Row(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 20),
+                          // height: 250,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Marking Scheme",
+                                    'Pre-Program Data',
                                     style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                      color: Colors.black.withOpacity(0.7),
+                                        fontSize: 15,
+                                        color: Colors.black.withOpacity(0.7),
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 7, horizontal: 25),
+                                    decoration: BoxDecoration(
+                                      color: kRed.withOpacity(0.8),
+                                      borderRadius: BorderRadius.circular(6),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: kRed.withOpacity(0.7),
+                                            blurRadius: 10)
+                                      ],
+                                    ),
+                                    child: Text(
+                                      'Close',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      clearForm();
-                                      Navigator.pop(context);
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      decoration: BoxDecoration(
-                                        color: kRed.withOpacity(0.7),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: kRed.withOpacity(1),
-                                            blurRadius: 10,
-                                          ),
-                                        ],
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        "GOT IT",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                  )
                                 ],
                               ),
-                            ),
-                            InfoWrapper(0),
-                            InfoWrapper(1),
-                            InfoWrapper(2),
-                            InfoWrapper(3),
-                          ],
+                              SizedBox(height: 15),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 7, horizontal: 15),
+                                decoration: BoxDecoration(
+                                    color: kLightBlue.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(6)),
+                                child: Text(
+                                  'Score: ${oldResponses[questionIndex].score}',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black.withOpacity(0.7),
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 7, horizontal: 15),
+                                decoration: BoxDecoration(
+                                    color: kRed.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(6)),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Response:',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.black.withOpacity(0.7),
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      oldResponses[questionIndex].answer,
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black.withOpacity(0.7),
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   );
                 },
@@ -697,7 +745,7 @@ class TitleBar extends StatelessWidget {
         ),
         Container(
           child: Text(
-            "Test-Form",
+            "Post Test-Form",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black.withOpacity(0.5),

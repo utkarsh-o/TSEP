@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 
 import '../local-data/constants.dart';
 import '../logic/mentor-cached-data.dart';
-import '../screens/test-screen.dart';
+import '../screens/pre-test-screen.dart';
 
 final auth = FirebaseAuth.instance;
 final firestore = FirebaseFirestore.instance;

@@ -140,6 +140,7 @@ class ProfileHandler {
             joiningDate: value['JoiningDate'].toDate(),
             lastName: lastName,
             intervention: value['Intervention'],
+            subDivision: value['SubDivision'],
             phoneNumber: value['PhoneNumber'],
             whatsappNumber: value['WhatsappNumber'],
             fullName: "$firstName $lastName",
@@ -300,6 +301,7 @@ class Mentee {
       fullName,
       initialLevel,
       gender,
+      subDivision,
       intervention;
   int phoneNumber,
       idNumber,
@@ -320,6 +322,7 @@ class Mentee {
     required this.initialLevel,
     required this.gender,
     required this.intervention,
+    required this.subDivision,
     required this.idNumber,
     required this.phoneNumber,
     required this.whatsappNumber,

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:tsep/logic/authentication.dart';
 import 'package:tsep/logic/mentor-firestore.dart';
 import 'package:tsep/screens/login-page.dart';
+import 'package:tsep/screens/post-test-screen.dart';
 import '../local-data/constants.dart';
 
 class AdminHomePage extends StatefulWidget {
@@ -219,12 +220,19 @@ class CompletionCard extends StatelessWidget {
             decoration: BoxDecoration(boxShadow: [
               BoxShadow(color: kGreen.withOpacity(0.7), blurRadius: 10)
             ], borderRadius: BorderRadius.circular(3), color: kGreen),
-            child: Text(
-              'POST TEST',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 20),
+            child: InkWell(
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          PostTestScreen(menteeUID: completion.menteeUID))),
+              child: Text(
+                'POST TEST',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 20),
+              ),
             ),
           ),
           Container(
@@ -282,7 +290,7 @@ class CompletionCard extends StatelessWidget {
 }
 
 String getJoiningDuration(DateTime date) {
-  Duration duration = date.difference(DateTime.now());
+  Duration duration = DateTime.now().difference(date);
   return '${(duration.inDays / 7).toStringAsFixed(0)} weeks ${(duration.inDays % 7).toStringAsFixed(0)} days';
 }
 

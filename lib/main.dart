@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:tsep/screens/admin-home-page.dart';
-import 'package:tsep/screens/test-screen.dart';
 
 import '../screens/mentee-schedule-page.dart';
 import '../screens/mentee-profile.dart';
