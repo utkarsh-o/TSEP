@@ -40,7 +40,7 @@ class _MenteeCustomBottomNavBarState extends State<MenteeCustomBottomNavBar> {
           },
         );
       }, onAdFailedToLoad: (_, error) {
-        showSnackBar(context, 'ad error -> $error');
+        // showSnackBar(context, 'ad error -> $error');
         print('Ad failed to load with error -> $error');
       }),
     );

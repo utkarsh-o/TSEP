@@ -340,7 +340,7 @@ class Response {
 
 class Lesson {
   String title, duration, url;
-  List<String>? videoLinks;
+  List<String>? videoLinks, homeworkLinks;
   int number;
 
   Lesson(
@@ -348,6 +348,7 @@ class Lesson {
       required this.number,
       required this.duration,
       required this.url,
+      this.homeworkLinks,
       this.videoLinks});
 }
 

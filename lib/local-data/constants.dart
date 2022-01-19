@@ -17,16 +17,18 @@ List<Lesson> lessonData = [
     duration: '30mins',
   ),
   Lesson(
-      title: 'Routines and Habits',
-      number: 2,
-      url:
-          'https://drive.google.com/file/d/1stjNjyus09FtNnVkb6LmUOwYTSnX2Vab/view?usp=sharing',
-      duration: '30mins',
-      videoLinks: [
-        'https://youtu.be/dSBIqRYu0PY',
-        'https://youtu.be/L9AWrJnhsRI',
-        'https://www.elllo.org/english/Mixer126/T150-Badhabit.htm'
-      ]),
+    title: 'Routines and Habits',
+    number: 2,
+    url:
+        'https://drive.google.com/file/d/1stjNjyus09FtNnVkb6LmUOwYTSnX2Vab/view?usp=sharing',
+    duration: '30mins',
+    videoLinks: [
+      'https://youtu.be/dSBIqRYu0PY',
+      'https://youtu.be/L9AWrJnhsRI',
+      'https://www.elllo.org/english/Mixer126/T150-Badhabit.htm'
+    ],
+    homeworkLinks: ['https://www.ego4u.com/en/cram-up/tests/simple-present-1'],
+  ),
   Lesson(
     title: 'About your hobbies',
     number: 3,
@@ -51,16 +53,20 @@ List<Lesson> lessonData = [
     ],
   ),
   Lesson(
-      title: 'Describing places',
-      number: 5,
-      url:
-          'https://drive.google.com/file/d/1RtfT2q_lFNl5Le8FrJ6uFOtYZVMbrUGe/view?usp=sharing',
-      duration: '30mins',
-      videoLinks: [
-        'https://youtu.be/illyGhiL2p8',
-        'https://youtu.be/qb-m3tEW_as',
-        'https://youtu.be/XqYzPmbA8i0',
-      ]),
+    title: 'Describing places',
+    number: 5,
+    url:
+        'https://drive.google.com/file/d/1RtfT2q_lFNl5Le8FrJ6uFOtYZVMbrUGe/view?usp=sharing',
+    duration: '30mins',
+    videoLinks: [
+      'https://youtu.be/illyGhiL2p8',
+      'https://youtu.be/qb-m3tEW_as',
+      'https://youtu.be/XqYzPmbA8i0',
+    ],
+    homeworkLinks: [
+      'http://www.englishvocabularyexercises.com/eve-exercises/EngVocEx_adjectives_7_2.htm'
+    ],
+  ),
   Lesson(
     title: 'In the news',
     number: 6,
@@ -68,6 +74,9 @@ List<Lesson> lessonData = [
         'https://drive.google.com/file/d/1CjZwp77u3JPRO_YJLz7XvjeDUZZiX9EJ/view?usp=sharing',
     duration: '30mins',
     videoLinks: ['https://youtu.be/etvW0FOD_so'],
+    homeworkLinks: [
+      'https://eslflow.com/wp-content/uploads/2020/03/Past-continuous-worksheet-Q-and-A.pdf'
+    ],
   ),
   Lesson(
     title: 'Opinions about the news',
@@ -156,16 +165,23 @@ List<Lesson> lessonData = [
       'https://youtu.be/8AFFPl7KRC8',
       'https://youtu.be/jH8WYW8Qa8o',
     ],
+    homeworkLinks: [
+      'https://create.kahoot.it/share/time-management/f84179eb-0ce3-4f86-ab5b-01ac1fd74103'
+    ],
   ),
   Lesson(
-      title: 'Mumbai 2050',
-      number: 15,
-      url:
-          'https://drive.google.com/file/d/1zCG4kOq2MDtRXaiNxYAh64XNRPebi155/view?usp=sharing',
-      duration: '30mins',
-      videoLinks: [
-        'https://youtu.be/hz4-LkCEHCU',
-      ]),
+    title: 'Mumbai 2050',
+    number: 15,
+    url:
+        'https://drive.google.com/file/d/1zCG4kOq2MDtRXaiNxYAh64XNRPebi155/view?usp=sharing',
+    duration: '30mins',
+    videoLinks: [
+      'https://youtu.be/hz4-LkCEHCU',
+    ],
+    homeworkLinks: [
+      'https://en.islcollective.com/english-esl-worksheets/grammar/future-tenses/will-vs-be-going-key-included/8754'
+    ],
+  ),
   Lesson(
       title: 'What ails our society',
       number: 16,
@@ -226,14 +242,21 @@ List<Lesson> lessonData = [
       'https://youtu.be/-_YoeEY8FPM',
       'https://youtu.be/fzKQ69qWhTA',
     ],
+    homeworkLinks: [
+      'https://create.kahoot.it/share/giving-and-asking-for-directions/3fe26c0d-e551-4528-9842-10816df5ab3d'
+    ],
   ),
   Lesson(
-      title: 'An interview',
-      number: 22,
-      url:
-          'https://drive.google.com/file/d/1Sm37Q4yr0G8anT0Se0fw9Yj53yeH-AQl/view?usp=sharing',
-      duration: '30mins',
-      videoLinks: ['https://youtu.be/laGZaS4sdeU']),
+    title: 'An interview',
+    number: 22,
+    url:
+        'https://drive.google.com/file/d/1Sm37Q4yr0G8anT0Se0fw9Yj53yeH-AQl/view?usp=sharing',
+    duration: '30mins',
+    videoLinks: ['https://youtu.be/laGZaS4sdeU'],
+    homeworkLinks: [
+      'https://create.kahoot.it/share/giving-your-opinion/fe866e1b-be6a-4ffe-8dd6-33344188505b'
+    ],
+  ),
   Lesson(
       title: 'Back to the future',
       number: 23,

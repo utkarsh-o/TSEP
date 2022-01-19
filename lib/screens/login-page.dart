@@ -378,7 +378,8 @@ class MainLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.pushNamed(context, AdminHomePage.route),
+      // onTap: () => Navigator.pushNamed(context, AdminHomePage.route),
+      onTap: () {},
       child: Container(
         margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.06),
         child: SvgPicture.asset(

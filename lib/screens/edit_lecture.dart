@@ -368,8 +368,8 @@ class _TimeDatePickerWrapperState extends State<TimeDatePickerWrapper> {
       DateTime? date = await showDatePicker(
         context: context,
         initialDate: pickedDate,
-        firstDate: DateTime(DateTime.now().year - 1),
-        lastDate: DateTime(DateTime.now().year + 1),
+        firstDate: DateTime(DateTime.now().year - 5),
+        lastDate: DateTime(DateTime.now().year + 5),
       );
       if (date != null) {
         setState(() {

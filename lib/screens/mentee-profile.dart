@@ -410,7 +410,7 @@ class MenteeProfileBanner extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Container(
-              width: gender == 'female' ? size.width * 0.3 : size.width * 0.25,
+              width: gender == 'female' ? size.width * 0.22 : size.width * 0.25,
               child: gender == 'male'
                   ? Image.asset("assets/vectors/Mentee(M)happy.png")
                   : Image.asset("assets/vectors/Mentee(F)happy.png"),

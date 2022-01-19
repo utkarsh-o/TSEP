@@ -43,8 +43,8 @@ class _MentorCustomBottomNavBarState extends State<MentorCustomBottomNavBar> {
           },
         );
       }, onAdFailedToLoad: (_, error) {
-        showSnackBar(context, 'ad error -> $error');
-        // print('Ad failed to load with error -> $error');
+        // showSnackBar(context, 'ad error -> $error');
+        print('Ad failed to load with error -> $error');
       }),
     );
     _ad.load();

@@ -89,24 +89,26 @@ class _MentorProfileState extends State<MentorProfile> {
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            TitleBar(callback: logoutCallback),
-            MentorProfileBanner(joiningDate: mentorProfileData.joiningDate),
-            OrgIDNumCard(),
-            BreakLine(),
-            ActivityPlot(),
-            Text(
-              "Weeks vs Hours/Lessons".toUpperCase(),
-              style: TextStyle(
-                fontWeight: FontWeight.w800,
-                color: Colors.black.withOpacity(0.7),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TitleBar(callback: logoutCallback),
+              MentorProfileBanner(joiningDate: mentorProfileData.joiningDate),
+              OrgIDNumCard(),
+              BreakLine(),
+              ActivityPlot(),
+              Text(
+                "Weeks vs Hours/Lessons".toUpperCase(),
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: Colors.black.withOpacity(0.7),
+                ),
               ),
-            ),
-            BreakLine(),
-            DecComRepDropContainer()
-          ],
+              BreakLine(),
+              DecComRepDropContainer()
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: MentorCustomBottomNavBar(active: 0),
@@ -196,8 +198,8 @@ class TitleBar extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      margin: EdgeInsets.symmetric(
-          horizontal: size.width * 0.1, vertical: size.height * 0.035),
+      margin:
+          EdgeInsets.symmetric(horizontal: 35, vertical: size.height * 0.02),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -501,7 +503,7 @@ class DecComRepDropContainer extends StatelessWidget {
               }));
             },
             child: Container(
-              margin: EdgeInsets.symmetric(vertical: 15),
+              margin: EdgeInsets.symmetric(vertical: 10),
               child: Center(
                 child: Text(
                   "DECLARE\nCOMPLETION",
@@ -541,7 +543,7 @@ class DecComRepDropContainer extends StatelessWidget {
               );
             },
             child: Container(
-              margin: EdgeInsets.symmetric(vertical: 15),
+              margin: EdgeInsets.symmetric(vertical: 10),
               child: Center(
                 child: Text(
                   "REPORT\nDROPOUT",

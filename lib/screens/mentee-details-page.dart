@@ -468,7 +468,7 @@ class BatchJoinProfIDWidget extends StatelessWidget {
         children: [
           Text(
             heading,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
           SizedBox(
             height: size.height * 0.005,
@@ -476,9 +476,9 @@ class BatchJoinProfIDWidget extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              color: Color(0xffD92136).withOpacity(0.8),
-              fontWeight: FontWeight.w600,
-            ),
+                color: Color(0xffD92136).withOpacity(0.8),
+                fontWeight: FontWeight.w600,
+                fontSize: 12),
           ),
         ],
       ),

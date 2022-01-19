@@ -292,7 +292,7 @@ class CompletionCard extends StatelessWidget {
 
 String getJoiningDuration(DateTime date) {
   Duration duration = DateTime.now().difference(date);
-  return '${(duration.inDays / 7).toStringAsFixed(0)} weeks ${(duration.inDays % 7).toStringAsFixed(0)} days';
+  return '${(duration.inDays / 7).toStringAsFixed(0)} W(s) ${(duration.inDays % 7).toStringAsFixed(0)} D(s)';
 }
 
 class MenteeProfileDetail extends StatelessWidget {
