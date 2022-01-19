@@ -97,7 +97,6 @@ class TitleBar extends StatelessWidget {
 class FAQGuidelineCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -110,28 +109,8 @@ class FAQGuidelineCards extends StatelessWidget {
             },
             child: Container(
               margin: EdgeInsets.only(top: 30),
-              child: Container(
-                margin: EdgeInsets.symmetric(vertical: 15),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/faq.svg',
-                      width: size.height * 0.04,
-                    ),
-                    Text(
-                      "FAQ",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-              height: size.height * 0.14,
-              width: size.width * 0.3,
+              height: 100,
+              width: 120,
               decoration: BoxDecoration(
                 color: kLightBlue,
                 shape: BoxShape.rectangle,
@@ -143,6 +122,27 @@ class FAQGuidelineCards extends StatelessWidget {
                   )
                 ],
               ),
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: 15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/faq.svg',
+                      width: 30,
+                    ),
+                    Text(
+                      "FAQ",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           InkWell(
@@ -153,6 +153,19 @@ class FAQGuidelineCards extends StatelessWidget {
             },
             child: Container(
               margin: EdgeInsets.only(top: 30),
+              height: 100,
+              width: 120,
+              decoration: BoxDecoration(
+                color: kRed.withOpacity(0.7),
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: kRed.withOpacity(0.7),
+                    blurRadius: 10,
+                  ),
+                ],
+              ),
               child: Container(
                 margin: EdgeInsets.symmetric(vertical: 15),
                 child: Column(
@@ -160,7 +173,7 @@ class FAQGuidelineCards extends StatelessWidget {
                   children: [
                     SvgPicture.asset(
                       'assets/icons/guidelines.svg',
-                      width: size.height * 0.04,
+                      width: 30,
                     ),
                     Text(
                       "GUIDELINES",
@@ -173,19 +186,6 @@ class FAQGuidelineCards extends StatelessWidget {
                   ],
                 ),
               ),
-              height: size.height * 0.14,
-              width: size.width * 0.3,
-              decoration: BoxDecoration(
-                color: kRed.withOpacity(0.7),
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: kRed.withOpacity(0.7),
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
             ),
           ),
         ],
@@ -197,11 +197,10 @@ class FAQGuidelineCards extends StatelessWidget {
 class BreakLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 20),
       height: 1,
-      width: size.width,
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.05),
         borderRadius: BorderRadius.circular(3),
@@ -222,95 +221,102 @@ class LessonCard extends StatelessWidget {
   LessonCard({required this.lesson, required this.index});
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    // Size size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () {
         _openPDF(lesson.url, context);
       },
-      child: Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(vertical: 10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 25),
         child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 10,
-              ),
-            ],
-          ),
-          width: size.width * 0.85,
-          height: size.height * 0.1,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.only(
-                    left: size.width * 0.06, right: size.width * 0.04),
-                height: 35,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: kBlue.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: kBlue.withOpacity(0.3),
-                      blurRadius: 10,
-                    ),
-                  ],
+          alignment: Alignment.center,
+          padding: EdgeInsets.symmetric(vertical: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
                 ),
-                child: Center(
-                  child: Text(
-                    "$index",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                constraints: BoxConstraints(
-                    maxWidth: size.width * 0.45, minWidth: size.width * 0.40),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Lesson $index",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
+              ],
+            ),
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: 80,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  // margin: EdgeInsets.symmetric(horizontal: 15),
+                  height: 35,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: kBlue.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: kBlue.withOpacity(0.3),
+                        blurRadius: 10,
                       ),
-                    ),
-                    SizedBox(
-                      height: 3,
-                    ),
-                    Text(
-                      "${lesson.title}",
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      "$index",
                       style: TextStyle(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 11,
-                        color: Colors.black.withOpacity(0.7),
+                      ),
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                      width: 140,
+                      // constraints: BoxConstraints(
+                      //     maxWidth: size.width * 0.4, minWidth: size.width * 0.40),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Lesson $index",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Text(
+                            "${lesson.title}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                              color: Colors.black.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        "${lesson.duration}",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: kBlue,
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.only(
-                    left: size.width * 0.03, right: size.width * 0.03),
-                child: Text(
-                  "${lesson.duration}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: kBlue,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

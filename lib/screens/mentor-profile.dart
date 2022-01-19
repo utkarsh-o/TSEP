@@ -106,6 +106,7 @@ class _MentorProfileState extends State<MentorProfile> {
                 ),
               ),
               BreakLine(),
+              SizedBox(height: 20),
               DecComRepDropContainer()
             ],
           ),

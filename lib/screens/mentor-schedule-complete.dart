@@ -24,8 +24,6 @@ class MentorScheduleComplete extends StatefulWidget {
 class _MentorScheduleCompleteState extends State<MentorScheduleComplete> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
@@ -73,9 +71,9 @@ class _MentorScheduleCompleteState extends State<MentorScheduleComplete> {
                   }
                   return Column(
                     children: [
-                      BreakLine(size: size),
+                      BreakLine(),
                       TotContriLesTauWrapper(schedule: scheduleList),
-                      BreakLine(size: size),
+                      BreakLine(),
                       ...scheduleCardList
                     ],
                   );
@@ -92,8 +90,6 @@ class _MentorScheduleCompleteState extends State<MentorScheduleComplete> {
 class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -105,13 +101,13 @@ class TitleBar extends StatelessWidget {
             },
             icon: SvgPicture.asset(
               "assets/icons/back-tb.svg",
-              height: screenWidth * 0.07,
+              height: 30,
             ),
           ),
         ),
         SizedBox(
-          width: screenWidth * 0.05,
-          height: screenHeight * 0.12,
+          width: 20,
+          height: 80,
         ),
         Container(
           child: Text(
@@ -150,19 +146,19 @@ class ScheduleCard extends StatelessWidget {
             .isBefore(DateTime.now())) {
       surveyAvailable = true;
     }
-    Size size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () {
         showDialog(
             context: context,
             builder: (context) {
               return Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: Container(
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(15)),
-                  height: size.height * 0.27,
+                  height: 210,
                   child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 30),
+                    margin: EdgeInsets.symmetric(horizontal: 25),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,7 +199,7 @@ class ScheduleCard extends StatelessWidget {
             });
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -215,8 +211,7 @@ class ScheduleCard extends StatelessWidget {
               ),
             ],
           ),
-          width: size.width * 0.9,
-          constraints: BoxConstraints(minHeight: size.height * 0.09),
+          width: MediaQuery.of(context).size.width * 0.9,
           child: Column(
             children: [
               Row(
@@ -253,11 +248,8 @@ class ScheduleCard extends StatelessWidget {
                   ),
                   Expanded(
                     child: Container(
-                      constraints: BoxConstraints(
-                          maxWidth: size.width * 0.34,
-                          minWidth: size.width * 0.3),
                       margin: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 15),
+                          horizontal: 10, vertical: 12),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,12 +259,12 @@ class ScheduleCard extends StatelessWidget {
                             style: schedule.mentee != 'Dropped Mentee'
                                 ? TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 14,
+                                    fontSize: 12,
                                   )
                                 : TextStyle(
                                     color: kRed.withOpacity(0.8),
                                     fontWeight: FontWeight.w800,
-                                    fontSize: 14,
+                                    fontSize: 12,
                                   ),
                           ),
                           SizedBox(height: 3),
@@ -313,7 +305,7 @@ class ScheduleCard extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(right: size.width * 0.04),
+                    margin: EdgeInsets.only(right: 15),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -322,10 +314,11 @@ class ScheduleCard extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black.withOpacity(0.8),
+                            fontSize: 12,
                           ),
                         ),
                         SizedBox(
-                          height: size.height * 0.01,
+                          height: 5,
                         ),
                         Row(
                           children: [
@@ -364,14 +357,14 @@ class ScheduleCard extends StatelessWidget {
                       Text(
                         'FootNotes:',
                         style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 12,
                             color: kBlue.withOpacity(0.9),
                             fontWeight: FontWeight.bold),
                       ),
                       SelectableText(
                         schedule.footNotes,
                         style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 12),
+                            fontWeight: FontWeight.w600, fontSize: 10),
                       ),
                     ],
                   ),
@@ -417,21 +410,21 @@ class PlannedCard extends StatelessWidget {
   PlannedCard({required this.heading, required this.value});
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
     return Container(
       child: Column(
         children: [
           Text(
             heading,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
           SizedBox(
-            height: size.height * 0.005,
+            height: 5,
           ),
           Text(
             value,
             style: TextStyle(
               color: Color(0xffD92136).withOpacity(0.8),
+              fontSize: 14,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -442,19 +435,12 @@ class PlannedCard extends StatelessWidget {
 }
 
 class BreakLine extends StatelessWidget {
-  const BreakLine({
-    Key? key,
-    required this.size,
-  }) : super(key: key);
-
-  final Size size;
-
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 18),
       height: 1,
-      width: size.width,
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.05),
         borderRadius: BorderRadius.circular(3),
@@ -511,7 +497,6 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
   EditDeleteSurveyWrapper({required this.schedule});
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
       child: Column(
         children: [
@@ -545,8 +530,8 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
                           fontSize: 18),
                     ),
                   ),
-                  height: size.height * 0.042,
-                  width: size.width * 0.3,
+                  height: 35,
+                  width: MediaQuery.of(context).size.width * 0.3,
                   decoration: BoxDecoration(
                     color: kLightBlue,
                     shape: BoxShape.rectangle,
@@ -577,8 +562,8 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
                           fontSize: 18),
                     ),
                   ),
-                  height: size.height * 0.042,
-                  width: size.width * 0.3,
+                  height: 35,
+                  width: MediaQuery.of(context).size.width * 0.3,
                   decoration: BoxDecoration(
                     color: kRed.withOpacity(0.7),
                     shape: BoxShape.rectangle,
@@ -622,7 +607,7 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
                       fontSize: 18),
                 ),
               ),
-              height: size.height * 0.042,
+              height: 40,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: kGreen.withOpacity(0.9),

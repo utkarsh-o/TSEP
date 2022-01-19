@@ -36,8 +36,6 @@ class FAQPage extends StatelessWidget {
 class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -49,13 +47,13 @@ class TitleBar extends StatelessWidget {
             },
             icon: SvgPicture.asset(
               "assets/icons/back-tb.svg",
-              height: screenWidth * 0.07,
+              height: 30,
             ),
           ),
         ),
         SizedBox(
-          width: screenWidth * 0.05,
-          height: screenHeight * 0.12,
+          width: 20,
+          height: 80,
         ),
         Container(
           child: Text(
@@ -63,7 +61,7 @@ class TitleBar extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black.withOpacity(0.5),
-              fontSize: 18,
+              fontSize: 17,
             ),
           ),
         ),

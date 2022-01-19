@@ -9,11 +9,13 @@ class GuidelinesPage extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            TitleBar(),
-            MainBody(),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TitleBar(),
+              MainBody(),
+            ],
+          ),
         ),
       ),
     );
@@ -50,14 +52,14 @@ class MainBody extends StatelessWidget {
               style: TextStyle(
                 height: 1.4,
                 fontWeight: FontWeight.w600,
-                fontSize: size.height * 0.0155,
+                fontSize: 11,
                 // wordSpacing: 1,
               ),
             ),
             Text(
               "Hope these guidelines will be of help to achieve the best results for our mentees and we are sure we can count on your committed time and efforts.",
               style: TextStyle(
-                fontSize: size.height * 0.0165,
+                fontSize: 11,
                 fontWeight: FontWeight.bold,
                 color: Color(0xffA00D1E).withOpacity(0.85),
                 shadows: [

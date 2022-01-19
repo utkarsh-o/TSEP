@@ -85,7 +85,6 @@ class _MenteeDetailsState extends State<MenteeDetails> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -104,9 +103,9 @@ class _MenteeDetailsState extends State<MenteeDetails> {
                         _MenteeProfile(
                           lessonsScheduled: 0,
                         ),
-                        SizedBox(height: size.height * 0.02),
+                        SizedBox(height: 15),
                         BatchJoinProfWrapper(),
-                        SizedBox(height: size.height * 0.02),
+                        SizedBox(height: 15),
                         InkWell(
                           onTap: () {
                             Navigator.push(context,
@@ -128,8 +127,8 @@ class _MenteeDetailsState extends State<MenteeDetails> {
                                     fontSize: 18),
                               ),
                             ),
-                            height: size.height * 0.08,
-                            width: size.width * 0.6,
+                            height: 50,
+                            width: 240,
                             decoration: BoxDecoration(
                               color: kLightBlue,
                               shape: BoxShape.rectangle,
@@ -168,9 +167,9 @@ class _MenteeDetailsState extends State<MenteeDetails> {
                       _MenteeProfile(
                         lessonsScheduled: index > 0 ? index - 1 : index,
                       ),
-                      SizedBox(height: size.height * 0.02),
+                      SizedBox(height: 15),
                       BatchJoinProfWrapper(),
-                      SizedBox(height: size.height * 0.02),
+                      SizedBox(height: 15),
                       ...lessonList,
                     ],
                   );
@@ -220,27 +219,6 @@ class BatchJoinProfWrapper extends StatelessWidget {
   }
 }
 
-class BreakLine extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Container(
-      height: 3,
-      width: size.width,
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(3),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0xff003670).withOpacity(0.1),
-            blurRadius: 10,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class LessonList extends StatelessWidget {
   final date, lessonLength;
   final int index, lesson;
@@ -252,9 +230,8 @@ class LessonList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -266,8 +243,8 @@ class LessonList extends StatelessWidget {
             ),
           ],
         ),
-        // width: size.width * 0.75,
-        height: size.height * 0.1,
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: 75,
         child: Row(
           children: [
             Container(
@@ -305,7 +282,7 @@ class LessonList extends StatelessWidget {
                     "Lesson $lesson",
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: 17,
+                      fontSize: 16,
                     ),
                   ),
                   SizedBox(
@@ -329,6 +306,7 @@ class LessonList extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Color(0xff003670),
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -344,7 +322,6 @@ class _MenteeProfile extends StatelessWidget {
   _MenteeProfile({required this.lessonsScheduled});
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10),
       child: IntrinsicHeight(
@@ -360,7 +337,7 @@ class _MenteeProfile extends StatelessWidget {
                     )
                   : Image.asset(
                       "assets/vectors/Mentee(F)normal.png",
-                      scale: 2,
+                      scale: 2.5,
                     ),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
@@ -401,28 +378,28 @@ class _MenteeProfile extends StatelessWidget {
                       Icon(
                         Icons.phone,
                         color: kGreen,
-                        size: 16,
+                        size: 14,
                       ),
-                      SizedBox(width: size.width * 0.02),
+                      SizedBox(width: 3),
                       Text(
                         "$phoneNumber",
                         style: TextStyle(
                             color: Color(0xff269200),
-                            fontSize: 14,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(width: size.width * 0.04),
+                      SizedBox(width: 6),
                       Icon(
                         Icons.message,
                         color: kGreen,
-                        size: 16,
+                        size: 14,
                       ),
-                      SizedBox(width: size.width * 0.02),
+                      SizedBox(width: 3),
                       Text(
                         "$whatsappNumber",
                         style: TextStyle(
                             color: Color(0xff269200),
-                            fontSize: 14,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -462,7 +439,6 @@ class BatchJoinProfIDWidget extends StatelessWidget {
   BatchJoinProfIDWidget({required this.heading, required this.value});
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
     return Container(
       child: Column(
         children: [
@@ -471,7 +447,7 @@ class BatchJoinProfIDWidget extends StatelessWidget {
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
           SizedBox(
-            height: size.height * 0.005,
+            height: 5,
           ),
           Text(
             value,
@@ -494,7 +470,6 @@ class EngLessonCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
       child: Column(
         children: [
@@ -506,7 +481,7 @@ class EngLessonCards extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: size.height * 0.007,
+            height: 5,
           ),
           Text(
             value,
@@ -521,8 +496,6 @@ class EngLessonCards extends StatelessWidget {
 class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -534,13 +507,13 @@ class TitleBar extends StatelessWidget {
             },
             icon: SvgPicture.asset(
               "assets/icons/back-tb.svg",
-              height: screenWidth * 0.07,
+              height: 30,
             ),
           ),
         ),
         SizedBox(
-          width: screenWidth * 0.05,
-          height: screenHeight * 0.12,
+          width: 20,
+          height: 80,
         ),
         Container(
           child: Text(

@@ -52,41 +52,45 @@ class _MenteesPageState extends State<MenteesPage> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                TitleBar(),
-                !assigned
-                    ? Container(
-                        margin: EdgeInsets.symmetric(
-                            vertical: size.height * 0.2,
-                            horizontal: size.width * 0.1),
-                        child: Column(
-                          children: [
-                            Text(
-                              "Please check back later, you will be assigned mentee/s◘ shortly!",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black.withOpacity(0.5),
-                                fontSize: 16,
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  TitleBar(),
+                  !assigned
+                      ? Container(
+                          margin: EdgeInsets.symmetric(
+                              // vertical: size.height * 0.2,
+                              // horizontal: size.width * 0.1),
+                              vertical: 120,
+                              horizontal: 35),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Please check back later, you will be assigned mentee/s◘ shortly!",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black.withOpacity(0.5),
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: size.height * 0.05),
-                            SpinKitSquareCircle(
-                              color: Color(0xff003670).withOpacity(0.5),
-                              size: 70,
-                            ),
-                          ],
-                        ),
-                      )
-                    : Column(children: menteeCards)
-              ],
+                              SizedBox(height: 35),
+                              SpinKitSquareCircle(
+                                color: Color(0xff003670).withOpacity(0.5),
+                                size: 70,
+                              ),
+                            ],
+                          ),
+                        )
+                      : Column(children: menteeCards)
+                ],
+              ),
             ),
           ),
         ),
@@ -99,10 +103,8 @@ class _MenteesPageState extends State<MenteesPage> {
 class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
-      margin: EdgeInsets.symmetric(
-          horizontal: size.width * 0.1, vertical: size.height * 0.04),
+      margin: EdgeInsets.symmetric(horizontal: 64, vertical: 25),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -134,10 +136,8 @@ class MenteeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    int screenWidthInt = size.width.round();
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -149,8 +149,8 @@ class MenteeCard extends StatelessWidget {
             ),
           ],
         ),
-        width: size.width * 0.9,
-        height: size.height * 0.1,
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: 80,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -187,15 +187,15 @@ class MenteeCard extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
+                      fontSize: 14,
                     ),
                   ),
                 ),
               ),
             ),
             Container(
-              constraints: BoxConstraints(minWidth: size.width * 0.37),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
+              constraints: BoxConstraints(minWidth: 120),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: InkWell(
                 onTap: () {
                   Navigator.push(
@@ -220,7 +220,7 @@ class MenteeCard extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
-                    SizedBox(height: size.height * 0.003),
+                    SizedBox(height: 2),
                     Text(
                       level.toUpperCase(),
                       style: TextStyle(
@@ -229,7 +229,7 @@ class MenteeCard extends StatelessWidget {
                         color: Colors.black.withOpacity(0.7),
                       ),
                     ),
-                    SizedBox(height: size.height * 0.01),
+                    SizedBox(height: 5),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -238,11 +238,11 @@ class MenteeCard extends StatelessWidget {
                           child: Icon(
                             Icons.message_rounded,
                             color: kGreen,
-                            size: 14,
+                            size: 12,
                           ),
                         ),
-                        SizedBox(width: size.width * 0.015),
-                        Text(
+                        SizedBox(width: 6),
+                        SelectableText(
                           whatsappNumber.toString(),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -257,13 +257,13 @@ class MenteeCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: screenWidthInt * 0.01, vertical: 6),
-              child: Text(
+              padding: EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+              child: SelectableText(
                 phone.toString(),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: kGreen,
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -273,7 +273,8 @@ class MenteeCard extends StatelessWidget {
               },
               icon: SvgPicture.asset(
                 "assets/icons/phone-call.svg",
-                height: size.width * 0.06,
+                // height: size.width * 0.06,
+                height: 20,
               ),
             ),
           ],
