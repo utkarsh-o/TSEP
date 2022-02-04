@@ -278,7 +278,7 @@ class ScheduleCard extends StatelessWidget {
                           ),
                           SizedBox(height: 3),
                           Text(
-                            lessonData[schedule.lesson].title,
+                            lessonData[schedule.lesson - 1].title,
                             style: TextStyle(
                                 fontSize: 11,
                                 color: kRed.withOpacity(0.7),

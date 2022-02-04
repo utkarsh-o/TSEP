@@ -73,6 +73,11 @@ class TSEP extends StatelessWidget {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
     return MaterialApp(
+      builder: (context, child) {
+        return MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+            child: child!);
+      },
       debugShowCheckedModeBanner: false,
       routes: {
         '/': (context) => LoginPage(),

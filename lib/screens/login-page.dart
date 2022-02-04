@@ -377,15 +377,11 @@ class SignupWrapper extends StatelessWidget {
 class MainLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      // onTap: () => Navigator.pushNamed(context, AdminHomePage.route),
-      onTap: () {},
-      child: Container(
-        margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.06),
-        child: SvgPicture.asset(
-          "assets/Kotak_Mahindra_Bank_logo.svg",
-          height: MediaQuery.of(context).size.height * 0.25,
-        ),
+    return Container(
+      margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.06),
+      child: SvgPicture.asset(
+        "assets/Kotak_Mahindra_Bank_logo.svg",
+        height: MediaQuery.of(context).size.height * 0.25,
       ),
     );
   }
