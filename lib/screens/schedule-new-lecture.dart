@@ -609,10 +609,14 @@ class _MntLsnCardsState extends State<MntLsnCards> {
       21,
       22,
       23,
-      24
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30
     ];
-    // List<String> mentees = ['Iron Man'];
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -700,6 +704,7 @@ class _MntLsnCardsState extends State<MntLsnCards> {
                 ],
               ),
               child: DropdownButton(
+                menuMaxHeight: 400,
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,

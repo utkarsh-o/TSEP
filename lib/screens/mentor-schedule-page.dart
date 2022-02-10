@@ -191,7 +191,7 @@ class TotalContributionLessonsTaughtWrapper extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           TotalContributionLessonTaughtCard(
-              heading: "Total Contribution",
+              heading: "Weekly Contribution",
               value:
                   "${totalContributionHours}hr ${totalContributionMinutes}min"),
           TotalContributionLessonTaughtCard(

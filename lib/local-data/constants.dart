@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tsep/screens/mentee-details-page.dart';
 
 import '../logic/mentor-firestore.dart';
 
@@ -274,6 +273,66 @@ List<Lesson> lessonData = [
           'https://drive.google.com/file/d/1VsnT9XjVSfoTKl9dLSY75JG1VrBaaDyd/view?usp=sharing',
       duration: '30mins',
       videoLinks: ['https://youtu.be/rJ3YKh2gHmU']),
+  Lesson(
+      title: 'Customer Service',
+      number: 25,
+      url:
+          'https://drive.google.com/file/d/1Z6uFNGburt-rO0a4vnUadAHrppO92sC9/view?usp=sharing',
+      duration: '30mins',
+      videoLinks: [
+        'https://www.youtube.com/watch?v=uY4wZpVc7Ko',
+        'https://www.youtube.com/watch?v=tYUXK2Rb-PY'
+      ]),
+  Lesson(
+      title: 'Selling Skills',
+      number: 26,
+      url:
+          'https://drive.google.com/file/d/14lQITNOeW8FMMccv38TKHMIXoe2UP4Ce/view?usp=sharing',
+      duration: '30mins',
+      videoLinks: [
+        'https://www.youtube.com/watch?v=ixQ2wdhUVck',
+        'https://www.youtube.com/watch?v=GOgpQjegsdg'
+      ]),
+  Lesson(
+      title: 'Customer Handling',
+      number: 27,
+      url:
+          'https://drive.google.com/file/d/1s2_MWhpQ7WmASTfHi7op_kyNRzzdKY3n/view?usp=sharing',
+      duration: '30mins',
+      videoLinks: [
+        'https://www.youtube.com/watch?v=VUvI0gQmlho',
+        'https://www.youtube.com/watch?v=a1nrWFCys6A'
+      ]),
+  Lesson(
+      title: 'Interview Skills 1',
+      number: 28,
+      url:
+          'https://drive.google.com/file/d/1H0LnZ6U6gSVlqhoi2i5oCVDwtZa-WTX7/view?usp=sharing',
+      duration: '30mins',
+      videoLinks: [
+        'https://www.youtube.com/watch?v=I8emh3KK_Bg',
+        'https://www.youtube.com/watch?v=rAxOebp_iG0'
+      ]),
+  Lesson(
+      title: 'Interview Skills 2',
+      number: 29,
+      url:
+          'https://drive.google.com/file/d/1JI1HGzoDpsvn8rDqIgN4rUhODzgOLSH0/view?usp=sharing',
+      duration: '30mins',
+      videoLinks: [
+        'https://www.youtube.com/watch?v=Ix9msJx9e5s',
+        'https://youtu.be/jCi0c-R3Poc'
+      ]),
+  Lesson(
+      title: 'Interview Skills 3',
+      number: 30,
+      url:
+          'https://drive.google.com/file/d/10_hR9kfd0leO3nQ11YzTFFiYCzclzJ-X/view?usp=sharing',
+      duration: '30mins',
+      videoLinks: [
+        'https://www.youtube.com/watch?v=oN9KhbPS-xs',
+        'https://www.youtube.com/watch?v=xfu-kLyI29Y'
+      ]),
 ];
 
 List<String> markingScheme = [

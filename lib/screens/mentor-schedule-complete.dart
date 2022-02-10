@@ -396,9 +396,9 @@ class TotContriLesTauWrapper extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           PlannedCard(
-              heading: "Planned Engagement", value: "${hours}hr ${minutes}min"),
+              heading: "Total Engagement", value: "${hours}hr ${minutes}min"),
           PlannedCard(
-              heading: "Planned Lessons", value: plannedLessons.toString()),
+              heading: "Total Lessons", value: plannedLessons.toString()),
         ],
       ),
     );
