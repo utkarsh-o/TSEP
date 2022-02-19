@@ -24,7 +24,9 @@ TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 GlobalKey<FormState> _emailLoginKey = GlobalKey<FormState>();
 GlobalKey<FormState> _passwordLoginKey = GlobalKey<FormState>();
-String activeUser = 'Mentor';
+// String activeUser = 'Mentor';
+
+enum UserType { Mentor, Mentee, Admin }
 
 emailValidator(String? val) {
   String value = val ?? 'test';
@@ -59,43 +61,45 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         loading = true;
       });
-      bool validID = false;
-      if (activeUser == 'Mentor') {
-        await FirebaseFirestore.instance
-            .collection('MentorData')
-            .where('email', isEqualTo: emailController.text)
-            .get()
-            .then((value) => validID = value.docs.isNotEmpty);
-      } else if (activeUser == 'Mentee') {
-        await FirebaseFirestore.instance
-            .collection('MenteeInfo')
-            .where('email', isEqualTo: emailController.text)
-            .get()
-            .then((value) {
-          validID = value.docs.isNotEmpty;
-        });
-      } else if (activeUser == 'Admin') {
-        await FirebaseFirestore.instance
-            .collection('AdminData')
-            .where('email', isEqualTo: emailController.text)
-            .get()
-            .then((value) => validID = value.docs.isNotEmpty);
-      }
-      if (validID) {
+      UserType? userType;
+      await FirebaseFirestore.instance
+          .collection('MentorData')
+          .where('email', isEqualTo: emailController.text)
+          .get()
+          .then((value) {
+        if (value.docs.isNotEmpty) userType = UserType.Mentor;
+      });
+
+      await FirebaseFirestore.instance
+          .collection('MenteeInfo')
+          .where('email', isEqualTo: emailController.text)
+          .get()
+          .then((value) {
+        if (value.docs.isNotEmpty) userType = UserType.Mentee;
+      });
+
+      await FirebaseFirestore.instance
+          .collection('AdminData')
+          .where('email', isEqualTo: emailController.text)
+          .get()
+          .then((value) {
+        if (value.docs.isNotEmpty) userType = UserType.Admin;
+      });
+      if (userType != null) {
         final newUser =
             await auth.loginUser(emailController.text, passwordController.text);
         if (newUser != null) {
-          if (activeUser == 'Mentor')
+          if (userType == UserType.Mentor)
             Navigator.pushReplacementNamed(context, MentorProfile.route);
-          else if (activeUser == 'Mentee')
+          else if (userType == UserType.Mentee)
             Navigator.pushReplacementNamed(context, MenteeProfile.route);
           else {
             Navigator.pushReplacementNamed(context, AdminHomePage.route);
           }
         }
       } else {
-        showSnackBar(context,
-            '$activeUser having the provided email address does not exist');
+        showSnackBar(
+            context, 'User having the provided email address does not exist');
         setState(() {
           loading = false;
         });
@@ -127,9 +131,9 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       MainLogo(),
                       SignupWrapper(),
-                      AdminMentorMenteeWrapper(
-                        loginCallback: displayCallback,
-                      ),
+                      // AdminMentorMenteeWrapper(
+                      //   loginCallback: displayCallback,
+                      // ),
                       SizedBox(height: size.height * 0.025),
                       EmailPasswordInputForm(),
                       ForgotPasswordWrapper(),
@@ -189,7 +193,7 @@ class LoginWrapper extends StatelessWidget {
           loginCallback();
         },
         child: Text(
-          '$activeUser Login',
+          'Login',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
@@ -235,49 +239,49 @@ class ForgotPasswordWrapper extends StatelessWidget {
   }
 }
 
-class AdminMentorMenteeWrapper extends StatefulWidget {
-  VoidCallback loginCallback;
-  AdminMentorMenteeWrapper({required this.loginCallback});
-  @override
-  _AdminMentorMenteeWrapperState createState() =>
-      _AdminMentorMenteeWrapperState();
-}
+// class AdminMentorMenteeWrapper extends StatefulWidget {
+//   VoidCallback loginCallback;
+//   AdminMentorMenteeWrapper({required this.loginCallback});
+//   @override
+//   _AdminMentorMenteeWrapperState createState() =>
+//       _AdminMentorMenteeWrapperState();
+// }
 
-class _AdminMentorMenteeWrapperState extends State<AdminMentorMenteeWrapper> {
-  void onTap(String who) {
-    setState(() {
-      activeUser = who;
-    });
-    widget.loginCallback();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        MentorMenteeButton(
-          icon: "assets/icons/admin.svg",
-          who: 'Admin',
-          active: activeUser,
-          ontap: onTap,
-        ),
-        MentorMenteeButton(
-          icon: "assets/icons/mentee.svg",
-          who: 'Mentee',
-          active: activeUser,
-          ontap: onTap,
-        ),
-        MentorMenteeButton(
-          icon: "assets/icons/mentor.svg",
-          who: 'Mentor',
-          active: activeUser,
-          ontap: onTap,
-        ),
-      ],
-    );
-  }
-}
+// class _AdminMentorMenteeWrapperState extends State<AdminMentorMenteeWrapper> {
+//   void onTap(String who) {
+//     setState(() {
+//       activeUser = who;
+//     });
+//     widget.loginCallback();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.spaceAround,
+//       children: [
+//         MentorMenteeButton(
+//           icon: "assets/icons/admin.svg",
+//           who: 'Admin',
+//           active: activeUser,
+//           ontap: onTap,
+//         ),
+//         MentorMenteeButton(
+//           icon: "assets/icons/mentee.svg",
+//           who: 'Mentee',
+//           active: activeUser,
+//           ontap: onTap,
+//         ),
+//         MentorMenteeButton(
+//           icon: "assets/icons/mentor.svg",
+//           who: 'Mentor',
+//           active: activeUser,
+//           ontap: onTap,
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 class MentorMenteeButton extends StatelessWidget {
   final String icon, who, active;
@@ -313,9 +317,8 @@ class MentorMenteeButton extends StatelessWidget {
 class SignupWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
-      margin: EdgeInsets.symmetric(vertical: size.height * 0.025),
+      margin: EdgeInsets.symmetric(vertical: 25),
       width: double.infinity,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -342,15 +345,56 @@ class SignupWrapper extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      activeUser == 'Mentee'
-                          ? Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                              return MenteeSignUp();
-                            }))
-                          : Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                              return MentorSignUp();
-                            }));
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15)),
+                                height: 180,
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 30),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Sign-Up",
+                                        style: TextStyle(
+                                          color: kBlue.withOpacity(0.8),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      Container(
+                                        // margin: EdgeInsets.only(top: 10),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 13, vertical: 7),
+                                        decoration: BoxDecoration(
+                                          color: kRed.withOpacity(0.2),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          "Carefully select user type",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 17,
+                                            color: kRed.withOpacity(0.7),
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                      EditDeleteSurveyWrapper(),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          });
                     },
                     child: Text(
                       "Sign Up",
@@ -367,6 +411,118 @@ class SignupWrapper extends StatelessWidget {
           SvgPicture.asset(
             "assets/tsep-logo1.svg",
             height: MediaQuery.of(context).size.width * 0.21,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class EditDeleteSurveyWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MenteeSignUp()));
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  child: Column(
+                    children: [
+                      SvgPicture.asset(
+                        "assets/icons/mentee.svg",
+                        height: size.height * 0.05,
+                        color: Colors.white,
+                      ),
+                      Text(
+                        "MENTEE",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
+                      ),
+                      Text(
+                        "( student )",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.white,
+                            // fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                    color: kLightBlue,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: kLightBlue,
+                        blurRadius: 10,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MentorSignUp()));
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  child: Column(
+                    children: [
+                      SvgPicture.asset(
+                        "assets/icons/mentor.svg",
+                        height: size.height * 0.05,
+                        color: Colors.white,
+                      ),
+                      Text(
+                        "MENTOR",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
+                      ),
+                      Text(
+                        "( teacher )",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.white,
+                            // fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                    color: kLightBlue,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: kLightBlue,
+                        blurRadius: 10,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
