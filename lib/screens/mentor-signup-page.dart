@@ -69,7 +69,6 @@ class _MentorSignUpState extends State<MentorSignUp> {
     gender = 'none';
     firstNameController.clear();
     lastNameController.clear();
-    categoryNameController.clear();
     emailController.clear();
     passwordController.clear();
     ageController.clear();
@@ -103,8 +102,10 @@ class _MentorSignUpState extends State<MentorSignUp> {
     } else if (addressController.text == '') {
       showSnackBar(context, 'Please enter your Address');
     } else if (categoryNameController.text == '' &&
-        categoryNameController.text != categoryList.last) {
-      showSnackBar(context, 'Please enter the category\'s name');
+        selectedCategory != categoryList.last) {
+      print(selectedCategory);
+      showSnackBar(context,
+          'Please enter the category\'s name ${categoryNameController.text}');
       return;
     }
     if (!_emailSignUpKey.currentState!.validate()) {
@@ -190,7 +191,6 @@ class _MentorSignUpState extends State<MentorSignUp> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return loading
         ? Loading()
         : Scaffold(
@@ -414,6 +414,7 @@ class NameAgePhoneWrapper extends StatelessWidget {
                 hint: "36",
                 prefixIcon: false,
                 width: size.width * 0.15,
+                textInputType: TextInputType.number,
               ),
               RedBorderTextField(
                 heading: "Phone Number",
@@ -421,6 +422,7 @@ class NameAgePhoneWrapper extends StatelessWidget {
                 hint: "9876543210",
                 prefixIcon: false,
                 width: size.width * 0.35,
+                textInputType: TextInputType.number,
               ),
               RedBorderTextField(
                 heading: "Whatsapp Number",
@@ -428,6 +430,7 @@ class NameAgePhoneWrapper extends StatelessWidget {
                 hint: "9876543210",
                 prefixIcon: false,
                 width: size.width * 0.35,
+                textInputType: TextInputType.number,
               ),
             ],
           ),
@@ -442,13 +445,15 @@ class RedBorderTextField extends StatelessWidget {
   final TextEditingController controller;
   bool prefixIcon;
   double width;
-
-  RedBorderTextField(
-      {required this.heading,
-      required this.controller,
-      required this.hint,
-      required this.prefixIcon,
-      required this.width});
+  TextInputType textInputType;
+  RedBorderTextField({
+    required this.heading,
+    required this.controller,
+    required this.hint,
+    required this.prefixIcon,
+    required this.width,
+    this.textInputType = TextInputType.text,
+  });
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -481,6 +486,7 @@ class RedBorderTextField extends StatelessWidget {
             ],
           ),
           child: TextFormField(
+            keyboardType: textInputType,
             textAlignVertical: TextAlignVertical.center,
             controller: controller,
             // autofillHints: getAutofillType(heading),
@@ -831,6 +837,9 @@ class EmailPasswordForm extends StatelessWidget {
             child: Form(
               key: _emailSignUpKey,
               child: TextFormField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.deny(RegExp('[ ]')),
+                ],
                 controller: emailController,
                 autofillHints: [AutofillHints.email],
                 validator: (String? val) {

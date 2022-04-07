@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tsep/screens/admin-home-page.dart';
 
@@ -370,6 +371,7 @@ class SignupWrapper extends StatelessWidget {
                                         ),
                                       ),
                                       Container(
+                                        width: double.infinity,
                                         // margin: EdgeInsets.only(top: 10),
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 13, vertical: 7),
@@ -388,7 +390,7 @@ class SignupWrapper extends StatelessWidget {
                                           textAlign: TextAlign.center,
                                         ),
                                       ),
-                                      EditDeleteSurveyWrapper(),
+                                      MenteeMentorSelectorWrapper(),
                                     ],
                                   ),
                                 ),
@@ -418,15 +420,14 @@ class SignupWrapper extends StatelessWidget {
   }
 }
 
-class EditDeleteSurveyWrapper extends StatelessWidget {
+class MenteeMentorSelectorWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               InkWell(
                 onTap: () {
@@ -438,11 +439,11 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: Column(
                     children: [
-                      SvgPicture.asset(
-                        "assets/icons/mentee.svg",
-                        height: size.height * 0.05,
-                        color: Colors.white,
-                      ),
+                      // SvgPicture.asset(
+                      //   "assets/icons/mentee.svg",
+                      //   height: size.height * 0.05,
+                      //   color: Colors.white,
+                      // ),
                       Text(
                         "MENTEE",
                         textAlign: TextAlign.center,
@@ -464,7 +465,6 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: kLightBlue,
-                    shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(4),
                     boxShadow: [
                       BoxShadow(
@@ -475,6 +475,7 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
                   ),
                 ),
               ),
+              SizedBox(width: 24),
               InkWell(
                 onTap: () {
                   Navigator.of(context).pop();
@@ -485,11 +486,11 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: Column(
                     children: [
-                      SvgPicture.asset(
-                        "assets/icons/mentor.svg",
-                        height: size.height * 0.05,
-                        color: Colors.white,
-                      ),
+                      // SvgPicture.asset(
+                      //   "assets/icons/mentor.svg",
+                      //   height: size.height * 0.05,
+                      //   color: Colors.white,
+                      // ),
                       Text(
                         "MENTOR",
                         textAlign: TextAlign.center,
@@ -511,7 +512,6 @@ class EditDeleteSurveyWrapper extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: kLightBlue,
-                    shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(4),
                     boxShadow: [
                       BoxShadow(
@@ -556,6 +556,9 @@ class EmailPasswordInputForm extends StatelessWidget {
               controller: emailController,
               validator: (String? val) => emailValidator(val),
               keyboardType: TextInputType.emailAddress,
+              inputFormatters: [
+                FilteringTextInputFormatter.deny(RegExp('[ ]')),
+              ],
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,

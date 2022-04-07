@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tsep/components/mentee-customNavigationBar.dart';
 
 import '../local-data/constants.dart';
 import '../logic/mentor-firestore.dart';
@@ -55,20 +56,30 @@ clearForm() {
 class _PostTestScreenState extends State<PostTestScreen> {
   getPreTestResponses() async {
     final firestore = FirebaseFirestore.instance;
-    await firestore
-        .collection('MenteeInfo/${widget.menteeUID}/TestData')
-        .doc('PreTest')
-        .get()
-        .then((value) {
-      for (int i = 0; i < 10; i++) {
-        String question = value.data()!['Responses'][i]['Question'];
-        String answer = value.data()!['Responses'][i]['Answer'];
-        int score = value.data()!['Responses'][i]['Score'];
-        oldResponses
-            .add(Response(question: question, answer: answer, score: score));
-      }
-      setState(() {});
-    });
+    try {
+      oldResponses.clear();
+      await firestore
+          .collection('MenteeInfo/${widget.menteeUID}/TestData')
+          .doc('PreTest')
+          .get()
+          .then((value) {
+        for (int i = 0; i < 10; i++) {
+          String question = value.data()!['Responses'][i]['Question'];
+          String answer = value.data()!['Responses'][i]['Answer'];
+          int score = value.data()!['Responses'][i]['Score'];
+          oldResponses
+              .add(Response(question: question, answer: answer, score: score));
+        }
+        setState(() {});
+      });
+    } catch (error) {
+      oldResponses.clear();
+      List<int>.generate(10, (i) => i + 1).forEach((element) {
+        oldResponses.add(
+            Response(question: '', answer: 'Pre-Test Not Taken', score: -1));
+      });
+      showSnackBar(context, error.toString());
+    }
   }
 
   submitForm() async {
@@ -102,10 +113,12 @@ class _PostTestScreenState extends State<PostTestScreen> {
       }
     });
     docID.forEach((docID) async {
-      await firestore
-          .collection('Completion')
-          .doc(docID)
-          .update({'PostTest': true});
+      getLevel();
+      await firestore.collection('Completion').doc(docID).update({
+        'PostTest': true,
+        'FinalLevel': currentLevel,
+        'PostTestScore': totalScore
+      });
       print('updated $docID');
     });
   }
@@ -716,8 +729,8 @@ class MenteeProfileBanner extends StatelessWidget {
             ],
           ),
           DetailsWidget(heading: "Batch", value: menteeData.batchName),
-          DetailsWidget(
-              heading: "ID Number", value: menteeData.idNumber.toString()),
+          // DetailsWidget(
+          //     heading: "ID Number", value: menteeData.idNumber.toString()),
         ],
       ),
     );

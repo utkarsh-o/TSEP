@@ -6,7 +6,7 @@ class LineTitles {
         show: true,
         bottomTitles: SideTitles(
           showTitles: true,
-          getTextStyles: (value) => const TextStyle(
+          getTextStyles: (context, double) => TextStyle(
             color: Color(0xff68737d),
             fontWeight: FontWeight.w900,
             fontSize: 12,
@@ -40,7 +40,7 @@ class LineTitles {
         ),
         leftTitles: SideTitles(
           showTitles: true,
-          getTextStyles: (value) => const TextStyle(
+          getTextStyles: (context, double) => const TextStyle(
             color: Color(0xff67727d),
             fontWeight: FontWeight.w900,
             fontSize: 12,

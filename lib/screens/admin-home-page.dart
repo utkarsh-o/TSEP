@@ -34,6 +34,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
           context, MaterialPageRoute(builder: (context) => LoginPage()));
     }
 
+    List<String> testMenteeList = [
+      'FCGcaeBdBGR4EJUQQlE2ZGGPy1D2',
+      'uedPvWCvyYbPQZfjBPEW0q8fnDJ3'
+    ];
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
@@ -98,40 +102,46 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     List<Widget> completionList = [];
                     if (snapshot.hasData) {
                       final completions = snapshot.data!.docs;
-                      completions.forEach(
-                        (element) async {
-                          final menteeUID = element.get('MenteeUID');
-                          final mentorUID = element.get('MentorUID');
-                          if (!element.get('PostTest'))
-                            completionList.add(
-                              CompletionCard(
-                                completion: Completion(
-                                  menteeInitialLevel:
-                                      element.get('MenteeInitialLevel'),
-                                  menteeID: element.get('MenteeID'),
-                                  menteeJoiningDate:
-                                      element.get('MenteeJoiningDate').toDate(),
-                                  mentorCategory: element.get('MentorCategory'),
-                                  mentorID: element.get('MentorID'),
-                                  preTestScore: element.get('PreTestScore'),
-                                  menteeGender: element.get('MenteeGender'),
-                                  mentorGender: element.get('MentorGender'),
-                                  menteeName: element.get('MenteeName'),
-                                  menteeUID: menteeUID,
-                                  mentorName: element.get('MentorName'),
-                                  mentorUID: mentorUID,
-                                  engagementTime: Duration(
-                                      minutes: element.get('EngagementTime')),
-                                  lessonCount: element.get('LessonCount'),
-                                  menteeBatch: element.get('MenteeBatch'),
-                                  mentorBatch: element.get('MentorBatch'),
-                                  dateDeclared:
-                                      element.get('DateDeclared').toDate(),
-                                ),
+                      for (var element in completions) {
+                        final menteeUID = element.get('MenteeUID');
+                        final mentorUID = element.get('MentorUID');
+                        var postTest = 'Not Taken';
+                        try {
+                          bool temp = element.get('PostTest');
+                          postTest = temp ? 'Taken' : 'Not Taken';
+                        } catch (error) {
+                          // already handled since, postTest is initialized as Not Taken
+                        }
+                        if (!testMenteeList.contains(menteeUID) &&
+                            postTest == 'Not Taken')
+                          completionList.add(
+                            CompletionCard(
+                              completion: Completion(
+                                menteeInitialLevel:
+                                    element.get('MenteeInitialLevel'),
+                                menteeID: element.get('MenteeID'),
+                                menteeJoiningDate:
+                                    element.get('MenteeJoiningDate').toDate(),
+                                mentorCategory: element.get('MentorCategory'),
+                                mentorID: element.get('MentorID'),
+                                preTestScore: element.get('PreTestScore'),
+                                menteeGender: element.get('MenteeGender'),
+                                mentorGender: element.get('MentorGender'),
+                                menteeName: element.get('MenteeName'),
+                                menteeUID: menteeUID,
+                                mentorName: element.get('MentorName'),
+                                mentorUID: mentorUID,
+                                engagementTime: Duration(
+                                    minutes: element.get('EngagementTime')),
+                                lessonCount: element.get('LessonCount'),
+                                menteeBatch: element.get('MenteeBatch'),
+                                mentorBatch: element.get('MentorBatch'),
+                                dateDeclared:
+                                    element.get('DateDeclared').toDate(),
                               ),
-                            );
-                        },
-                      );
+                            ),
+                          );
+                      }
                     }
                     return Column(
                       children: completionList,
@@ -152,7 +162,6 @@ class CompletionCard extends StatelessWidget {
   CompletionCard({required this.completion});
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -209,7 +218,9 @@ class CompletionCard extends StatelessWidget {
                     MenteeProfileDetail(
                         heading: 'Batch', value: completion.menteeBatch),
                     MenteeProfileDetail(
-                        heading: 'ID', value: completion.menteeID.toString()),
+                        heading: 'Date Declared',
+                        value: DateFormat('dd MMMM yyyy')
+                            .format(completion.dateDeclared)),
                   ],
                 )
               ],
@@ -228,7 +239,7 @@ class CompletionCard extends StatelessWidget {
                       builder: (context) =>
                           PostTestScreen(menteeUID: completion.menteeUID))),
               child: Text(
-                'POST TEST',
+                'TAKE POST TEST',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -272,7 +283,7 @@ class CompletionCard extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  width: 80,
+                  width: 78,
                   margin: EdgeInsets.symmetric(horizontal: 15),
                   child: Image.asset(
                     completion.mentorGender == 'male'
