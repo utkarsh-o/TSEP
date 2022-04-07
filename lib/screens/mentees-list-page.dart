@@ -72,7 +72,7 @@ class _MenteesPageState extends State<MenteesPage> {
                           child: Column(
                             children: [
                               Text(
-                                "Please check back later, you will be assigned mentee/s◘ shortly!",
+                                "Please check back later, you will be assigned mentee(s) shortly!",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black.withOpacity(0.5),

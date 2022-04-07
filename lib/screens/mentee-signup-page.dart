@@ -332,6 +332,7 @@ class NameAgePhoneWrapper extends StatelessWidget {
                 hint: "16",
                 prefixIcon: false,
                 width: size.width * 0.15,
+                textInputType: TextInputType.number,
               ),
               RedBorderTextField(
                 heading: "Phone Number",
@@ -340,6 +341,7 @@ class NameAgePhoneWrapper extends StatelessWidget {
                 hint: "9876543210",
                 prefixIcon: false,
                 width: size.width * 0.35,
+                textInputType: TextInputType.number,
               ),
               RedBorderTextField(
                 heading: "Whatsapp Number",
@@ -348,6 +350,7 @@ class NameAgePhoneWrapper extends StatelessWidget {
                 hint: "9876543210",
                 prefixIcon: false,
                 width: size.width * 0.35,
+                textInputType: TextInputType.number,
               ),
             ],
           ),
@@ -363,14 +366,15 @@ class RedBorderTextField extends StatelessWidget {
   List<String> autofillHints;
   bool prefixIcon;
   double width;
-
+  TextInputType textInputType;
   RedBorderTextField(
       {required this.heading,
       required this.controller,
       required this.hint,
       required this.autofillHints,
       required this.prefixIcon,
-      required this.width});
+      required this.width,
+      this.textInputType = TextInputType.text});
 
   @override
   Widget build(BuildContext context) {
@@ -404,6 +408,7 @@ class RedBorderTextField extends StatelessWidget {
             ],
           ),
           child: TextFormField(
+            keyboardType: textInputType,
             textAlignVertical: TextAlignVertical.center,
             controller: controller,
             autofillHints: autofillHints,
@@ -756,6 +761,9 @@ class EmailPasswordForm extends StatelessWidget {
               key: _emailSignUpKey,
               child: TextFormField(
                 controller: emailController,
+                inputFormatters: [
+                  FilteringTextInputFormatter.deny(RegExp('[ ]')),
+                ],
                 autofillHints: [AutofillHints.email],
                 validator: (String? val) {
                   String value = val ?? 'test';
@@ -805,6 +813,9 @@ class EmailPasswordForm extends StatelessWidget {
             child: Form(
               key: _passwordSingUpKey,
               child: TextFormField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.deny(RegExp('[ ]')),
+                ],
                 controller: passwordController,
                 autofillHints: [AutofillHints.password],
                 onEditingComplete: () => TextInput.finishAutofillContext(),
